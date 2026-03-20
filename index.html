@@ -27,22 +27,50 @@
         /* --- SIDEBAR --- */
         aside {
             width: var(--sidebar-width); background: var(--surface-1); border-right: 1px solid var(--border);
-            padding: 2.5rem 1.5rem; display: flex; flex-direction: column; z-index: 20;
+            padding: 0 1.5rem; display: flex; flex-direction: column; z-index: 20;
+            overflow: hidden;
         }
-        .logo-text { font-size: 1.4rem; font-weight: 800; letter-spacing: -1.5px; color: var(--accent); margin-bottom: 2.5rem; display: flex; align-items: center; gap: 10px; }
+        
+        .logo-text { font-size: 1.4rem; font-weight: 800; letter-spacing: -1.5px; color: var(--accent); margin-bottom: 0; display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding: 2.5rem 0; }
         .logo-dot { width: 12px; height: 12px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
         
-        .nav-label { font-size: 0.65rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 1rem; padding-left: 10px; margin-top: 20px; }
+        .nav-label { font-size: 0.65rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 1rem; padding-left: 10px; margin-top: 20px; flex-shrink: 0; }
         .nav-link {
             padding: 14px 18px; border-radius: 14px; color: var(--text-secondary);
             font-weight: 700; margin-bottom: 8px; cursor: pointer; display: flex;
-            justify-content: space-between; align-items: center; border: 1px solid transparent;
+            justify-content: space-between; align-items: center; border: 1px solid transparent; flex-shrink: 0;
         }
         .nav-link:hover { background: rgba(255, 255, 255, 0.03); color: white; border-color: var(--border); }
         .nav-link.active { background: var(--accent); color: white; box-shadow: 0 8px 20px -5px var(--accent-glow); }
 
+        /* Scrollable nav container that grows to fill available space */
+        #sidebar-nav {
+            flex: 1; overflow-y: auto; padding: 2.5rem 0 1.5rem 0; margin: 0;
+        }
+        
+        #sidebar-nav::-webkit-scrollbar { width: 5px; }
+        #sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        #sidebar-nav::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 3px; }
+        #sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.5); }
+        
+        #sidebar-nav .nav-label:first-child {
+            margin-top: 0;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
+        #sidebar-nav .nav-label {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
+        #sidebar-nav .nav-link {
+            margin-left: 1.5rem;
+            margin-right: 1.5rem;
+        }
+
         /* --- TRACKERS --- */
-        .overall-stats { margin-top: auto; background: var(--surface-2); padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
+        .overall-stats { margin-top: auto; background: var(--surface-2); padding: 20px; border-radius: 20px; border: 1px solid var(--border); flex-shrink: 0; margin-bottom: 2.5rem; }
         .stat-row { margin-bottom: 15px; }
         .stat-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; display: flex; justify-content: space-between; margin-bottom: 6px; }
         .progress-container { height: 7px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; }
@@ -965,26 +993,26 @@ window.saveToFirebase = async function () {
 <aside>
     <div class="logo-text"><div class="logo-dot"></div> JEE.COMMAND</div>
     
-    <div class="nav-label">Core Syllabus</div>
     <div id="sidebar-nav">
+        <div class="nav-label">Core Syllabus</div>
         <div class="nav-link active" onclick="switchTab('physics', this)"><span>PHYSICS</span></div>
         <div class="nav-link" onclick="switchTab('chemistry', this)"><span>CHEMISTRY</span></div>
         <div class="nav-link" onclick="switchTab('mathematics', this)"><span>MATHEMATICS</span></div>
+
+        <div class="nav-label">Study Vault</div>
+        <div class="nav-link" onclick="switchTab('vault', this)"><span>NOTES & QUESTIONS</span><span style="font-size:0.6rem; color:var(--adv)">PRO</span></div>
+        <div class="nav-link" onclick="switchTab('backlog', this)"><span>BACKLOG</span></div>
+
+        <div class="nav-label">Focus</div>
+        <div class="nav-link" onclick="switchTab('pomodoro', this)"><span>&#9201; POMODORO</span></div>
+
+        <div class="nav-label">Community</div>
+        <div class="nav-link" onclick="switchTab('community', this)"><span>&#128101; DOUBTS FORUM</span></div>
+
+        <div class="nav-label">Tests</div>
+        <div class="nav-link" onclick="switchTab('mains', this)"><span>JEE MAINS</span></div>
+        <div class="nav-link" onclick="switchTab('advanced', this)"><span>JEE ADVANCED</span></div>
     </div>
-
-    <div class="nav-label">Study Vault</div>
-    <div class="nav-link" onclick="switchTab('vault', this)"><span>NOTES & QUESTIONS</span><span style="font-size:0.6rem; color:var(--adv)">PRO</span></div>
-    <div class="nav-link" onclick="switchTab('backlog', this)"><span>BACKLOG</span></div>
-
-    <div class="nav-label">Focus</div>
-    <div class="nav-link" onclick="switchTab('pomodoro', this)"><span>&#9201; POMODORO</span></div>
-
-    <div class="nav-label">Community</div>
-    <div class="nav-link" onclick="switchTab('community', this)"><span>&#128101; DOUBTS FORUM</span></div>
-
-    <div class="nav-label">Tests</div>
-    <div class="nav-link" onclick="switchTab('mains', this)"><span>JEE MAINS</span></div>
-    <div class="nav-link" onclick="switchTab('advanced', this)"><span>JEE ADVANCED</span></div>
 
     <div class="overall-stats">
         <div class="stat-row">
