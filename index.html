@@ -7,17 +7,16 @@
 
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #111;
       color: white;
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      line-height: 1.6;
     }
 
     h1 { color: #ff4b2b; text-align: center; }
-    h3 { border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 30px; }
+    h3 { border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 25px; }
 
     input, textarea, button {
       padding: 12px;
@@ -35,15 +34,14 @@
       border: none;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.3s;
     }
 
-    button:hover { opacity: 0.8; transform: translateY(-1px); }
+    button:hover { opacity: 0.9; }
     button:disabled { background: #555; cursor: not-allowed; }
 
     .card {
       background: #1a1a1a;
-      padding: 15px;
+      padding: 12px;
       margin-top: 10px;
       border-radius: 8px;
       display: flex;
@@ -52,12 +50,7 @@
       border: 1px solid #333;
     }
 
-    .delete-btn {
-      width: auto;
-      background: #444;
-      padding: 5px 10px;
-      font-size: 12px;
-    }
+    .delete-btn { width: auto; background: #444; padding: 5px 10px; font-size: 12px; }
 
     #aiResponse {
       background: #0f172a;
@@ -65,10 +58,11 @@
       padding: 15px;
       margin-top: 15px;
       border-radius: 4px;
-      white-space: pre-wrap; /* Maintains formatting/line breaks */
+      white-space: pre-wrap;
+      font-size: 14px;
     }
 
-    .loader { color: #38bdf8; font-size: 14px; display: none; margin-top: 10px; }
+    .loader { color: #38bdf8; font-size: 14px; display: none; margin-top: 10px; text-align: center; }
   </style>
 </head>
 
@@ -80,14 +74,14 @@
 
 <section>
   <h3>1. Save a Word</h3>
-  <input id="wordInput" placeholder="Type a word or phrase...">
+  <input id="wordInput" placeholder="Type a word to save...">
   <button onclick="addWord()">Save to Cloud</button>
 </section>
 
 <section>
   <h3>2. Ask Gemini AI</h3>
-  <textarea id="aiInput" rows="3" placeholder="Example: Write a short story using my saved words..."></textarea>
-  <button id="askBtn" onclick="askAI()">Ask AI</button>
+  <textarea id="aiInput" rows="3" placeholder="Example: Use my saved words in a sentence..."></textarea>
+  <button id="askBtn" onclick="askAI()">Ask Gemini</button>
   <div id="aiLoader" class="loader">✨ Gemini is thinking...</div>
   <div id="aiResponse" style="display:none;"></div>
 </section>
@@ -98,121 +92,6 @@
 </section>
 
 <script type="module">
-// IMPORT LIBRARIES
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
-// CONFIGURATION
-const firebaseConfig = {
-  apiKey: "AIzaSyDMG2GapxBu9Tnry0fJx7IaQO1zwgA0sVw",
-  authDomain: "jee-progress-tracker-3d733.firebaseapp.com",
-  projectId: "jee-progress-tracker-3d733",
-  storageBucket: "jee-progress-tracker-3d733.firebasestorage.app",
-  messagingSenderId: "644810316053",
-  appId: "1:644810316053:web:aa531fc435469e3e2c311c"
-};
-
-const API_KEY = "AIzaSyC6TpmqY1qNIqdxK7NyJ9oE-SUe-3pybEU";
-const genAI = new GoogleGenerativeAI(API_KEY);
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser = null;
-let data = [];
-
-// --- AI FUNCTION ---
-window.askAI = async function() {
-  const promptInput = document.getElementById("aiInput");
-  const responseDiv = document.getElementById("aiResponse");
-  const loader = document.getElementById("aiLoader");
-  const btn = document.getElementById("askBtn");
-  
-  if (!promptInput.value.trim()) return alert("Please type a question!");
-
-  try {
-    btn.disabled = true;
-    loader.style.display = "block";
-    responseDiv.style.display = "none";
-
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    // This feeds your saved words into the AI's "memory" for the request
-    const context = data.length > 0 ? `My saved words are: ${data.join(", ")}. ` : "";
-    const fullPrompt = `${context} User Question: ${promptInput.value}`;
-
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    
-    responseDiv.innerText = response.text();
-    responseDiv.style.display = "block";
-  } catch (error) {
-    console.error(error);
-    alert("AI Error: Check if your API key is restricted or valid.");
-  } finally {
-    btn.disabled = false;
-    loader.style.display = "none";
-  }
-};
-
-// --- AUTH & DATA FUNCTIONS ---
-window.login = async function () {
-  const provider = new GoogleAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    currentUser = result.user;
-  } catch (e) { alert("Login failed: " + e.message); }
-};
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      data = snap.data().words || [];
-      render();
-    }
-  }
-});
-
-async function saveData() {
-  if (!currentUser) return alert("Please login first!");
-  await setDoc(doc(db, "users", currentUser.uid), { words: data });
-}
-
-window.addWord = function () {
-  const input = document.getElementById("wordInput");
-  const word = input.value.trim();
-  if (!word) return alert("Enter something to save!");
-  data.push(word);
-  saveData();
-  render();
-  input.value = "";
-};
-
-window.deleteWord = function (index) {
-  data.splice(index, 1);
-  saveData();
-  render();
-};
-
-function render() {
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-  data.forEach((word, index) => {
-    list.innerHTML += `
-      <div class="card">
-        <span>${word}</span>
-        <button class="delete-btn" onclick="deleteWord(${index})">Delete</button>
-      </div>
-    `;
-  });
-}
-</script>
-
-</body>
-</html>
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.
