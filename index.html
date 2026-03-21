@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JEE.COMMAND — The Ultimate JEE 2026 Tracker</title>
-
- <meta name="google-site-verification" content="FahlvYzKHDtwlcYKu__6Z2hodlZVQHqQJ_Zl_lsMKuI" />
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ═══ LANDING ═══ */
@@ -1374,7 +1372,13 @@ footer {
 
         #app-shell #group-modal.open{ display: flex; }
 
-        #app-shell .group-modal-box{ background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 680px; max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+        #app-shell .group-modal-box{ background: var(--surface-1); border: 1px solid var(--border); border-radius: 24px; width: 90%; max-width: 680px; max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.6); position: relative; min-width: 340px; }
+
+        #app-shell .gm-resize-handle{ position: absolute; left: 0; top: 0; bottom: 0; width: 6px; cursor: ew-resize; border-radius: 24px 0 0 24px; background: transparent; transition: background 0.2s; z-index: 10; }
+
+        #app-shell .gm-resize-handle:hover, #app-shell .gm-resize-handle.dragging{ background: rgba(99,102,241,0.35); }
+
+        #app-shell .gm-resize-hint{ font-size: 0.6rem; color: var(--text-secondary); text-align: center; padding: 3px 0; opacity: 0.5; letter-spacing: 0.08em; }
 
         #app-shell .gm-header{ padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); }
 
@@ -1741,6 +1745,8 @@ footer {
         #app-shell .chat-setup-msg strong{ color:var(--text-primary); }
 
         #app-shell .chat-setup-btn{ display:inline-block; margin-top:10px; padding:8px 18px; background:linear-gradient(135deg,#6366f1,#3b82f6); color:white; border:none; border-radius:10px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+
+        #app-shell .chat-action-result{ background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:12px; padding:10px 14px; font-size:0.78rem; color:#10b981; font-weight:600; line-height:1.7; }
 
         #app-shell .chat-setup-btn:hover{ transform:translateY(-1px); box-shadow:0 4px 14px rgba(99,102,241,0.4); }
 
@@ -2727,7 +2733,8 @@ footer {
 
     <!-- Group chat modal -->
     <div id="group-modal">
-        <div class="group-modal-box">
+        <div class="group-modal-box" id="group-modal-box">
+            <div class="gm-resize-handle" id="gm-resize-handle" title="Drag to resize"></div>
             <div class="gm-header">
                 <div class="gm-avatar" id="gm-avatar-el" style="background:rgba(59,130,246,0.15)">&#128101;</div>
                 <div style="flex:1">
@@ -3086,7 +3093,6 @@ document.querySelectorAll('.feat-grid,.big-grid').forEach(grid => {
     document.querySelectorAll('.big-arrow').forEach(function(a) {
       a.style.animation = 'none';
       a.style.transition = 'none';
-      a.style.opacity = a.style.opacity || '1';
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           a.style.transition = 'opacity 1.2s ease';
@@ -3096,14 +3102,8 @@ document.querySelectorAll('.feat-grid,.big-grid').forEach(grid => {
       });
     });
   }
-  var scrolled = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-  if (scrolled > 300) { hideArrows(); return; }
   window.addEventListener('scroll', function() {
-    var s = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    if (s > 150) hideArrows();
-  }, { passive: true });
-  document.addEventListener('scroll', function() {
-    var s = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var s = window.scrollY || document.documentElement.scrollTop || 0;
     if (s > 150) hideArrows();
   }, { passive: true });
   setTimeout(hideArrows, 8000);
@@ -4470,6 +4470,108 @@ const rawText=data.choices?.[0]?.message?.content||'';let tasks;try{const cleane
         if (t) t.remove();
     }
 
+    // ── APP STATE SNAPSHOT for AI context ──
+    function chatGetAppState() {
+        // Vault notes
+        let notesCtx = '';
+        if (vaultData) {
+            const sections = [...(vaultData.notes||[]), ...(vaultData.questions||[])];
+            notesCtx = sections.map(s => `[${s.name}]: ${(s.text||'').slice(0,300)}${(s.text||'').length>300?'...':''}`).join('\n');
+        }
+        // Chapters progress
+        let chapCtx = '';
+        let chapList = [];
+        Object.keys(DATA).forEach(sub => {
+            ['11','12'].forEach(cls => {
+                Object.entries(DATA[sub][cls]).forEach(([unit, chs]) => {
+                    chs.forEach(ch => {
+                        const id = `${sub}-${ch.s}`;
+                        const stages = store[id]?.stages || [];
+                        const note = store[id]?.note || '';
+                        const subtopics = store[id]?.subtopics || {};
+                        chapList.push({ id, name: ch.n, subject: sub, cls, unit, stages, note, subtopics });
+                    });
+                });
+            });
+        });
+        chapCtx = chapList.slice(0,80).map(c =>
+            `${c.id} | ${c.subject} Cl.${c.cls} | ${c.name} | stages:${c.stages.join(',') || 'Pending'} | note:${c.note.slice(0,60) || 'none'}`
+        ).join('\n');
+        // Targets
+        const targetsCtx = (targets||[]).map(t => `${t.checked?'[x]':'[ ]'} ${t.text}`).join('\n');
+        return { notesCtx, chapCtx, chapList, targetsCtx };
+    }
+
+    // ── TOOL EXECUTOR ──
+    function chatExecuteTool(toolName, args) {
+        try {
+            if (toolName === 'navigate') {
+                const tabMap = { backlog:'backlog', syllabus:'syllabus', vault:'vault', notes:'vault', community:'community', groups:'groups', friends:'friends', pomodoro:'pomodoro', mains:'mains', advanced:'advanced' };
+                const t = tabMap[args.tab?.toLowerCase()] || args.tab;
+                const navEl = document.querySelector(`.nav-link[onclick*="${t}"]`);
+                if (navEl) { switchTab(t, navEl); return `✅ Navigated to ${args.tab}.`; }
+                return `❌ Tab "${args.tab}" not found.`;
+            }
+            if (toolName === 'addNote') {
+                if (!vaultData) return '❌ Vault not loaded yet.';
+                const sections = [...(vaultData.notes||[]), ...(vaultData.questions||[])];
+                let sec = sections.find(s => s.name.toLowerCase().includes((args.section||'').toLowerCase()));
+                if (!sec) sec = vaultData.notes?.[0];
+                if (!sec) return '❌ No notes section found.';
+                sec.text = (sec.text || '') + (sec.text ? '\n\n' : '') + (args.content || '');
+                saveVault();
+                return `✅ Added to "${sec.name}" in your vault.`;
+            }
+            if (toolName === 'addTarget') {
+                const text = args.text || '';
+                if (!text) return '❌ No target text provided.';
+                targets.push({ id: Date.now(), text, checked: false });
+                localStorage.setItem('jee_targets', JSON.stringify(targets));
+                renderTargets();
+                return `✅ Added target: "${text}"`;
+            }
+            if (toolName === 'setStage') {
+                const chap = args.chapter_id || '';
+                const stages = args.stages || [];
+                if (!store[chap]) store[chap] = {};
+                const ORDER = ['Theory','Examples','Exercise','Mains PYQ','Advance PYQ'];
+                const validStages = stages.filter(s => ORDER.includes(s));
+                store[chap].stages = validStages;
+                store[chap].stage = ORDER.filter(x => validStages.includes(x)).pop() || 'Pending';
+                save(); render(); updateStats();
+                return `✅ Set stages [${validStages.join(', ')}] for ${chap}.`;
+            }
+            if (toolName === 'markRevised') {
+                const chap = args.chapter_id || '';
+                if (!store[chap]) store[chap] = {};
+                store[chap].lastRevised = new Date().toISOString().split('T')[0];
+                save(); render();
+                return `✅ Marked ${chap} as revised today.`;
+            }
+            if (toolName === 'editNote') {
+                const chap = args.chapter_id || '';
+                const note = args.note || '';
+                if (!store[chap]) store[chap] = {};
+                store[chap].note = note;
+                save(); render();
+                return `✅ Updated note for ${chap}.`;
+            }
+            if (toolName === 'checkSubtopic') {
+                const chap = args.chapter_id || '';
+                const topic = args.subtopic || '';
+                const checked = args.checked !== false;
+                if (!store[chap]) store[chap] = {};
+                if (!store[chap].subtopics) store[chap].subtopics = {};
+                store[chap].subtopics[topic] = checked;
+                save();
+                return `✅ Subtopic "${topic}" marked as ${checked ? 'done' : 'undone'}.`;
+            }
+            return `❌ Unknown tool: ${toolName}`;
+        } catch(e) {
+            return `❌ Error running ${toolName}: ${e.message}`;
+        }
+    }
+
     async function chatSend() {
         const key = localStorage.getItem('openrouter_api_key');
         if (!key) { chatShowSetup(); return; }
@@ -4479,68 +4581,151 @@ const rawText=data.choices?.[0]?.message?.content||'';let tasks;try{const cleane
         const text = input.value.trim();
         if (!text && !chatImgData) return;
 
-        // Build user message content
         let userContent;
         if (chatImgData) {
-            userContent = [
-                { type: 'image_url', image_url: { url: chatImgData } }
-            ];
+            userContent = [{ type: 'image_url', image_url: { url: chatImgData } }];
             if (text) userContent.push({ type: 'text', text });
         } else {
             userContent = text;
         }
 
-        // Show user message
         chatAddMsg('user', text || '📎 Image attached', chatImgData);
-
-        // Clear input
-        input.value = '';
-        input.style.height = 'auto';
-        chatClearImg();
-        sendBtn.disabled = true;
-
-        // Add to history
+        input.value = ''; input.style.height = 'auto';
+        chatClearImg(); sendBtn.disabled = true;
         chatHistory.push({ role: 'user', content: userContent });
-
-        // Show typing indicator
         chatAddTyping();
 
         const model = document.getElementById('chat-model-sel')?.value || 'google/gemini-2.0-flash-001';
+        const { notesCtx, chapCtx, targetsCtx } = chatGetAppState();
+
+        const SYSTEM = `You are an intelligent AI assistant embedded inside JEE.COMMAND, a JEE 2026 study tracker app. You can both answer questions AND directly control the app by calling tools.
+
+CURRENT APP STATE:
+=== VAULT NOTES ===
+${notesCtx || 'Empty'}
+
+=== TODAY'S TARGETS ===
+${targetsCtx || 'None set'}
+
+=== CHAPTERS (id | subject Cl.X | name | stages | note) ===
+${chapCtx}
+
+AVAILABLE TOOLS — when you want to perform an action, include a JSON block in your response like this:
+\`\`\`tool
+{"tool":"toolName","args":{...}}
+\`\`\`
+
+TOOLS:
+- navigate: {"tool":"navigate","args":{"tab":"backlog|syllabus|vault|community|pomodoro|mains|advanced"}}
+- addNote: {"tool":"addNote","args":{"section":"section name","content":"text to add"}} — adds to vault notes
+- addTarget: {"tool":"addTarget","args":{"text":"target description"}} — adds to today's targets
+- setStage: {"tool":"setStage","args":{"chapter_id":"physics-kinematics","stages":["Theory","Examples"]}}
+- markRevised: {"tool":"markRevised","args":{"chapter_id":"physics-kinematics"}}
+- editNote: {"tool":"editNote","args":{"chapter_id":"physics-kinematics","note":"formula note"}}
+- checkSubtopic: {"tool":"checkSubtopic","args":{"chapter_id":"physics-kinematics","subtopic":"Projectile Motion","checked":true}}
+
+RULES:
+- When the user asks you to DO something (save, add, mark, navigate), use a tool AND explain what you did.
+- You can use multiple tool blocks in one response.
+- When just answering questions, respond normally without tools.
+- Chapter IDs follow the pattern: subject-slug (e.g. physics-kinematics, chemistry-solutions, mathematics-probability).
+- Be concise but thorough. For JEE concepts, give clear explanations with formulas.`;
 
         try {
             const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-                body: JSON.stringify({
-                    model,
-                    max_tokens: 1500,
-                    messages: [
-                        { role: 'system', content: 'You are a helpful JEE (Joint Entrance Examination) study assistant. Help students with Physics, Chemistry, and Mathematics concepts, problems, and exam strategies. Be concise and clear.' },
-                        ...chatHistory
-                    ]
-                })
+                body: JSON.stringify({ model, max_tokens: 2000, messages: [{ role: 'system', content: SYSTEM }, ...chatHistory] })
             });
-
             chatRemoveTyping();
-
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.error?.message || 'Error ' + res.status);
-            }
-
+            if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.error?.message || 'Error '+res.status); }
             const data = await res.json();
-            const reply = data.choices?.[0]?.message?.content || 'No response received.';
+            let reply = data.choices?.[0]?.message?.content || 'No response received.';
             chatHistory.push({ role: 'assistant', content: reply });
-            chatAddMsg('assistant', reply);
 
+            // Extract and execute tool calls
+            const toolRegex = /```tool\n([\s\S]*?)```/g;
+            let match; const toolResults = [];
+            let displayReply = reply;
+            while ((match = toolRegex.exec(reply)) !== null) {
+                try {
+                    const toolCall = JSON.parse(match[1].trim());
+                    const result = chatExecuteTool(toolCall.tool, toolCall.args || {});
+                    toolResults.push(result);
+                } catch(e) { toolResults.push('❌ Could not parse tool call.'); }
+                displayReply = displayReply.replace(match[0], '');
+            }
+            displayReply = displayReply.trim();
+            if (displayReply) chatAddMsg('assistant', displayReply);
+            if (toolResults.length) {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'chat-msg assistant';
+                actionsDiv.innerHTML = `<div class="chat-action-result">${toolResults.join('<br>')}</div>`;
+                document.getElementById('chat-messages').appendChild(actionsDiv);
+                document.getElementById('chat-messages').scrollTop = 9999;
+            }
         } catch(e) {
             chatRemoveTyping();
-            chatAddMsg('assistant', '⚠️ ' + (e.message || 'Something went wrong. Check your API key and internet connection.'));
+            chatAddMsg('assistant', '⚠️ ' + (e.message || 'Something went wrong.'));
         } finally {
             sendBtn.disabled = false;
             document.getElementById('chat-input')?.focus();
         }
     }
+
+    // ── GROUP CHAT RESIZE ──
+    (function() {
+        let isResizing = false, startX = 0, startW = 0;
+        const MAX_W = Math.min(window.innerWidth * 0.92, 1100);
+        const MIN_W = 340;
+        document.addEventListener('mousedown', function(e) {
+            const handle = document.getElementById('gm-resize-handle');
+            if (!handle || e.target !== handle) return;
+            isResizing = true;
+            handle.classList.add('dragging');
+            startX = e.clientX;
+            const box = document.getElementById('group-modal-box');
+            startW = box ? box.offsetWidth : 680;
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+            const box = document.getElementById('group-modal-box');
+            if (!box) return;
+            const delta = startX - e.clientX; // dragging left = wider
+            const newW = Math.min(MAX_W, Math.max(MIN_W, startW + delta));
+            box.style.width = newW + 'px';
+            box.style.maxWidth = newW + 'px';
+        });
+        document.addEventListener('mouseup', function() {
+            if (!isResizing) return;
+            isResizing = false;
+            const handle = document.getElementById('gm-resize-handle');
+            if (handle) handle.classList.remove('dragging');
+            document.body.style.userSelect = '';
+        });
+        // Touch support
+        document.addEventListener('touchstart', function(e) {
+            const handle = document.getElementById('gm-resize-handle');
+            if (!handle || e.target !== handle) return;
+            isResizing = true;
+            startX = e.touches[0].clientX;
+            const box = document.getElementById('group-modal-box');
+            startW = box ? box.offsetWidth : 680;
+            e.preventDefault();
+        }, { passive: false });
+        document.addEventListener('touchmove', function(e) {
+            if (!isResizing) return;
+            const box = document.getElementById('group-modal-box');
+            if (!box) return;
+            const delta = startX - e.touches[0].clientX;
+            const newW = Math.min(MAX_W, Math.max(MIN_W, startW + delta));
+            box.style.width = newW + 'px';
+            box.style.maxWidth = newW + 'px';
+        }, { passive: false });
+        document.addEventListener('touchend', function() { isResizing = false; });
+    })();
 
     window.chatToggle = chatToggle;
     window.chatSend = chatSend;
