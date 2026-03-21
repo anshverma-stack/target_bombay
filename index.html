@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="unsafe-url">
 <title>JEE.COMMAND — The Ultimate JEE 2026 Tracker</title>
 <meta name="description" content="Track every chapter, rank against friends, get AI study plans, join community doubts. Free. No install.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -2847,11 +2848,13 @@ footer {
             <div style="margin-bottom:16px;">
                 <label style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;display:block;margin-bottom:8px;">Model</label>
                 <select id="ai-model-select" style="width:100%;padding:12px 16px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#f8fafc;font-size:0.85rem;font-family:inherit;outline:none;cursor:pointer;appearance:none;">
-                    <option value="google/gemini-flash-1.5">Gemini Flash 1.5 (Free &amp; Fast ⚡)</option>
-                    <option value="google/gemini-pro-1.5">Gemini Pro 1.5 (Better quality)</option>
+                    <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (Free ⚡)</option>
+                    <option value="google/gemini-flash-1.5-8b">Gemini Flash 1.5 8B (Free)</option>
+                    <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (Free)</option>
                     <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</option>
+                    <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
                     <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (Free)</option>
-                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                    <option value="anthropic/claude-3.5-haiku">Claude 3.5 Haiku</option>
                     <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
                     <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
                     <option value="openai/gpt-4o">GPT-4o</option>
@@ -4059,7 +4062,7 @@ document.querySelectorAll('.hero-cta,[data-launch]').forEach(btn => {
     async function generateAIPlan(){const hoursInput=document.getElementById('ai-hours-input');const priority=document.getElementById('ai-priority-select').value;const stageGoal=document.getElementById('ai-stage-select').value;const btn=document.getElementById('ai-gen-btn');const output=document.getElementById('ai-plan-output');const hours=parseFloat(hoursInput.value);if(!hours||hours<=0||hours>16){hoursInput.style.borderColor='#ef4444';setTimeout(()=>hoursInput.style.borderColor='',1200);return;}const stageOrder=['Pending','Theory','Examples','Exercise','Mains PYQ','Advance PYQ'];const allChapters=[];Object.keys(DATA).forEach(sub=>{['11','12'].forEach(cls=>{Object.entries(DATA[sub][cls]).forEach(([unit,chapters])=>{chapters.forEach(ch=>{const id=`${sub}-${ch.s}`;const stage=store[id]?.stage||'Pending';const stageIdx=stageOrder.indexOf(stage);allChapters.push({subject:sub,cls,unit,name:ch.n,currentStage:stage,stageIndex:stageIdx,nextStage:stageOrder[stageIdx+1]||null,isComplete:stage==='Advance PYQ'});});});});});const incomplete=allChapters.filter(c=>!c.isComplete);const totalBehind=incomplete.length;const chapterSummary=incomplete.slice(0,60).map(c=>`- ${c.subject.toUpperCase()} Cl.${c.cls} | ${c.unit} | ${c.name} | Currently at: ${c.currentStage}`).join('\n');const priorityDesc={balanced:'balance all three subjects evenly',physics:'prioritise Physics chapters',chemistry:'prioritise Chemistry chapters',mathematics:'prioritise Mathematics chapters',weakest:'prioritise chapters that are at the earliest stage (most behind)',mains:'focus on getting chapters to Mains PYQ coverage',advanced:'focus on getting chapters to Advance PYQ coverage'}[priority];const stageDesc=stageGoal==='next'?'move each chapter to its NEXT stage (e.g. Theory → Examples)':`cover the "${stageGoal}" stage for selected chapters`;const prompt=`You are an expert JEE 2026 study planner AI.\n\nThe student has ${hours} free hours today. Their backlog has ${totalBehind} incomplete chapters.\n\nSTUDENT'S BACKLOG (up to 60 chapters shown):\n${chapterSummary}\n\nINSTRUCTIONS:\n- Priority: ${priorityDesc}\n- Target: ${stageDesc}\n- Total time: ${hours} hours (${hours*60} minutes)\n- Create a realistic plan fitting within ${hours} hours\n- Assign specific time blocks in minutes per task\n- Choose 4-8 tasks maximum\n- Time estimates: Theory=45-60min, Examples=30-45min, Exercise=60-90min, Mains PYQ=60-90min, Advance PYQ=90-120min\n- Include a short motivational tip for each task\n\nRespond ONLY with valid JSON array (no markdown, no explanation):\n[\n  {\n    "taskNumber": 1,\n    "chapterName": "chapter name",\n    "subject": "Physics/Chemistry/Mathematics",\n    "unit": "unit name",\n    "class": "11 or 12",\n    "currentStage": "current stage",\n    "targetStage": "stage to complete",\n    "timeMinutes": 60,\n    "tip": "short tip",\n    "priority": "high/medium/low"\n  }\n]`;btn.disabled=true;btn.innerHTML=`<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite"></div> Generating...`;output.classList.add('visible');output.innerHTML=`<div class="ai-loading-state"><div class="ai-loading-ring"></div><div class="ai-loading-text">🤖 AI is analysing your backlog…</div><div class="ai-loading-sub">Scanning ${totalBehind} chapters · Building optimal ${hours}h plan</div></div>`;try{
 const _orKey=localStorage.getItem('openrouter_api_key')||'';
 if(!_orKey){throw new Error('No API key set. Click ⚙️ API Key to add your OpenRouter key.');}
-const _orModel=localStorage.getItem('openrouter_model')||'google/gemini-flash-1.5';
+const _orModel=localStorage.getItem('openrouter_model')||'google/gemini-2.0-flash-001';
 const _orPayload={model:_orModel,max_tokens:1500,messages:[{role:'user',content:prompt}]};
 
 let response;
@@ -4068,8 +4071,7 @@ try {
     method:'POST',
     headers:{
       'Content-Type':'application/json',
-      'Authorization':'Bearer '+_orKey,
-      'X-Title':'JEE Command'
+      'Authorization':'Bearer '+_orKey
     },
     body:JSON.stringify(_orPayload)
   });
@@ -4077,7 +4079,7 @@ try {
   if(location.protocol==='file:'){
     throw new Error('You\'re opening this as a local file — browsers block API calls from file:// for security. Upload to GitHub Pages (free) and it will work perfectly.');
   }
-  throw new Error('Could not reach OpenRouter. Check your internet. ('+netErr.message+')');
+  throw new Error('Could not reach OpenRouter. \n\nFix: Go to openrouter.ai → Settings → add your GitHub Pages URL to "Allowed HTTP Referers". \n\nError: '+netErr.message);
 }
 if(!response.ok){
   let errMsg='';
