@@ -1127,6 +1127,35 @@ footer {
         #app-shell .hm-dot{ width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
         #app-shell #pomodoro-view{ font-family: inherit; }
+        /* Focus sub-tabs */
+        #app-shell .focus-subtabs{ display:flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:14px; margin-bottom:1.8rem; width:fit-content; }
+        #app-shell .focus-subtab{ padding:8px 18px; border-radius:10px; border:none; background:transparent; color:var(--text-secondary); font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.18s; font-family:inherit; white-space:nowrap; }
+        #app-shell .focus-subtab:hover{ color:var(--text-primary); }
+        #app-shell .focus-subtab.active{ background:var(--surface-1); color:var(--text-primary); box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+        #app-shell .focus-panel{ display:none; }
+        #app-shell .focus-panel.active{ display:block; }
+        /* Stats cards */
+        #app-shell .stats-section-card{ background:var(--surface-1); border:1px solid var(--border); border-radius:20px; padding:1.8rem; margin-bottom:1.2rem; }
+        #app-shell .stats-section-title{ font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-secondary); margin-bottom:1rem; }
+        #app-shell .stats-big-num{ font-size:2.8rem; font-weight:800; color:#10b981; letter-spacing:-0.03em; }
+        #app-shell .stats-week-total{ font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem; }
+        #app-shell .stats-bars{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; align-items:end; height:120px; }
+        #app-shell .stats-bar-col{ display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
+        #app-shell .stats-bar-fill{ width:100%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,#10b981,#059669); min-height:4px; transition:height 0.5s ease; }
+        #app-shell .stats-bar-fill.today{ background:linear-gradient(180deg,#6366f1,#3b82f6); }
+        #app-shell .stats-bar-day{ font-size:0.6rem; font-weight:700; color:var(--text-secondary); }
+        #app-shell .stats-bar-val{ font-size:0.58rem; color:var(--text-secondary); }
+        #app-shell .stats-week-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.025); border:1px solid var(--border); border-radius:10px; }
+        #app-shell .stats-week-label{ font-size:0.78rem; font-weight:600; color:var(--text-primary); }
+        #app-shell .stats-week-val{ font-size:0.82rem; font-weight:800; color:#10b981; font-family:monospace; }
+        /* Leaderboard */
+        #app-shell .tlb-row{ display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--surface-1); border:1px solid var(--border); border-radius:14px; }
+        #app-shell .tlb-row.me{ background:rgba(99,102,241,0.08); border-color:rgba(99,102,241,0.3); }
+        #app-shell .tlb-rank{ font-size:1.1rem; min-width:32px; text-align:center; font-weight:800; }
+        #app-shell .tlb-av{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:800; color:white; flex-shrink:0; }
+        #app-shell .tlb-name{ flex:1; font-size:0.82rem; font-weight:700; color:var(--text-primary); }
+        #app-shell .tlb-time{ font-family:monospace; font-size:0.8rem; font-weight:800; color:#10b981; }
+        #app-shell .tlb-you{ font-size:0.5rem; background:var(--mains); color:white; padding:2px 5px; border-radius:6px; font-weight:800; vertical-align:middle; margin-left:4px; }
 
         #app-shell .pom-layout{ display: grid; grid-template-columns: 1fr 420px; gap: 2rem; align-items: start; }
 
@@ -3341,40 +3370,129 @@ footer {
         <div id="advanced-tests-list"></div>
     </div>
     <div id="pomodoro-view" class="content-body">
-        <div class="pom-layout">
-            <div style="display:flex;flex-direction:column;gap:1.4rem;">
-                <div class="pom-card">
-                    <div class="pom-ring-wrap">
-                        <svg class="pom-ring-svg" width="220" height="220" viewBox="0 0 220 220"><circle class="pom-ring-bg" cx="110" cy="110" r="100"/><circle class="pom-ring-fill" id="pom-ring" cx="110" cy="110" r="100"/></svg>
-                        <div class="pom-time-label"><div class="pom-time-digits" id="pom-digits">--:--</div><div class="pom-time-phase" id="pom-phase">Build your sequence</div><div class="pom-step-indicator" id="pom-step-ind"></div></div>
+        <!-- Focus sub-tabs -->
+        <div class="focus-subtabs">
+            <button class="focus-subtab active" id="fst-timer" onclick="focusTab('timer',this)">⏱ Timer</button>
+            <button class="focus-subtab" id="fst-stats" onclick="focusTab('stats',this)">📊 Study Stats</button>
+            <button class="focus-subtab" id="fst-lb" onclick="focusTab('lb',this)">🏆 Time Leaderboard</button>
+        </div>
+
+        <!-- ── TAB 1: TIMER ── -->
+        <div class="focus-panel active" id="focus-timer-panel">
+            <div class="pom-layout">
+                <div style="display:flex;flex-direction:column;gap:1.4rem;">
+                    <!-- Live session timer -->
+                    <div class="pom-card">
+                        <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-secondary);margin-bottom:1.2rem;">📚 Study Session</div>
+                        <div class="pom-ring-wrap">
+                            <svg class="pom-ring-svg" width="220" height="220" viewBox="0 0 220 220"><circle class="pom-ring-bg" cx="110" cy="110" r="100"/><circle class="pom-ring-fill" id="sess-ring" cx="110" cy="110" r="100" style="stroke:#10b981"/></svg>
+                            <div class="pom-time-label">
+                                <div class="pom-time-digits" id="sess-digits" style="color:#10b981">00:00:00</div>
+                                <div class="pom-time-phase" id="sess-phase">Ready to study</div>
+                            </div>
+                        </div>
+                        <div class="pom-controls">
+                            <button class="pom-ctrl-btn pom-start" id="sess-start-btn" onclick="sessToggle()" style="background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 6px 18px rgba(16,185,129,0.35);">▶ Start Session</button>
+                            <button class="pom-ctrl-btn pom-reset" id="sess-stop-btn" onclick="sessStop()" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;">⬛ Stop &amp; Save</button>
+                        </div>
+                        <!-- Privacy toggle -->
+                        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+                            <span style="font-size:0.68rem;color:var(--text-secondary);font-weight:700;">Study time visibility:</span>
+                            <select id="sess-privacy" onchange="sessUpdatePrivacy()" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text-primary);padding:5px 10px;border-radius:9px;font-size:0.72rem;font-weight:700;outline:none;cursor:pointer;">
+                                <option value="public">🌐 Public</option>
+                                <option value="semi">👥 Friends only</option>
+                                <option value="private">🔒 Private</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="pom-controls">
-                        <button class="pom-ctrl-btn pom-start" id="pom-start-btn" onclick="pomToggle()">&#9654; Start</button>
-                        <button class="pom-ctrl-btn pom-skip" onclick="pomSkipStep()">&#9654;&#9654; Skip</button>
-                        <button class="pom-ctrl-btn pom-reset" onclick="pomReset()">&#8635; Reset</button>
+                    <!-- Pomodoro option -->
+                    <div class="pom-card" style="padding:1.4rem;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                            <span style="font-size:0.82rem;font-weight:800;">⏰ Pomodoro Mode</span>
+                            <button onclick="focusPomToggle()" id="pom-toggle-btn" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;padding:5px 12px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;">Show</button>
+                        </div>
+                        <div id="pom-section" style="display:none;">
+                            <div class="pom-ring-wrap" style="width:160px;height:160px;margin-bottom:1rem;">
+                                <svg class="pom-ring-svg" width="160" height="160" viewBox="0 0 220 220"><circle class="pom-ring-bg" cx="110" cy="110" r="100"/><circle class="pom-ring-fill" id="pom-ring" cx="110" cy="110" r="100"/></svg>
+                                <div class="pom-time-label"><div class="pom-time-digits" id="pom-digits" style="font-size:2rem;">--:--</div><div class="pom-time-phase" id="pom-phase">Build sequence</div><div class="pom-step-indicator" id="pom-step-ind"></div></div>
+                            </div>
+                            <div class="pom-controls">
+                                <button class="pom-ctrl-btn pom-start" id="pom-start-btn" onclick="pomToggle()">▶ Start</button>
+                                <button class="pom-ctrl-btn pom-skip" onclick="pomSkipStep()">▶▶ Skip</button>
+                                <button class="pom-ctrl-btn pom-reset" onclick="pomReset()">↺ Reset</button>
+                            </div>
+                            <div class="seq-builder" style="margin-top:1rem;">
+                                <div class="seq-builder-title"><span>⚙️ Sequence</span><div style="display:flex;gap:6px;"><button onclick="seqSave()" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;padding:4px 10px;border-radius:7px;cursor:pointer;font-size:0.68rem;font-weight:700;">Save</button><button onclick="seqClear()" style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:4px 10px;border-radius:7px;cursor:pointer;font-size:0.68rem;font-weight:700;">Clear</button></div></div>
+                                <div class="seq-total-bar" id="seq-bar"></div>
+                                <div class="seq-total-info" id="seq-info"><span>📖 Study: <strong id="seq-study-total">0m</strong></span><span>☕ Break: <strong id="seq-break-total">0m</strong></span><span>Total: <strong id="seq-grand-total">0m</strong></span></div>
+                                <div class="seq-steps-list" id="seq-steps-list"></div>
+                                <div class="seq-add-row">
+                                    <button class="seq-add-btn seq-add-study" onclick="seqAddStep('study','Study Block',25)">+ Study</button>
+                                    <button class="seq-add-btn seq-add-break" onclick="seqAddStep('break','Short Break',5)">+ Break</button>
+                                    <button class="seq-add-btn seq-add-long" onclick="seqAddStep('long','Long Break',15)">+ Long Break</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="seq-builder">
-                    <div class="seq-builder-title"><span>&#9881;&#65039; Custom Sequence</span><div style="display:flex;gap:6px;"><button onclick="seqSave()" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.72rem;font-weight:700;">Save</button><button onclick="seqClear()" style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.72rem;font-weight:700;">Clear All</button></div></div>
-                    <div class="seq-total-bar" id="seq-bar"></div>
-                    <div class="seq-total-info" id="seq-info"><span>&#128218; Study: <strong id="seq-study-total">0m</strong></span><span>&#9749; Break: <strong id="seq-break-total">0m</strong></span><span>Total: <strong id="seq-grand-total">0m</strong></span></div>
-                    <div class="seq-steps-list" id="seq-steps-list"></div>
-                    <div class="seq-add-row">
-                        <button class="seq-add-btn seq-add-study" onclick="seqAddStep('study','Study Block',25)">&#43; Study Block</button>
-                        <button class="seq-add-btn seq-add-break" onclick="seqAddStep('break','Short Break',5)">&#43; Short Break</button>
-                        <button class="seq-add-btn seq-add-long" onclick="seqAddStep('long','Long Break',15)">&#43; Long Break</button>
+                <div class="pom-right">
+                    <div class="pom-day-summary">
+                        <div class="pom-day-title"><span>📅 Today's Sessions</span></div>
+                        <div class="pom-today-stats">
+                            <div class="pom-stat-chip"><div class="ps-l">Sessions</div><div class="ps-v" id="pom-count" style="color:var(--accent)">0</div></div>
+                            <div class="pom-stat-chip"><div class="ps-l">Study Time</div><div class="ps-v" id="pom-study-time" style="color:var(--success)">0m</div></div>
+                            <div class="pom-stat-chip"><div class="ps-l">Break Time</div><div class="ps-v" id="pom-break-time" style="color:var(--adv)">0m</div></div>
+                        </div>
+                        <div class="pom-timeline" id="pom-timeline"><div class="pom-log-empty">No sessions yet. Hit Start!</div></div>
                     </div>
                 </div>
             </div>
-            <div class="pom-right">
-                <div class="pom-day-summary">
-                    <div class="pom-day-title"><span>&#128197; Today's Summary</span><button onclick="pomClearLog()" style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.72rem;font-weight:700;">Clear</button></div>
-                    <div class="pom-today-stats">
-                        <div class="pom-stat-chip"><div class="ps-l">Study Blocks</div><div class="ps-v" id="pom-count" style="color:var(--accent)">0</div></div>
-                        <div class="pom-stat-chip"><div class="ps-l">Study Time</div><div class="ps-v" id="pom-study-time" style="color:var(--success)">0m</div></div>
-                        <div class="pom-stat-chip"><div class="ps-l">Break Time</div><div class="ps-v" id="pom-break-time" style="color:var(--adv)">0m</div></div>
-                    </div>
-                    <div class="pom-timeline" id="pom-timeline"><div class="pom-log-empty">No sessions completed yet.</div></div>
+        </div>
+
+        <!-- ── TAB 2: STUDY STATS ── -->
+        <div class="focus-panel" id="focus-stats-panel">
+            <div id="stats-auth-wall" style="display:none;text-align:center;padding:3rem 1rem;">
+                <div style="font-size:2rem;margin-bottom:1rem;">📊</div>
+                <div style="font-weight:800;margin-bottom:0.5rem;">Sign in to track your study time</div>
+                <div style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:1.5rem;">Your sessions sync to the cloud across all devices.</div>
+                <button class="comm-login-btn" onclick="login()">🔑 Sign in with Google</button>
+            </div>
+            <div id="stats-main">
+                <!-- Today -->
+                <div class="stats-section-card">
+                    <div class="stats-section-title">📅 Today — <span id="stats-today-date"></span></div>
+                    <div class="stats-big-num" id="stats-today-total">0h 0m</div>
+                    <div id="stats-today-sessions" class="pom-timeline" style="margin-top:1rem;"></div>
+                </div>
+                <!-- Week day bars -->
+                <div class="stats-section-card">
+                    <div class="stats-section-title">📆 This Week</div>
+                    <div class="stats-week-total">Total: <strong id="stats-week-total">0h 0m</strong></div>
+                    <div class="stats-bars" id="stats-week-bars"></div>
+                </div>
+                <!-- Past weeks -->
+                <div class="stats-section-card">
+                    <div class="stats-section-title">🗓 Weekly History</div>
+                    <div id="stats-weeks-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB 3: TIME LEADERBOARD ── -->
+        <div class="focus-panel" id="focus-lb-panel">
+            <div id="tlb-auth-wall" style="display:none;text-align:center;padding:3rem 1rem;">
+                <div style="font-size:2rem;margin-bottom:1rem;">🏆</div>
+                <div style="font-weight:800;margin-bottom:0.5rem;">Sign in to see the leaderboard</div>
+                <button class="comm-login-btn" onclick="login()">🔑 Sign in with Google</button>
+            </div>
+            <div id="tlb-main">
+                <div class="focus-subtabs" style="margin-bottom:1.5rem;">
+                    <button class="focus-subtab active" id="tlb-all-btn" onclick="tlbSwitch('all',this)">🌐 All Users</button>
+                    <button class="focus-subtab" id="tlb-groups-btn" onclick="tlbSwitch('groups',this)">👥 My Groups</button>
+                </div>
+                <div id="tlb-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+                <div style="margin-top:1.5rem;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;font-size:0.72rem;color:var(--text-secondary);">
+                    🔒 Only users with <strong style="color:var(--text-primary);">Public</strong> visibility appear here. Change your visibility in the Timer tab.
                 </div>
             </div>
         </div>
@@ -4159,7 +4277,7 @@ document.querySelectorAll('.hero-cta,[data-launch]').forEach(btn => {
         if (tab==='vault'){document.getElementById('view-title').innerText="Study Vault";document.getElementById('vault-view').classList.add('active');}
         else if (tab==='backlog'){document.getElementById('view-title').innerText="Study Backlog";document.getElementById('backlog-view').classList.add('active');renderBacklog();}
         else if(tab==='community'){document.getElementById('view-title').innerText='Doubts Forum';document.getElementById('community-view').classList.add('active');commInit();} else if(tab==='groups'){document.getElementById('view-title').innerText='Study Groups';document.getElementById('groups-view').classList.add('active');groupsInit();} else if(tab==='friends'){document.getElementById('view-title').innerText='Friends';document.getElementById('friends-view').classList.add('active');friendsInit();}
-        else if (tab==='pomodoro'){document.getElementById('view-title').innerText='Pomodoro Timer';document.getElementById('pomodoro-view').classList.add('active');seqRender();pomSyncToSeq();pomRenderLog();}
+        else if (tab==='pomodoro'){document.getElementById('view-title').innerText='Focus';document.getElementById('pomodoro-view').classList.add('active');seqRender();pomSyncToSeq();pomRenderLog();focusStatsRender();}
         else if (tab==='mains'){document.getElementById('view-title').innerText="JEE Mains";document.getElementById('mains-view').classList.add('active');renderTests();}
         else if (tab==='advanced'){document.getElementById('view-title').innerText="JEE Advanced";document.getElementById('advanced-view').classList.add('active');renderTests();}
         else{curTab=tab;document.getElementById('view-title').innerText=tab;document.getElementById('cls-toggle-box').style.display='flex';document.getElementById('syllabus-view').classList.add('active');render();updateStats();}
@@ -4514,6 +4632,348 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
     function pomNotify(step){if(Notification.permission!=='granted')return;const nextStep=sequence[pomStepIdx];const nextLabel=nextStep?nextStep.label+' ('+nextStep.minutes+'min)':'Sequence complete!';new Notification(step.label+' done!',{body:'Up next: '+nextLabel,tag:'pom-step'});}
     function pomRender(){const digits=document.getElementById('pom-digits'),phase=document.getElementById('pom-phase'),stepInd=document.getElementById('pom-step-ind'),ring=document.getElementById('pom-ring');if(!digits)return;if(!sequence.length){digits.textContent='--:--';digits.style.color='var(--text-secondary)';if(phase)phase.textContent='Build your sequence →';if(stepInd)stepInd.textContent='';if(ring)ring.style.strokeDashoffset=POM_CIRCUMFERENCE;return;}const step=sequence[pomStepIdx]||sequence[0];const m=Math.floor(pomSecondsLeft/60).toString().padStart(2,'0'),s=(pomSecondsLeft%60).toString().padStart(2,'0');digits.textContent=m+':'+s;digits.style.color=SEQ_COLORS[step.type];if(phase)phase.textContent=step.label;if(stepInd)stepInd.textContent='Step '+(pomStepIdx+1)+' of '+sequence.length;if(ring){const progress=pomTotalSeconds>0?pomSecondsLeft/pomTotalSeconds:1;ring.style.strokeDashoffset=POM_CIRCUMFERENCE*(1-progress);ring.style.stroke=SEQ_COLORS[step.type];}}
     function pomRenderLog(){const timeline=document.getElementById('pom-timeline'),countEl=document.getElementById('pom-count'),studyEl=document.getElementById('pom-study-time'),breakEl=document.getElementById('pom-break-time');const todayLog=pomLog.filter(e=>e.day===todayStr());const studyMins=todayLog.filter(e=>e.type==='study').reduce((a,e)=>a+e.minutes,0);const breakMins=todayLog.filter(e=>e.type!=='study').reduce((a,e)=>a+e.minutes,0);const studyBlks=todayLog.filter(e=>e.type==='study').length;if(countEl)countEl.textContent=studyBlks;if(studyEl)studyEl.textContent=studyMins+'m';if(breakEl)breakEl.textContent=breakMins+'m';if(!timeline)return;if(!todayLog.length){timeline.innerHTML='<div class="pom-log-empty">No sessions completed yet.</div>';return;}timeline.innerHTML=todayLog.map(e=>`<div class="pom-tl-item"><div class="pom-tl-dot" style="background:${SEQ_COLORS[e.type]}"></div><div class="pom-tl-label">${e.label}</div><div class="pom-tl-time">${e.time}</div><div class="pom-tl-dur" style="color:${SEQ_COLORS[e.type]}">${e.minutes}m</div></div>`).join('');}
+    // ═══════════════════════════════════════════
+    // FOCUS SYSTEM — Session Timer, Stats, Leaderboard
+    // ═══════════════════════════════════════════
+
+    // ── Tab switcher ──
+    function focusTab(tab, btn) {
+        document.querySelectorAll('.focus-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.focus-subtab').forEach(b => b.classList.remove('active'));
+        document.getElementById('focus-' + tab + '-panel').classList.add('active');
+        if (btn) btn.classList.add('active');
+        if (tab === 'stats') focusStatsRender();
+        if (tab === 'lb') tlbLoad('all');
+    }
+
+    function focusPomToggle() {
+        const sec = document.getElementById('pom-section');
+        const btn = document.getElementById('pom-toggle-btn');
+        const open = sec.style.display === 'none' || !sec.style.display;
+        sec.style.display = open ? 'block' : 'none';
+        btn.textContent = open ? 'Hide' : 'Show';
+        if (open) { seqRender(); pomSyncToSeq(); }
+    }
+
+    // ── SESSION TIMER ──
+    let sessRunning = false, sessInterval = null, sessStartEpoch = 0, sessElapsed = 0;
+
+    function fmtHMS(secs) {
+        const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), s = secs % 60;
+        return (h > 0 ? h + ':' : '') + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+    function fmtHM(mins) {
+        const h = Math.floor(mins / 60), m = mins % 60;
+        return h > 0 ? h + 'h ' + m + 'm' : m + 'm';
+    }
+
+    function sessToggle() {
+        if (sessRunning) { sessPause(); } else { sessStart(); }
+    }
+
+    function sessStart() {
+        sessRunning = true;
+        sessStartEpoch = Date.now() - sessElapsed * 1000;
+        sessInterval = setInterval(sessTick, 1000);
+        const btn = document.getElementById('sess-start-btn');
+        const stopBtn = document.getElementById('sess-stop-btn');
+        if (btn) { btn.textContent = '⏸ Pause'; btn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)'; btn.style.boxShadow = '0 6px 18px rgba(245,158,11,0.35)'; }
+        if (stopBtn) stopBtn.style.display = '';
+        const phase = document.getElementById('sess-phase');
+        if (phase) phase.textContent = 'Studying...';
+    }
+
+    function sessPause() {
+        sessRunning = false;
+        clearInterval(sessInterval);
+        const btn = document.getElementById('sess-start-btn');
+        if (btn) { btn.textContent = '▶ Resume'; btn.style.background = 'linear-gradient(135deg,#10b981,#059669)'; btn.style.boxShadow = '0 6px 18px rgba(16,185,129,0.35)'; }
+        const phase = document.getElementById('sess-phase');
+        if (phase) phase.textContent = 'Paused';
+    }
+
+    function sessTick() {
+        sessElapsed = Math.floor((Date.now() - sessStartEpoch) / 1000);
+        const el = document.getElementById('sess-digits');
+        if (el) el.textContent = fmtHMS(sessElapsed);
+        // Spin ring — cap at 2hr for visual
+        const ring = document.getElementById('sess-ring');
+        if (ring) {
+            const pct = Math.min(sessElapsed / 7200, 1);
+            ring.style.strokeDashoffset = 628 * (1 - pct);
+        }
+    }
+
+    async function sessStop() {
+        if (!sessElapsed || sessElapsed < 10) {
+            alert('Session too short to save (min 10 seconds).');
+            sessReset(); return;
+        }
+        const mins = Math.round(sessElapsed / 60) || 1;
+        const user = window.currentUser;
+        const privacy = document.getElementById('sess-privacy')?.value || 'public';
+        const now = new Date();
+        const dateStr = now.toDateString();
+        const timeStr = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+
+        // Save to local pom log (for today's sessions in timer tab)
+        const entry = { day: dateStr, type: 'study', label: 'Study Session', minutes: mins, time: timeStr };
+        pomLog.unshift(entry);
+        savePomLog();
+        pomRenderLog();
+
+        // Save to Firestore if signed in
+        if (user && window._db && window._fsOps) {
+            try {
+                const { collection, addDoc, serverTimestamp, doc, setDoc, getDoc } = window._fsOps;
+                const db = window._db;
+                // 1. Save individual session
+                await addDoc(collection(db, 'studySessions'), {
+                    uid: user.uid,
+                    displayName: user.displayName || 'Anonymous',
+                    initial: (user.displayName || 'A')[0].toUpperCase(),
+                    photoURL: user.photoURL || null,
+                    minutes: mins,
+                    seconds: sessElapsed,
+                    dateStr,
+                    week: getWeekKey(),
+                    privacy,
+                    createdAt: serverTimestamp()
+                });
+                // 2. Update user's aggregated study time doc
+                const userRef = doc(db, 'studyTime', user.uid);
+                const snap = await getDoc(userRef);
+                const prev = snap.exists() ? snap.data() : {};
+                const prevDayMins = (prev.days && prev.days[dateStr]) || 0;
+                const prevWeekMins = (prev.weeks && prev.weeks[getWeekKey()]) || 0;
+                const prevTotal = prev.totalMins || 0;
+                const days = { ...(prev.days || {}), [dateStr]: prevDayMins + mins };
+                const weeks = { ...(prev.weeks || {}), [getWeekKey()]: prevWeekMins + mins };
+                // Keep only last 28 days of daily data
+                const dayKeys = Object.keys(days).sort((a,b) => new Date(b)-new Date(a));
+                if (dayKeys.length > 28) dayKeys.slice(28).forEach(k => delete days[k]);
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    displayName: user.displayName || 'Anonymous',
+                    initial: (user.displayName || 'A')[0].toUpperCase(),
+                    photoURL: user.photoURL || null,
+                    days, weeks,
+                    totalMins: prevTotal + mins,
+                    privacy,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            } catch(e) { console.warn('Session save error:', e); }
+        }
+
+        sessReset();
+        focusStatsRender();
+        alert('✅ Session saved! ' + fmtHM(mins) + ' logged.');
+    }
+
+    function sessReset() {
+        sessRunning = false;
+        clearInterval(sessInterval);
+        sessElapsed = 0;
+        sessStartEpoch = 0;
+        const el = document.getElementById('sess-digits');
+        if (el) el.textContent = '00:00:00';
+        const btn = document.getElementById('sess-start-btn');
+        if (btn) { btn.textContent = '▶ Start Session'; btn.style.background = 'linear-gradient(135deg,#10b981,#059669)'; btn.style.boxShadow = '0 6px 18px rgba(16,185,129,0.35)'; }
+        const stopBtn = document.getElementById('sess-stop-btn');
+        if (stopBtn) stopBtn.style.display = 'none';
+        const phase = document.getElementById('sess-phase');
+        if (phase) phase.textContent = 'Ready to study';
+        const ring = document.getElementById('sess-ring');
+        if (ring) ring.style.strokeDashoffset = '628';
+    }
+
+    async function sessUpdatePrivacy() {
+        const privacy = document.getElementById('sess-privacy')?.value || 'public';
+        localStorage.setItem('sess_privacy', privacy);
+        const user = window.currentUser;
+        if (user && window._db && window._fsOps) {
+            try {
+                const { doc, setDoc } = window._fsOps;
+                await setDoc(doc(window._db, 'studyTime', user.uid), { privacy }, { merge: true });
+            } catch(e) {}
+        }
+    }
+
+    function getWeekKey() {
+        const d = new Date();
+        const jan1 = new Date(d.getFullYear(), 0, 1);
+        const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+        return d.getFullYear() + '-W' + String(week).padStart(2,'0');
+    }
+
+    // ── STATS TAB ──
+    async function focusStatsRender() {
+        const user = window.currentUser;
+        const authWall = document.getElementById('stats-auth-wall');
+        const main = document.getElementById('stats-main');
+        if (!user) {
+            if (authWall) authWall.style.display = 'block';
+            if (main) main.style.display = 'none';
+            return;
+        }
+        if (authWall) authWall.style.display = 'none';
+        if (main) main.style.display = 'block';
+
+        // Set today's date label
+        const todayDateEl = document.getElementById('stats-today-date');
+        if (todayDateEl) todayDateEl.textContent = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'short'});
+
+        // Local sessions for today from pomLog
+        const todayStr2 = new Date().toDateString();
+        const todaySessions = pomLog.filter(e => e.day === todayStr2);
+        const todayMins = todaySessions.reduce((a, e) => a + e.minutes, 0);
+        const todayEl = document.getElementById('stats-today-total');
+        if (todayEl) todayEl.textContent = fmtHM(todayMins);
+        const sessListEl = document.getElementById('stats-today-sessions');
+        if (sessListEl) {
+            sessListEl.innerHTML = todaySessions.length
+                ? todaySessions.map(e => `<div class="pom-tl-item"><div class="pom-tl-dot" style="background:#10b981"></div><div class="pom-tl-label">${e.label}</div><div class="pom-tl-time">${e.time}</div><div class="pom-tl-dur" style="color:#10b981">${e.minutes}m</div></div>`).join('')
+                : '<div class="pom-log-empty">No sessions today yet.</div>';
+        }
+
+        // Fetch from Firestore for week + history
+        try {
+            const { doc, getDoc } = window._fsOps;
+            const snap = await getDoc(doc(window._db, 'studyTime', user.uid));
+            if (!snap.exists()) return;
+            const data = snap.data();
+            const days = data.days || {};
+            const weeks = data.weeks || {};
+
+            // Week bars — Mon to Sun
+            const barsEl = document.getElementById('stats-week-bars');
+            const weekTotalEl = document.getElementById('stats-week-total');
+            if (barsEl) {
+                const now = new Date();
+                const dayOfWeek = (now.getDay() + 6) % 7; // Mon=0
+                const weekDays = Array.from({length:7}, (_,i) => {
+                    const d = new Date(now); d.setDate(now.getDate() - dayOfWeek + i);
+                    return { label: ['M','T','W','T','F','S','S'][i], dateStr: d.toDateString(), isToday: d.toDateString() === todayStr2 };
+                });
+                const maxMins = Math.max(...weekDays.map(d => days[d.dateStr] || 0), 60);
+                let weekTotal = 0;
+                barsEl.innerHTML = weekDays.map(d => {
+                    const mins = days[d.dateStr] || 0;
+                    weekTotal += mins;
+                    const pct = Math.max((mins / maxMins) * 100, mins > 0 ? 5 : 0);
+                    return `<div class="stats-bar-col">
+                        <div style="font-size:0.6rem;color:${mins>0?'#10b981':'var(--text-secondary)'};font-weight:700;margin-bottom:2px;">${mins>0?fmtHM(mins):''}</div>
+                        <div class="stats-bar-fill ${d.isToday?'today':''}" style="height:${pct}%;"></div>
+                        <div class="stats-bar-day" style="color:${d.isToday?'#6366f1':'var(--text-secondary)'}">${d.label}</div>
+                    </div>`;
+                }).join('');
+                if (weekTotalEl) weekTotalEl.textContent = fmtHM(weekTotal);
+            }
+
+            // Weekly history
+            const weeksEl = document.getElementById('stats-weeks-list');
+            if (weeksEl) {
+                const weekEntries = Object.entries(weeks).sort((a,b) => b[0].localeCompare(a[0])).slice(0,12);
+                weeksEl.innerHTML = weekEntries.length
+                    ? weekEntries.map(([wk, mins]) => `<div class="stats-week-row"><span class="stats-week-label">📅 ${wk}</span><span class="stats-week-val">${fmtHM(mins)}</span></div>`).join('')
+                    : '<div class="pom-log-empty">No weekly data yet.</div>';
+            }
+        } catch(e) { console.warn('Stats fetch error:', e); }
+    }
+
+    // ── LEADERBOARD TAB ──
+    let tlbScope = 'all';
+
+    async function tlbSwitch(scope, btn) {
+        tlbScope = scope;
+        document.querySelectorAll('#tlb-main .focus-subtab').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        tlbLoad(scope);
+    }
+
+    async function tlbLoad(scope) {
+        const user = window.currentUser;
+        const authWall = document.getElementById('tlb-auth-wall');
+        const main = document.getElementById('tlb-main');
+        if (!user) {
+            if (authWall) authWall.style.display = 'block';
+            if (main) main.style.display = 'none';
+            return;
+        }
+        if (authWall) authWall.style.display = 'none';
+        if (main) main.style.display = 'block';
+
+        const listEl = document.getElementById('tlb-list');
+        if (listEl) listEl.innerHTML = '<div class="pom-log-empty">Loading...</div>';
+
+        try {
+            const { collection, query, where, orderBy, limit, getDocs } = window._fsOps;
+            const db = window._db;
+            let entries = [];
+
+            if (scope === 'all') {
+                const q = query(collection(db, 'studyTime'), where('privacy', '==', 'public'), orderBy('totalMins', 'desc'), limit(50));
+                const snap = await getDocs(q);
+                entries = snap.docs.map(d => ({...d.data(), id: d.id}));
+            } else {
+                // Groups scope — get all groups user is in, collect their member uids
+                const gq = query(collection(db, 'studyGroups'), where('memberIds', 'array-contains', user.uid));
+                const gSnap = await getDocs(gq);
+                const memberUids = new Set([user.uid]);
+                gSnap.docs.forEach(d => (d.data().memberIds || []).forEach(id => memberUids.add(id)));
+                if (memberUids.size === 1) {
+                    if (listEl) listEl.innerHTML = '<div class="pom-log-empty">Join a study group to see group rankings.</div>';
+                    return;
+                }
+                // Fetch studyTime for all those members (Firestore in batches of 10)
+                const uids = [...memberUids];
+                const batches = [];
+                for (let i = 0; i < uids.length; i += 10) batches.push(uids.slice(i, i+10));
+                const { getDocs: gd2, collection: col2, query: q2, where: w2 } = window._fsOps;
+                for (const batch of batches) {
+                    const bq = query(collection(db, 'studyTime'), where('uid', 'in', batch));
+                    const bSnap = await getDocs(bq);
+                    bSnap.docs.forEach(d => {
+                        const data = d.data();
+                        if (data.privacy !== 'private') entries.push({...data, id: d.id});
+                    });
+                }
+                entries.sort((a,b) => (b.totalMins||0) - (a.totalMins||0));
+                entries = entries.slice(0, 50);
+            }
+
+            if (!entries.length) {
+                if (listEl) listEl.innerHTML = '<div class="pom-log-empty">No data yet. Be the first to log study time!</div>';
+                return;
+            }
+
+            const colors = ['#6366f1','#10b981','#f59e0b','#e879f9','#3b82f6','#ef4444','#06b6d4'];
+            const medals = ['🥇','🥈','🥉'];
+            if (listEl) listEl.innerHTML = entries.map((e, i) => {
+                const isMe = e.uid === user.uid;
+                const rank = medals[i] || ('#' + (i+1));
+                const color = colors[i % colors.length];
+                return `<div class="tlb-row ${isMe?'me':''}">
+                    <div class="tlb-rank">${rank}</div>
+                    <div class="tlb-av" style="background:${color}">${e.initial || '?'}</div>
+                    <div class="tlb-name">${e.displayName || 'Anonymous'}${isMe ? '<span class="tlb-you">YOU</span>' : ''}</div>
+                    <div class="tlb-time">${fmtHM(e.totalMins || 0)}</div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            console.warn('Leaderboard error:', e);
+            const listEl = document.getElementById('tlb-list');
+            if (listEl) listEl.innerHTML = '<div class="pom-log-empty">Could not load leaderboard. Check your connection.</div>';
+        }
+    }
+
+    // Init privacy setting from localStorage
+    (function() {
+        const saved = localStorage.getItem('sess_privacy') || 'public';
+        const el = document.getElementById('sess-privacy');
+        if (el) el.value = saved;
+    })();
+
     function pomClearLog(){if(!confirm("Clear today's session log?"))return;pomLog=[];savePomLog();pomRenderLog();}
     function savePomLog(){localStorage.setItem('pom_log',JSON.stringify(pomLog.filter(e=>e.day===todayStr())));}
 
@@ -5860,7 +6320,7 @@ RULES:
     window.notifClick = notifClick;
 
     // ══════════════════════════════════════════════
-    window.render=render;window.updateStats=updateStats;window.renderTests=renderTests;window.switchTab=switchTab;window.setClass=setClass;window.toggleUnit=toggleUnit;window.setStage=setStage;window.editNote=editNote;window.openTestModal=openTestModal;window.closeTestModal=closeTestModal;window.submitTest=submitTest;window.removeTest=removeTest;window.addTarget=addTarget;window.toggleTarget=toggleTarget;window.toggleTargetsPanel=toggleTargetsPanel;window.mobileTargetsToggle=mobileTargetsToggle;window.mobileTargetsExpand=mobileTargetsExpand;window.removeTarget=removeTarget;window.startNotificationReminders=startNotificationReminders;window.saveVault=saveVault;window.vaultSwitchTab=vaultSwitchTab;window.vaultAddSection=vaultAddSection;window.vaultDeleteSection=vaultDeleteSection;window.vaultRenameSection=vaultRenameSection;window.vaultUpdateText=vaultUpdateText;window.vaultTriggerImageUpload=vaultTriggerImageUpload;window.vaultHandleImageUpload=vaultHandleImageUpload;window.vaultDeleteImage=vaultDeleteImage;window.vaultOpenLightbox=vaultOpenLightbox;window.vaultCloseLightbox=vaultCloseLightbox;window.markRevised=markRevised;window.toggleSubtopics=toggleSubtopics;window.setSubtopic=setSubtopic;window.pomToggle=pomToggle;window.pomReset=pomReset;window.pomSkipStep=pomSkipStep;window.pomClearLog=pomClearLog;window.seqAddStep=seqAddStep;window.seqDeleteStep=seqDeleteStep;window.seqUpdateMinutes=seqUpdateMinutes;window.seqUpdateLabel=seqUpdateLabel;window.seqSave=seqSave;window.seqClear=seqClear;window.commInit=commInit;window.commHandleDoubtImg=commHandleDoubtImg;window.commClearDoubtImg=commClearDoubtImg;window.commOpenLightbox=commOpenLightbox;window.commPostDoubt=commPostDoubt;window.commPostReply=commPostReply;window.commMarkSolved=commMarkSolved;window.commDeleteDoubt=commDeleteDoubt;window.commSetFilter=commSetFilter;window.commToggleReplies=commToggleReplies;window.commRender=commRender;window.updateAuthUI=updateAuthUI;window.signOutUser=signOutUser;window.switchBacklogTab=switchBacklogTab;window.generateAIPlan=generateAIPlan;
+    window.render=render;window.updateStats=updateStats;window.renderTests=renderTests;window.switchTab=switchTab;window.setClass=setClass;window.toggleUnit=toggleUnit;window.setStage=setStage;window.editNote=editNote;window.openTestModal=openTestModal;window.closeTestModal=closeTestModal;window.submitTest=submitTest;window.removeTest=removeTest;window.addTarget=addTarget;window.toggleTarget=toggleTarget;window.toggleTargetsPanel=toggleTargetsPanel;window.mobileTargetsToggle=mobileTargetsToggle;window.mobileTargetsExpand=mobileTargetsExpand;window.removeTarget=removeTarget;window.startNotificationReminders=startNotificationReminders;window.saveVault=saveVault;window.vaultSwitchTab=vaultSwitchTab;window.vaultAddSection=vaultAddSection;window.vaultDeleteSection=vaultDeleteSection;window.vaultRenameSection=vaultRenameSection;window.vaultUpdateText=vaultUpdateText;window.vaultTriggerImageUpload=vaultTriggerImageUpload;window.vaultHandleImageUpload=vaultHandleImageUpload;window.vaultDeleteImage=vaultDeleteImage;window.vaultOpenLightbox=vaultOpenLightbox;window.vaultCloseLightbox=vaultCloseLightbox;window.markRevised=markRevised;window.toggleSubtopics=toggleSubtopics;window.setSubtopic=setSubtopic;window.pomToggle=pomToggle;window.pomReset=pomReset;window.pomSkipStep=pomSkipStep;window.pomClearLog=pomClearLog;window.focusTab=focusTab;window.focusPomToggle=focusPomToggle;window.sessToggle=sessToggle;window.sessStop=sessStop;window.sessUpdatePrivacy=sessUpdatePrivacy;window.tlbSwitch=tlbSwitch;window.tlbLoad=tlbLoad;window.seqAddStep=seqAddStep;window.seqDeleteStep=seqDeleteStep;window.seqUpdateMinutes=seqUpdateMinutes;window.seqUpdateLabel=seqUpdateLabel;window.seqSave=seqSave;window.seqClear=seqClear;window.commInit=commInit;window.commHandleDoubtImg=commHandleDoubtImg;window.commClearDoubtImg=commClearDoubtImg;window.commOpenLightbox=commOpenLightbox;window.commPostDoubt=commPostDoubt;window.commPostReply=commPostReply;window.commMarkSolved=commMarkSolved;window.commDeleteDoubt=commDeleteDoubt;window.commSetFilter=commSetFilter;window.commToggleReplies=commToggleReplies;window.commRender=commRender;window.updateAuthUI=updateAuthUI;window.signOutUser=signOutUser;window.switchBacklogTab=switchBacklogTab;window.generateAIPlan=generateAIPlan;
 
 
     // ── FRIENDS ──
