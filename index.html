@@ -4580,7 +4580,7 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
             closeCreateGroup();
             setTimeout(() => {
                 const g = { id: ref.id, name, emoji: selectedGroupEmoji, type: selectedGroupType, memberIds: [user.uid] };
-                openGroupChat(ref.id, name, selectedGroupEmoji, [user.uid], g);
+                openGroupChat(ref.id, name, selectedGroupEmoji, [user.uid], {...g, members:[{uid:user.uid,name:user.displayName||'Anonymous',initial:(user.displayName||'A')[0].toUpperCase()}], creatorId:user.uid});
             }, 600);
         } catch(e) { console.error(e); alert('Failed to create group.'); }
         btn.disabled = false; btn.textContent = '✓ Create Group';
@@ -4629,7 +4629,7 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
             const gDataStr = escHtml(JSON.stringify({id:g.id,name:g.name,emoji:g.emoji||'👥',type:g.type,memberIds:g.memberIds||[]}));
             const isCreator = user && g.creatorId === user.uid;
             const actions = isMember
-                ? `<button class="group-open-btn" onclick='openGroupChatFromCard(${JSON.stringify({id:g.id,name:g.name,emoji:g.emoji||"👥",type:g.type,memberIds:g.memberIds||[]})})'>💬 Open Chat</button>${isCreator ? `<button class="group-del-btn" onclick="deleteGroup('${g.id}')" title="Delete group">🗑 Delete</button>` : `<button class="group-leave-btn" onclick="leaveGroup('${g.id}')">Leave</button>`}`
+                ? `<button class="group-open-btn" onclick='openGroupChatFromCard(${JSON.stringify({id:g.id,name:g.name,emoji:g.emoji||"👥",type:g.type,memberIds:g.memberIds||[],members:g.members||[],creatorId:g.creatorId||""})})'>💬 Open Chat</button>${isCreator ? `<button class="group-del-btn" onclick="deleteGroup('${g.id}')" title="Delete group">🗑 Delete</button>` : `<button class="group-leave-btn" onclick="leaveGroup('${g.id}')">Leave</button>`}`
                 : `<button class="group-join-btn" onclick="joinGroup('${g.id}')">➕ Join Group</button>`;
             return `<div class="group-card">
                 <div class="group-card-header">
@@ -4761,8 +4761,12 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
     function gmRenderMembers() {
         const list = document.getElementById('gm-members-list');
         if (!list || !activeGroupData) return;
-        const members = activeGroupData.members || [];
-        const creatorId = activeGroupData.creatorId || '';
+        // Prefer live groupsList data which is always up-to-date from Firestore
+        const liveGroup = groupsList.find(g => g.id === activeGroupId);
+        const members = (liveGroup && liveGroup.members && liveGroup.members.length)
+            ? liveGroup.members
+            : (activeGroupData.members || []);
+        const creatorId = (liveGroup && liveGroup.creatorId) || activeGroupData.creatorId || '';
         const avatarColors = ['#6366f1','#10b981','#f59e0b','#e879f9','#3b82f6','#ef4444','#06b6d4'];
         list.innerHTML = members.length ? members.map((m, i) => {
             const color = avatarColors[i % avatarColors.length];
