@@ -3695,7 +3695,8 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
     }
     function fmtHM(mins) {
         const h = Math.floor(mins / 60), m = mins % 60;
-        return h > 0 ? h + 'h ' + m + 'm' : m + 'm';
+        if (mins === 0) return '0h';
+        return h > 0 ? h + 'h ' + (m > 0 ? m + 'm' : '') : m + 'm';
     }
 
     function sessToggle() {
@@ -3938,15 +3939,19 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
         if (listEl) listEl.innerHTML = '<div class="pom-log-empty">Loading...</div>';
 
         try {
-            const { collection, query, where, orderBy, limit, getDocs } = window._fsOps;
+            const { collection, query, where, limit, getDocs, doc, getDoc, setDoc, serverTimestamp } = window._fsOps;
             const db = window._db;
             let entries = [];
 
             if (scope === 'all') {
-                // Fetch without orderBy to avoid composite index requirement, sort client-side
-                const q = query(collection(db, 'studyTime'), where('privacy', '==', 'public'), limit(100));
+                // Fetch all docs and filter client-side — treats missing privacy as 'public'
+                const q = query(collection(db, 'studyTime'), limit(200));
                 const snap = await getDocs(q);
-                entries = snap.docs.map(d => ({...d.data(), id: d.id}));
+                snap.docs.forEach(d => {
+                    const data = d.data();
+                    const priv = data.privacy || 'public';
+                    if (priv === 'public') entries.push({...data, id: d.id});
+                });
                 entries.sort((a,b) => (b.totalMins||0) - (a.totalMins||0));
                 entries = entries.slice(0, 50);
             } else {
@@ -3959,7 +3964,6 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
                     if (listEl) listEl.innerHTML = '<div class="pom-log-empty">Join a study group to see group rankings.</div>';
                     return;
                 }
-                // Fetch studyTime for all those members (Firestore in batches of 10)
                 const uids = [...memberUids];
                 const batches = [];
                 for (let i = 0; i < uids.length; i += 10) batches.push(uids.slice(i, i+10));
@@ -3968,35 +3972,65 @@ function toggleTargetsPanel(){panelCollapsed=!panelCollapsed;document.getElement
                     const bSnap = await getDocs(bq);
                     bSnap.docs.forEach(d => {
                         const data = d.data();
-                        if (data.privacy !== 'private') entries.push({...data, id: d.id});
+                        const priv = data.privacy || 'public';
+                        if (priv !== 'private') entries.push({...data, id: d.id});
                     });
                 }
                 entries.sort((a,b) => (b.totalMins||0) - (a.totalMins||0));
                 entries = entries.slice(0, 50);
             }
 
-            if (!entries.length) {
-                if (listEl) listEl.innerHTML = '<div class="pom-log-empty">No data yet. Be the first to log study time!</div>';
-                return;
+            // Always ensure current user appears — add them with 0h if not in list
+            const meInList = entries.some(e => e.uid === user.uid);
+            if (!meInList) {
+                const userRef = doc(db, 'studyTime', user.uid);
+                const usnap = await getDoc(userRef);
+                if (!usnap.exists()) {
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        displayName: user.displayName || 'Anonymous',
+                        initial: (user.displayName || 'A')[0].toUpperCase(),
+                        photoURL: user.photoURL || null,
+                        totalMins: 0,
+                        days: {}, weeks: {},
+                        privacy: 'public',
+                        updatedAt: serverTimestamp()
+                    });
+                }
+                entries.push({
+                    uid: user.uid,
+                    displayName: user.displayName || 'Anonymous',
+                    initial: (user.displayName || 'A')[0].toUpperCase(),
+                    totalMins: 0,
+                    privacy: 'public'
+                });
+                entries.sort((a,b) => (b.totalMins||0) - (a.totalMins||0));
             }
 
             const colors = ['#6366f1','#10b981','#f59e0b','#e879f9','#3b82f6','#ef4444','#06b6d4'];
-            const medals = ['🥇','🥈','🥉'];
+            const medals = ['\u{1F947}','\u{1F948}','\u{1F949}'];
             if (listEl) listEl.innerHTML = entries.map((e, i) => {
                 const isMe = e.uid === user.uid;
                 const rank = medals[i] || ('#' + (i+1));
                 const color = colors[i % colors.length];
-                return `<div class="tlb-row ${isMe?'me':''}">
-                    <div class="tlb-rank">${rank}</div>
-                    <div class="tlb-av" style="background:${color}">${e.initial || '?'}</div>
-                    <div class="tlb-name">${e.displayName || 'Anonymous'}${isMe ? '<span class="tlb-you">YOU</span>' : ''}</div>
-                    <div class="tlb-time">${fmtHM(e.totalMins || 0)}</div>
-                </div>`;
+                return '<div class="tlb-row ' + (isMe?'me':'') + '">' +
+                    '<div class="tlb-rank">' + rank + '</div>' +
+                    '<div class="tlb-av" style="background:' + color + '">' + (e.initial || '?') + '</div>' +
+                    '<div class="tlb-name">' + (e.displayName || 'Anonymous') + (isMe ? '<span class="tlb-you">YOU</span>' : '') + '</div>' +
+                    '<div class="tlb-time">' + fmtHM(e.totalMins || 0) + '</div>' +
+                    '</div>';
             }).join('');
-        } catch(e) {
-            console.warn('Leaderboard error:', e);
+        } catch(err) {
+            console.warn('Leaderboard error:', err);
             const listEl = document.getElementById('tlb-list');
-            if (listEl) listEl.innerHTML = '<div class="pom-log-empty">Could not load leaderboard. Check your connection.</div>';
+            if (listEl) {
+                listEl.innerHTML = '<div class="tlb-row me">' +
+                    '<div class="tlb-rank">#1</div>' +
+                    '<div class="tlb-av" style="background:#6366f1">' + (user.displayName||'A')[0].toUpperCase() + '</div>' +
+                    '<div class="tlb-name">' + (user.displayName||'Anonymous') + '<span class="tlb-you">YOU</span></div>' +
+                    '<div class="tlb-time">0h</div>' +
+                    '</div>';
+            }
         }
     }
 
