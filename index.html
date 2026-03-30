@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,12 +68,7 @@ body::before {
 }
 
 /* ── SCROLL ARROWS ── */
-.hero-cta-row {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  animation: fadeUp 0.6s 0.3s ease both;
-}
+
 .big-arrow {
   position: fixed;
   bottom: 40px;
@@ -197,6 +191,15 @@ body::before {
 
 .hero-sub strong { color: var(--text); font-weight: 500; }
 
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
 .hero-cta {
   display: inline-flex;
   align-items: center;
@@ -211,12 +214,33 @@ body::before {
   text-decoration: none;
   box-shadow: 0 8px 32px rgba(99,102,241,0.4);
   transition: transform 0.2s, box-shadow 0.2s;
-  animation: fadeUp 0.6s 0.3s ease both;
   border: none;
   cursor: pointer;
 }
-
 .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(99,102,241,0.55); }
+
+.hero-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #94a3b8;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 15px 28px;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: transform 0.2s, border-color 0.2s, color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+.hero-cta-secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16,185,129,0.45);
+  color: #6ee7b7;
+  background: rgba(16,185,129,0.07);
+}
 
 .hero-stats {
   display: flex;
@@ -658,9 +682,14 @@ footer {
   <p class="hero-sub">
     <strong>JEEverse</strong> is the all-in-one study hub for serious JEE aspirants — syllabus tracking, AI planning, community doubts, live leaderboards, and more. <em>All in one study hub.</em>
   </p>
-  <button class="hero-cta" onclick="launchApp()">
-    Open JEEverse →
-  </button>
+  <div class="hero-cta-row">
+    <button class="hero-cta" onclick="launchApp()">
+      Open JEEverse →
+    </button>
+    <a href="study-planner.html" class="hero-cta-secondary">
+      📅 Study Planner
+    </a>
+  </div>
   <!-- Fixed bottom-corner scroll arrows -->
   <div class="big-arrow big-arrow-left">&#8595;</div>
   <div class="big-arrow big-arrow-right">&#8595;</div>
@@ -696,7 +725,7 @@ footer {
   <p class="section-sub reveal">Built by a JEE aspirant, for JEE aspirants. Every feature exists because someone needed it during prep.</p>
 
   <div class="feat-grid reveal">
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 0, rgba(99,102,241,0.06), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 0, rgba(99,102,241,0.06), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <span class="feat-icon">📐</span>
       <div class="feat-name">Full Syllabus Tracker</div>
       <div class="feat-desc">Physics, Chemistry &amp; Maths — Class 11 &amp; 12 — every chapter, every unit. Toggle between classes instantly.</div>
@@ -729,7 +758,7 @@ footer {
             <text x="14" y="85" font-size="6" fill="#475569" font-family="monospace">Physics · Class 11 · Mechanics I</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 0, rgba(16,185,129,0.06), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 0, rgba(16,185,129,0.06), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <span class="feat-icon">🎯</span>
       <div class="feat-name">Multi-Stage Progress</div>
       <div class="feat-desc">Mark Theory, Examples, Exercise, Mains PYQ and Advance PYQ independently per chapter. Mix &amp; match as you go.</div>
@@ -767,7 +796,7 @@ footer {
             <text x="14" y="61" font-size="6" fill="#34d399" font-family="sans-serif">✓ Kinematics · 3/5 stages complete · 2.75 Mains pts</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 0, rgba(245,158,11,0.06), transparent 60%); --preview-accent:#fcd34d" onclick="location.href='main_site.html?tab=backlog&sub=coverage'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 0, rgba(245,158,11,0.06), transparent 60%); --preview-accent:#fcd34d" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=backlog&sub=coverage'" role="link" tabindex="0">
       <span class="feat-icon">🧠</span>
       <div class="feat-name">AI Study Planner</div>
       <div class="feat-desc">AI scans your entire backlog and builds a personalised study plan for the day — with time blocks, priorities and tips. Bring your own free OpenRouter API key.</div>
@@ -802,7 +831,7 @@ footer {
             <text x="14" y="70" font-size="6" fill="#fcd34d" font-family="sans-serif">🤖 3 tasks · 2h 45m total · Generated by AI</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 100%, rgba(232,121,249,0.06), transparent 60%); --preview-accent:#f0abfc" onclick="location.href='main_site.html?tab=backlog'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 100%, rgba(232,121,249,0.06), transparent 60%); --preview-accent:#f0abfc" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=backlog'" role="link" tabindex="0">
       <span class="feat-icon">🔥</span>
       <div class="feat-name">Revision Heatmap</div>
       <div class="feat-desc">Every chapter glows green, amber or red based on how recently you revised it. Never let a topic go cold again.</div>
@@ -834,7 +863,7 @@ footer {
             <text x="213" y="50.5" font-size="5.5" fill="#fca5a5" font-family="sans-serif">❄ 12d — revise!</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 100%, rgba(59,130,246,0.06), transparent 60%); --preview-accent:#93c5fd" onclick="location.href='main_site.html?tab=vault'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 100%, rgba(59,130,246,0.06), transparent 60%); --preview-accent:#93c5fd" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=vault'" role="link" tabindex="0">
       <span class="feat-icon">📝</span>
       <div class="feat-name">Study Vault</div>
       <div class="feat-desc">Save notes, formulae and PYQ observations per topic. Upload images of handwritten notes or diagrams.</div>
@@ -865,7 +894,7 @@ footer {
             <text x="230" y="46" font-size="6" fill="#475569" font-family="sans-serif">IMG</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 100%, rgba(16,185,129,0.06), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='main_site.html?tab=pomodoro'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 100%, rgba(16,185,129,0.06), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=pomodoro'" role="link" tabindex="0">
       <span class="feat-icon">⏱</span>
       <div class="feat-name">Custom Pomodoro</div>
       <div class="feat-desc">Build your own study sequence — set Study blocks, Short breaks, Long breaks. Hourly desktop notifications keep you on track.</div>
@@ -897,7 +926,7 @@ footer {
             <text x="92" y="63" font-size="5.5" fill="#93c5fd" font-family="sans-serif">▶ Start Sequence</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 0, rgba(245,158,11,0.08), transparent 60%); --preview-accent:#fcd34d" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 0, rgba(245,158,11,0.08), transparent 60%); --preview-accent:#fcd34d" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <span class="feat-icon">📋</span>
       <div class="feat-name">Chapter PYQ Access</div>
       <div class="feat-desc">Direct JEE Main PYQs from every chapter card — one click to Examside.com questions for that exact chapter.</div>
@@ -926,7 +955,7 @@ footer {
             <text x="153" y="43.5" font-size="5.5" fill="#fcd34d" font-family="sans-serif">📋 Mains PYQ</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 0, rgba(99,102,241,0.08), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 0, rgba(99,102,241,0.08), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <span class="feat-icon">🧠</span>
       <div class="feat-name">AI Notes & Questions</div>
       <div class="feat-desc">Chapter & topic-wise notes + instant AI questions (ChatGPT). Every chapter card → everything you need.</div>
@@ -950,7 +979,7 @@ footer {
             <text x="174" y="49.5" font-size="5.5" fill="#a5b4fc" font-family="sans-serif">🧠 Open in ChatGPT →</text>
           </svg>
         </div></div>    </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 100%, rgba(99,102,241,0.08), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='main_site.html?tab=backlog&sub=coverage'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 100%, rgba(99,102,241,0.08), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=backlog&sub=coverage'" role="link" tabindex="0">
       <span class="feat-icon">🤖</span>
       <div class="feat-name">AI Integration</div>
       <div class="feat-desc">Study Planner · Instant Chat · Formula Sheets · Question Generator — powered by OpenRouter models</div>
@@ -990,7 +1019,7 @@ footer {
 
   <div class="big-grid reveal">
     <!-- Mains scoring -->
-    <div class="big-card big-link" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="big-card big-link" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <div class="big-card-accent" style="background: linear-gradient(90deg, #6366f1, #3b82f6)"></div>
       <div class="big-card-num">01 — Mains Scoring</div>
       <div class="big-card-title" style="color:#a5b4fc">Mains Readiness<br>Points</div>
@@ -1050,7 +1079,7 @@ footer {
     </div>
 
     <!-- Advanced scoring -->
-    <div class="big-card big-link" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="big-card big-link" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <div class="big-card-accent" style="background: linear-gradient(90deg, #f59e0b, #e879f9)"></div>
       <div class="big-card-num">02 — Advanced Scoring</div>
       <div class="big-card-title" style="color:#fcd34d">Advanced Mastery<br>Points</div>
@@ -1120,7 +1149,7 @@ footer {
   </div>
 
   <!-- Leaderboard preview -->
-  <div class="full-card full-link reveal" onclick="location.href='main_site.html?tab=friends'" role="link">
+  <div class="full-card full-link reveal" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=friends'" role="link">
     <div>
       <div class="big-card-accent" style="background: linear-gradient(90deg, #10b981, #6366f1); position:relative; top:auto; left:auto; right:auto; height:3px; border-radius:3px; margin-bottom:1.5rem;"></div>
       <div class="big-card-num">03 — Live Rankings</div>
@@ -1213,7 +1242,7 @@ footer {
   <p class="section-sub reveal">Three dedicated community spaces — built for how JEE prep actually happens.</p>
 
   <div class="big-grid reveal">
-    <div class="big-card big-link" onclick="location.href='main_site.html?tab=community'" role="link">
+    <div class="big-card big-link" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=community'" role="link">
       <div class="big-card-accent" style="background:linear-gradient(90deg,#3b82f6,#6366f1)"></div>
       <div class="big-card-num">01 — Doubts Forum</div>
       <div class="big-card-title">❓ Ask. Answer.<br>Get Unstuck.</div>
@@ -1258,7 +1287,7 @@ footer {
       </div>
     </div>
 
-    <div class="big-card big-link" onclick="location.href='main_site.html?tab=groups'" role="link">
+    <div class="big-card big-link" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=groups'" role="link">
       <div class="big-card-accent" style="background:linear-gradient(90deg,#10b981,#e879f9)"></div>
       <div class="big-card-num">02 — Study Groups</div>
       <div class="big-card-title">👥 Public &amp; Private<br>Group Chats</div>
@@ -1314,7 +1343,7 @@ footer {
   </div>
 
   <!-- Friends full-width -->
-  <div class="full-card full-link reveal" onclick="location.href='main_site.html?tab=friends'" role="link">
+  <div class="full-card full-link reveal" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=friends'" role="link">
     <div>
       <div class="big-card-num">03 — Friends System</div>
       <div class="big-card-title">👫 See Each Other's<br>Real Progress</div>
@@ -1392,7 +1421,7 @@ footer {
   <div class="feat-grid reveal">
 
     <!-- Tile 1: Custom Pomodoro -->
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 0, rgba(16,185,129,0.08), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='main_site.html?tab=pomodoro'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 0, rgba(16,185,129,0.08), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=pomodoro'" role="link" tabindex="0">
       <span class="feat-icon">⏱</span>
       <div class="feat-name">Custom Pomodoro Timer</div>
       <div class="feat-desc">Design your own study sequence — any number of Study blocks, Short breaks and Long breaks, each with custom durations. Start it and focus.</div>
@@ -1440,7 +1469,7 @@ footer {
     </div>
 
     <!-- Tile 2: Focus Stats -->
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 50%, rgba(99,102,241,0.08), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='main_site.html?tab=focus-stats'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 50%, rgba(99,102,241,0.08), transparent 60%); --preview-accent:#a5b4fc" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=focus-stats'" role="link" tabindex="0">
       <span class="feat-icon">📈</span>
       <div class="feat-name">Focus Stats & Session Log</div>
       <div class="feat-desc">Every completed Pomodoro session is logged automatically. See your daily, weekly and all-time focus hours, plus a breakdown of study vs break time.</div>
@@ -1486,7 +1515,7 @@ footer {
     </div>
 
     <!-- Tile 3: Focus Leaderboard -->
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 100%, rgba(245,158,11,0.08), transparent 60%); --preview-accent:#fcd34d" onclick="location.href='main_site.html?tab=focus-lb'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 100%, rgba(245,158,11,0.08), transparent 60%); --preview-accent:#fcd34d" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=focus-lb'" role="link" tabindex="0">
       <span class="feat-icon">🏆</span>
       <div class="feat-name">Focus Leaderboard</div>
       <div class="feat-desc">Compete with every JEEverse user on raw focus hours. Daily, weekly and all-time boards — see who's putting in the most time, and chase them down.</div>
@@ -1556,8 +1585,8 @@ footer {
   <div class="section-label reveal">More features</div>
   <h2 class="section-title reveal">The details that<br>make a difference.</h2>
 
-  <div class="feat-grid feat-grid-2col reveal" style="grid-template-columns: repeat(2, 1fr)">
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 0, rgba(245,158,11,0.06), transparent 60%)" onclick="location.href='main_site.html?tab=mains'" role="link">
+  <div class="feat-grid feat-grid-3col reveal" style="grid-template-columns: repeat(3, 1fr)">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 0, rgba(245,158,11,0.06), transparent 60%)" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=mains'" role="link">
       <span class="feat-icon">📊</span>
       <div class="feat-name">JEE Mains & Advanced Test Logger</div>
       <div class="feat-desc">Log every mock test result — total marks, subject-wise breakdown, AIR estimate, batch rank. Track your trajectory over time with a clean history view.</div>
@@ -1595,7 +1624,7 @@ footer {
         </div>
       </div>
     </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 0, rgba(16,185,129,0.06), transparent 60%)" onclick="location.href='main_site.html?tab=backlog'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 0, rgba(16,185,129,0.06), transparent 60%)" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=backlog'" role="link" tabindex="0">
       <span class="feat-icon">📋</span>
       <div class="feat-name">Daily Targets Panel</div>
       <div class="feat-desc">A floating to-do panel for daily goals. Tick them off as you go — the tab title updates live with your completion count. Enable hourly desktop reminders to stay on track.</div>
@@ -1628,7 +1657,7 @@ footer {
         </div>
       </div>
     </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 100%, rgba(59,130,246,0.06), transparent 60%)" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 0 100%, rgba(59,130,246,0.06), transparent 60%)" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <span class="feat-icon">🔄</span>
       <div class="feat-name">Cloud Sync via Google</div>
       <div class="feat-desc">Sign in with Google and your entire progress syncs to the cloud. Switch devices, share with friends — your data follows you everywhere, instantly.</div>
@@ -1661,7 +1690,53 @@ footer {
         </div>
       </div>
     </div>
-    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 100%, rgba(232,121,249,0.06), transparent 60%)" onclick="location.href='main_site.html?tab=physics'" role="link" tabindex="0">
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 50% 0, rgba(16,185,129,0.06), transparent 60%); --preview-accent:#6ee7b7" onclick="location.href='study-planner.html'" role="link" tabindex="0">
+      <span class="feat-icon">📅</span>
+      <div class="feat-name">Study Planner</div>
+      <div class="feat-desc">A separate calendar + weekly timetable planner. Schedule study sessions, set recurring blocks, and visualise your entire week in a Google Calendar-style 24-hour view.</div>
+      <span class="feat-tag" style="background:rgba(16,185,129,0.1);color:#6ee7b7;">Calendar · Timetable</span>
+      <div class="feat-popup">
+        <div class="feat-popup-label">What you'll see</div>
+        <div class="feat-preview-bullets">
+          <div class="feat-preview-bullet">Month view with named event chips per day</div>
+          <div class="feat-preview-bullet">Week view with full 24-hour timeline, events with name + time</div>
+          <div class="feat-preview-bullet">Weekly timetable for recurring slots — 1-hour blocks, scrollable</div>
+        </div>
+        <div class="feat-preview-screen">
+          <div class="feat-preview-screen-bar">
+            <div class="feat-preview-screen-dot" style="background:#ef4444"></div>
+            <div class="feat-preview-screen-dot" style="background:#f59e0b"></div>
+            <div class="feat-preview-screen-dot" style="background:#10b981"></div>
+          </div>
+          <svg viewBox="0 0 280 72" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+            <rect width="280" height="72" fill="#0d1117"/>
+            <!-- Week grid columns -->
+            <rect x="8" y="8" width="38" height="58" rx="3" fill="#131c2e" stroke="rgba(16,185,129,0.2)" stroke-width="0.5"/>
+            <text x="16" y="22" font-size="5" fill="#64748b" font-family="monospace">6 AM</text>
+            <text x="16" y="36" font-size="5" fill="#64748b" font-family="monospace">7 AM</text>
+            <text x="16" y="50" font-size="5" fill="#64748b" font-family="monospace">8 AM</text>
+            <rect x="50" y="8" width="32" height="58" rx="3" fill="#131c2e"/>
+            <rect x="52" y="12" width="28" height="14" rx="3" fill="rgba(99,102,241,0.25)" stroke="rgba(99,102,241,0.5)" stroke-width="0.5"/>
+            <text x="54" y="20" font-size="4.5" fill="#a5b4fc" font-family="sans-serif">Physics</text>
+            <text x="54" y="25" font-size="3.8" fill="#6366f1" font-family="monospace">6–7 AM</text>
+            <rect x="86" y="8" width="32" height="58" rx="3" fill="#131c2e"/>
+            <rect x="88" y="12" width="28" height="28" rx="3" fill="rgba(16,185,129,0.2)" stroke="rgba(16,185,129,0.4)" stroke-width="0.5"/>
+            <text x="90" y="20" font-size="4.5" fill="#34d399" font-family="sans-serif">Study</text>
+            <text x="90" y="25" font-size="3.8" fill="#10b981" font-family="monospace">6–8 AM</text>
+            <rect x="122" y="8" width="32" height="58" rx="3" fill="#131c2e"/>
+            <rect x="154" y="8" width="32" height="58" rx="3" fill="#131c2e"/>
+            <rect x="156" y="24" width="28" height="14" rx="3" fill="rgba(245,158,11,0.2)" stroke="rgba(245,158,11,0.4)" stroke-width="0.5"/>
+            <text x="158" y="32" font-size="4.5" fill="#fcd34d" font-family="sans-serif">Maths</text>
+            <rect x="190" y="8" width="32" height="58" rx="3" fill="#131c2e"/>
+            <rect x="226" y="8" width="46" height="58" rx="3" fill="#131c2e"/>
+            <!-- Now line -->
+            <line x1="8" y1="40" x2="272" y2="40" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="2,2"/>
+            <circle cx="9" cy="40" r="3" fill="#ef4444"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="feat-card feat-link" style="--card-glow: radial-gradient(circle at 100% 100%, rgba(232,121,249,0.06), transparent 60%); --preview-accent:#f0abfc" onclick="location.href='https://anshverma-stack.github.io/JEEverse/?tab=physics'" role="link" tabindex="0">
       <span class="feat-icon">📎</span>
       <div class="feat-name">PYQ & Formula Quick-Links</div>
       <div class="feat-desc">Every chapter has one-click links to ExamSide PYQs, ChatGPT formula sheets, and practice question generators — directly from the chapter card.</div>
@@ -1748,10 +1823,10 @@ document.querySelectorAll('.feat-grid,.big-grid').forEach(grid => {
   setTimeout(hideArrows, 8000);
 })();
 function launchApp() {
-  window.location.href = 'main_site.html';
+  window.location.href = 'app.html';
 }
 // ── DEEP-LINK: runs after all scripts load, reads __deepLinkTab set in <head> ──
-window.launchAndGo = function() { window.location.href = 'main_site.html'; };
+window.launchAndGo = function() { window.location.href = 'app.html'; };
 
 document.querySelectorAll('.hero-cta,[data-launch]').forEach(btn => {
   btn.removeAttribute('href');
