@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Planner — JEEverse</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   ROOT & RESET
+══════════════════════════════════════════ */
+:root {
+  --bg:          #030712;
+  --surface-0:   #080f1e;
+  --surface-1:   #0d1117;
+  --surface-2:   #111827;
+  --surface-3:   #1a2235;
+  --border:      rgba(255,255,255,0.07);
+  --border-2:    rgba(255,255,255,0.12);
+  --accent:      #6366f1;
+  --accent-2:    #3b82f6;
+  --accent-glow: rgba(99,102,241,0.35);
+  --green:       #10b981;
+  --amber:       #f59e0b;
+  --pink:        #e879f9;
+  --red:         #ef4444;
+  --text:        #f1f5f9;
+  --text-2:      #94a3b8;
+  --text-3:      #475569;
+  --hour-h:      56px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: 0.35;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ══════════════════════════════════════════
+   TOP NAV
+══════════════════════════════════════════ */
+.top-nav {
+  position: relative; z-index: 500;
+  background: rgba(3,7,18,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  height: 54px;
+  flex-shrink: 0;
+}
+.nav-brand {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.05rem; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-right: 2rem; text-decoration: none; white-space: nowrap;
+}
+.nav-tabs { display: flex; gap: 3px; flex: 1; }
+.nav-tab {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 16px; border-radius: 9px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--text-3); font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.nav-tab:hover { color: var(--text-2); background: rgba(255,255,255,0.04); }
+.nav-tab.active { color: var(--text); background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.28); }
+.nav-back {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 9px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-3); font-size: 0.78rem; font-weight: 500;
+  cursor: pointer; text-decoration: none; transition: all 0.15s;
+}
+.nav-back:hover { color: var(--text-2); border-color: var(--border-2); }
+
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+.page { display: none; flex: 1; flex-direction: column; overflow: hidden; min-height: 0; }
+.page.active { display: flex; }
+
+/* ══════════════════════════════════════════
+   CALENDAR TOOLBAR
+══════════════════════════════════════════ */
+.cal-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border);
+  background: var(--surface-0); flex-shrink: 0;
+}
+.cal-nav-btn {
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-2);
+  cursor: pointer; font-size: 1rem; transition: all 0.14s;
+}
+.cal-nav-btn:hover { border-color: var(--border-2); color: var(--text); }
+.cal-title {
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
+  letter-spacing: -0.02em; min-width: 190px;
+}
+.cal-today-btn {
+  padding: 5px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-2);
+  font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.14s;
+}
+.cal-today-btn:hover { border-color: var(--border-2); color: var(--text); }
+.view-toggle {
+  display: flex; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 9px; padding: 3px; margin-left: auto; gap: 2px;
+}
+.view-btn {
+  padding: 4px 13px; border-radius: 7px; border: none;
+  background: transparent; color: var(--text-3);
+  font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.14s;
+}
+.view-btn.active { background: var(--accent); color: white; box-shadow: 0 3px 10px var(--accent-glow); }
+.add-event-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 16px; border-radius: 9px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 3px 12px var(--accent-glow); transition: all 0.16s;
+}
+.add-event-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 18px var(--accent-glow); }
+
+/* ══════════════════════════════════════════
+   CALENDAR MONTH VIEW
+══════════════════════════════════════════ */
+#view-month { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.month-header-row {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  border-bottom: 1px solid var(--border); background: var(--surface-0); flex-shrink: 0;
+}
+.month-day-label {
+  padding: 9px 0; text-align: center;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3);
+}
+.month-grid-scroll { flex: 1; overflow-y: auto; }
+.month-grid {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  grid-auto-rows: minmax(100px,1fr); border-left: 1px solid var(--border);
+}
+.month-cell {
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 7px 5px 5px; min-height: 100px; cursor: pointer; transition: background 0.12s;
+}
+.month-cell:hover { background: rgba(255,255,255,0.02); }
+.month-cell.other-month .cell-date { opacity: 0.28; }
+.month-cell.today .cell-date {
+  background: var(--accent); color: white; border-radius: 50%;
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.cell-date {
+  font-family: 'DM Mono', monospace; font-size: 0.76rem; font-weight: 500;
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 3px;
+}
+.cell-events { display: flex; flex-direction: column; gap: 2px; }
+.cell-event-chip {
+  display: block; padding: 2px 6px; border-radius: 3px;
+  font-size: 0.63rem; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+}
+
+/* ══════════════════════════════════════════
+   CALENDAR WEEK VIEW
+══════════════════════════════════════════ */
+#view-week { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.week-header {
+  display: grid; grid-template-columns: 54px repeat(7,1fr);
+  border-bottom: 1px solid var(--border); background: var(--surface-0); flex-shrink: 0;
+}
+.week-header-spacer { border-right: 1px solid var(--border); }
+.week-day-col-header {
+  padding: 8px; text-align: center; border-right: 1px solid var(--border);
+}
+.week-day-name {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 2px;
+}
+.week-day-num {
+  font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--text-2);
+}
+.week-day-col-header.today-col .week-day-num {
+  background: var(--accent); color: white; border-radius: 50%;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; box-shadow: 0 3px 10px var(--accent-glow);
+}
+.week-day-col-header.today-col .week-day-name { color: var(--accent); }
+.week-body-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+.week-body-inner {
+  display: grid; grid-template-columns: 54px repeat(7,1fr);
+  min-height: calc(var(--hour-h) * 24);
+}
+.week-time-col { border-right: 1px solid var(--border); position: relative; height: calc(var(--hour-h)*24); }
+.week-hour-label {
+  position: absolute; right: 7px; height: var(--hour-h);
+  display: flex; align-items: flex-start; padding-top: 5px;
+  font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--text-3); white-space: nowrap;
+}
+.week-day-col {
+  border-right: 1px solid var(--border); position: relative; height: calc(var(--hour-h)*24);
+}
+.week-hour-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--border); pointer-events: none; }
+.week-half-line { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.025); pointer-events: none; }
+.week-hour-slot { position: absolute; left: 0; right: 0; height: var(--hour-h); cursor: pointer; transition: background 0.1s; }
+.week-hour-slot:hover { background: rgba(255,255,255,0.025); }
+.now-line { position: absolute; left: 0; right: 0; height: 2px; background: #ef4444; pointer-events: none; z-index: 20; }
+.now-dot { position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; }
+.week-event {
+  position: absolute; left: 3px; right: 3px; border-radius: 6px;
+  padding: 4px 7px; overflow: hidden; cursor: pointer; z-index: 10;
+  border-left: 3px solid rgba(255,255,255,0.35); transition: filter 0.14s;
+}
+.week-event:hover { filter: brightness(1.2); }
+.week-event-name { font-size: 0.68rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.week-event-time { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: rgba(255,255,255,0.65); margin-top: 1px; }
+
+/* ══════════════════════════════════════════
+   TIMETABLE TOOLBAR
+══════════════════════════════════════════ */
+.tt-toolbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-0); flex-shrink: 0;
+  min-height: 58px;
+}
+.tt-title-group { display: flex; flex-direction: column; gap: 1px; }
+.tt-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; }
+.tt-sub { font-size: 0.7rem; color: var(--text-3); }
+.tt-edit-hint {
+  font-size: 0.7rem; color: var(--text-3);
+  background: var(--surface-2); border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: 7px; white-space: nowrap;
+}
+.tt-spacer { flex: 1; }
+
+/* Edit mode indicator */
+.edit-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'DM Mono', monospace; font-size: 0.62rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #fcd34d; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.28);
+  padding: 4px 10px; border-radius: 7px;
+}
+.edit-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; animation: blink 1.2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+.btn-toolbar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 9px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all 0.16s; border: none;
+}
+.btn-edit { background: rgba(255,255,255,0.07); border: 1px solid var(--border) !important; color: var(--text-2); }
+.btn-edit:hover { background: rgba(255,255,255,0.12); color: var(--text); border-color: var(--border-2) !important; }
+.btn-confirm { background: linear-gradient(135deg, var(--green), #059669); color: white; box-shadow: 0 3px 12px rgba(16,185,129,0.35); }
+.btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(16,185,129,0.45); }
+.btn-cancel { background: rgba(255,255,255,0.05); border: 1px solid var(--border) !important; color: var(--text-3); }
+.btn-cancel:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3) !important; color: #fca5a5; }
+
+/* ══════════════════════════════════════════
+   TIMETABLE GRID
+══════════════════════════════════════════ */
+.tt-scroll-wrap {
+  flex: 1; overflow: auto; min-height: 0;
+  position: relative;
+}
+
+.tt-sticky-header {
+  display: flex; position: sticky; top: 0; z-index: 50;
+  background: var(--surface-0); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.tt-hdr-spacer {
+  width: 54px; flex-shrink: 0; border-right: 1px solid var(--border);
+}
+.tt-hdr-day {
+  flex: 1; min-width: 0; text-align: center; padding: 9px 4px;
+  border-right: 1px solid var(--border);
+  font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); font-weight: 500;
+}
+.tt-hdr-day.today-hdr { color: var(--accent); }
+
+.tt-body {
+  display: flex; position: relative;
+}
+
+.tt-time-col {
+  width: 54px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  position: relative;
+  height: calc(var(--hour-h) * 24);
+}
+.tt-time-lbl {
+  position: absolute; right: 7px; height: var(--hour-h);
+  display: flex; align-items: flex-start; padding-top: 5px;
+  font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--text-3); white-space: nowrap;
+}
+
+.tt-day-col {
+  flex: 1; min-width: 0;
+  border-right: 1px solid var(--border);
+  position: relative;
+  height: calc(var(--hour-h) * 24);
+}
+.tt-hour-line-g {
+  position: absolute; left: 0; right: 0;
+  height: 1px; background: var(--border); pointer-events: none;
+}
+.tt-half-line-g {
+  position: absolute; left: 0; right: 0;
+  height: 1px; background: rgba(255,255,255,0.022); pointer-events: none;
+}
+
+/* Hour zone — click target in edit mode */
+.tt-zone {
+  position: absolute; left: 0; right: 0;
+  height: var(--hour-h); z-index: 5;
+  cursor: default;
+}
+.edit-mode .tt-zone.zone-free {
+  cursor: pointer;
+}
+.edit-mode .tt-zone.zone-free:hover {
+  background: rgba(99,102,241,0.07);
+}
+.tt-zone.zone-sel {
+  background: rgba(99,102,241,0.18) !important;
+  border-left: 2px solid rgba(99,102,241,0.6);
+}
+.tt-zone.zone-sel-first { border-top: 1px dashed rgba(99,102,241,0.5); }
+.tt-zone.zone-sel-last  { border-bottom: 1px dashed rgba(99,102,241,0.5); }
+
+/* Floating "Create Slot" pill */
+.sel-create-pill {
+  position: absolute; z-index: 200;
+  display: none;
+  align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 100px;
+  background: var(--accent); color: white;
+  font-size: 0.76rem; font-weight: 700;
+  box-shadow: 0 4px 18px var(--accent-glow);
+  cursor: pointer; white-space: nowrap;
+  transform: translateX(-50%);
+  transition: transform 0.1s, box-shadow 0.1s;
+  border: none;
+}
+.sel-create-pill:hover { box-shadow: 0 6px 24px var(--accent-glow); transform: translateX(-50%) scale(1.04); }
+.sel-create-pill.visible { display: flex; }
+
+/* Timetable slots (view + edit) */
+.tt-slot-block {
+  position: absolute; left: 3px; right: 3px;
+  border-radius: 7px; border: 2px solid transparent; border-left-width: 3px;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 5px 8px; overflow: hidden; z-index: 10;
+  cursor: pointer; transition: filter 0.15s, transform 0.15s, border-color 0.3s, box-shadow 0.3s;
+}
+.tt-slot-block:hover { filter: brightness(1.18); transform: scaleX(1.015); }
+.tt-slot-name { font-size: 0.72rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-slot-time { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: rgba(255,255,255,0.6); margin-top: 1px; }
+.tt-slot-status-dot { display: none; }
+/* Delete button (edit mode only) */
+.tt-slot-del {
+  display: none; position: absolute; top: 3px; right: 4px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(239,68,68,0.25); border: none;
+  color: #fca5a5; font-size: 0.7rem; font-weight: 700;
+  cursor: pointer; align-items: center; justify-content: center;
+  line-height: 1; transition: background 0.14s;
+}
+.tt-slot-del:hover { background: rgba(239,68,68,0.55); }
+.edit-mode .tt-slot-del { display: flex; }
+
+/* ══════════════════════════════════════════
+   SLOT DETAIL PANEL (bottom sheet)
+══════════════════════════════════════════ */
+.detail-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  z-index: 800; display: none;
+  align-items: flex-end; justify-content: center;
+}
+.detail-backdrop.open { display: flex; }
+.detail-panel {
+  width: 100%; max-width: 680px;
+  background: #0b1426;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+  border-radius: 18px 18px 0 0;
+  padding: 1.4rem 1.6rem 1.8rem;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.34,1.1,0.64,1);
+  max-height: 85vh; overflow-y: auto;
+}
+.detail-backdrop.open .detail-panel { transform: translateY(0); }
+.detail-drag { width: 36px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.15); margin: 0 auto 1.2rem; }
+.detail-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 1.2rem; }
+.detail-color-bar { width: 4px; border-radius: 4px; flex-shrink: 0; align-self: stretch; min-height: 28px; }
+.detail-title-wrap { flex: 1; }
+.detail-name { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+.detail-time { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--text-3); margin-top: 2px; }
+.detail-close {
+  margin-left: auto; width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent; color: var(--text-3);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+  transition: all 0.14s; flex-shrink: 0;
+}
+.detail-close:hover { border-color: var(--border-2); color: var(--text); }
+
+/* Status row */
+.detail-section { margin-bottom: 1.1rem; }
+.detail-section-label {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 7px;
+}
+.status-row { display: flex; gap: 8px; }
+.status-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 10px 8px; border-radius: 10px;
+  border: 1px solid var(--border); background: transparent;
+  font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+  color: var(--text-2); cursor: pointer; transition: all 0.16s;
+}
+.status-btn:hover { border-color: var(--border-2); background: rgba(255,255,255,0.04); }
+.status-btn.active-done { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.45); color: #34d399; }
+.status-btn.active-partial { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.4); color: #fcd34d; }
+.status-btn.active-notdone { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.38); color: #fca5a5; }
+.status-icon { font-size: 1rem; }
+
+/* Notes */
+.note-area {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+  resize: vertical; min-height: 70px; outline: none; transition: border-color 0.15s;
+  font-weight: 400; line-height: 1.6;
+}
+.note-area:focus { border-color: rgba(99,102,241,0.45); background: rgba(99,102,241,0.05); }
+.note-area:disabled { opacity: 0.35; cursor: not-allowed; background: rgba(0,0,0,0.2); }
+.note-locked-msg {
+  font-size: 0.7rem; color: var(--text-3);
+  display: flex; align-items: center; gap: 5px; margin-top: 5px;
+}
+
+.detail-save-row { display: flex; gap: 8px; margin-top: 1.2rem; }
+.btn-detail-save {
+  flex: 1; padding: 10px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white; font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; box-shadow: 0 3px 12px var(--accent-glow); transition: all 0.16s;
+}
+.btn-detail-save:hover { transform: translateY(-1px); box-shadow: 0 5px 18px var(--accent-glow); }
+.btn-detail-cancel {
+  padding: 10px 20px; border-radius: 10px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-3); font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-detail-cancel:hover { background: rgba(255,255,255,0.06); color: var(--text-2); }
+
+/* ══════════════════════════════════════════
+   EVENT / SLOT MODALS
+══════════════════════════════════════════ */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.68);
+  backdrop-filter: blur(6px); z-index: 1000;
+  display: none; align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: #0d1828; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px;
+  padding: 1.7rem; width: 100%; max-width: 420px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.92);
+  animation: modalIn 0.22s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1.3rem; }
+.form-group { margin-bottom: 0.9rem; }
+.form-label {
+  display: block; font-family: 'DM Mono', monospace;
+  font-size: 0.58rem; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 5px;
+}
+.form-input {
+  width: 100%; padding: 9px 11px; border-radius: 9px;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.86rem;
+  outline: none; transition: border-color 0.14s;
+}
+.form-input:focus { border-color: rgba(99,102,241,0.45); background: rgba(99,102,241,0.05); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.color-grid { display: flex; gap: 7px; flex-wrap: wrap; }
+.color-swatch {
+  width: 26px; height: 26px; border-radius: 7px; cursor: pointer;
+  border: 2px solid transparent; transition: all 0.14s;
+}
+.color-swatch.selected { border-color: white; transform: scale(1.12); }
+.modal-actions { display: flex; gap: 8px; margin-top: 1.3rem; }
+.btn { flex: 1; padding: 9px 18px; border-radius: 9px; border: none; font-size: 0.83rem; font-weight: 700; cursor: pointer; transition: all 0.16s; font-family: 'DM Sans', sans-serif; }
+.btn-primary { background: linear-gradient(135deg,var(--accent),var(--accent-2)); color: white; box-shadow: 0 3px 12px var(--accent-glow); }
+.btn-primary:hover { transform: translateY(-1px); }
+.btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-2); }
+.btn-secondary:hover { background: rgba(255,255,255,0.09); }
+.btn-danger { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+.btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+/* Modal pre-filled time display */
+.modal-time-display {
+  padding: 8px 11px; border-radius: 9px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--text-2);
+}
+
+/* Weekly reset notice */
+.reset-notice {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 9px;
+  background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
+  font-size: 0.72rem; color: var(--text-3); margin-bottom: 1rem;
+}
+.reset-notice .rn-icon { font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">JEEverse</a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-calendar" onclick="switchPage('calendar')">
+      <span>📅</span> Calendar
+    </button>
+    <button class="nav-tab" id="tab-timetable" onclick="switchPage('timetable')">
+      <span>📋</span> Weekly Timetable
+    </button>
+  </div>
+  <a href="index.html" class="nav-back">← Back to JEEverse</a>
+</nav>
+
+<!-- ════════════════════════════════════════
+     PAGE 1: CALENDAR
+════════════════════════════════════════ -->
+<div id="page-calendar" class="page active">
+  <div class="cal-toolbar">
+    <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+    <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+    <div class="cal-title" id="cal-title"></div>
+    <button class="cal-today-btn" onclick="calGoToday()">Today</button>
+    <div class="view-toggle" style="margin-left:auto">
+      <button class="view-btn active" id="vbtn-month" onclick="setCalView('month')">Month</button>
+      <button class="view-btn" id="vbtn-week" onclick="setCalView('week')">Week</button>
+    </div>
+    <button class="add-event-btn" onclick="openEventModal(null,null)">+ Add Event</button>
+  </div>
+
+  <!-- Month View -->
+  <div id="view-month">
+    <div class="month-header-row">
+      <div class="month-day-label">Sun</div><div class="month-day-label">Mon</div>
+      <div class="month-day-label">Tue</div><div class="month-day-label">Wed</div>
+      <div class="month-day-label">Thu</div><div class="month-day-label">Fri</div>
+      <div class="month-day-label">Sat</div>
+    </div>
+    <div class="month-grid-scroll"><div class="month-grid" id="month-grid"></div></div>
+  </div>
+
+  <!-- Week View -->
+  <div id="view-week" style="display:none">
+    <div class="week-header" id="week-header"></div>
+    <div class="week-body-scroll" id="week-scroll">
+      <div class="week-body-inner" id="week-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAGE 2: TIMETABLE
+════════════════════════════════════════ -->
+<div id="page-timetable" class="page">
+
+  <!-- Toolbar — dynamic -->
+  <div class="tt-toolbar" id="tt-toolbar">
+    <!-- Injected by JS based on edit mode state -->
+  </div>
+
+  <!-- Scroll wrap -->
+  <div class="tt-scroll-wrap" id="tt-scroll-wrap">
+    <!-- Sticky header (day names) -->
+    <div class="tt-sticky-header" id="tt-sticky-header"></div>
+    <!-- Body -->
+    <div class="tt-body" id="tt-body"></div>
+
+    <!-- Floating create pill (selection) -->
+    <button class="sel-create-pill" id="sel-create-pill" onclick="openSlotModal()">
+      <span>＋</span> <span id="sel-pill-label">Create Slot</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLOT DETAIL PANEL
+════════════════════════════════════════ -->
+<div class="detail-backdrop" id="detail-backdrop" onclick="closeDetailPanel(event)">
+  <div class="detail-panel" onclick="event.stopPropagation()">
+    <div class="detail-drag"></div>
+    <div class="detail-header">
+      <div class="detail-color-bar" id="dp-color-bar"></div>
+      <div class="detail-title-wrap">
+        <div class="detail-name" id="dp-name"></div>
+        <div class="detail-time" id="dp-time"></div>
+      </div>
+      <button class="detail-close" onclick="closeDetailPanel()">✕</button>
+    </div>
+
+    <div class="reset-notice">
+      <span class="rn-icon">🔄</span>
+      Status and notes reset every week. The timetable itself stays.
+    </div>
+
+    <!-- Status -->
+    <div class="detail-section">
+      <div class="detail-section-label">Mark as</div>
+      <div class="status-row">
+        <button class="status-btn" id="sb-done"    onclick="setStatus('done')">
+          <span class="status-icon">✅</span> Done
+        </button>
+        <button class="status-btn" id="sb-partial" onclick="setStatus('partial')">
+          <span class="status-icon">⚡</span> Partial
+        </button>
+        <button class="status-btn" id="sb-notdone" onclick="setStatus('notdone')">
+          <span class="status-icon">❌</span> Not Done
+        </button>
+      </div>
+    </div>
+
+    <!-- Goal note -->
+    <div class="detail-section">
+      <div class="detail-section-label">📌 Goal for this block</div>
+      <textarea class="note-area" id="dp-goal" placeholder="What do you want to achieve in this block?"></textarea>
+      <div class="note-locked-msg" id="dp-goal-locked" style="display:none">🔒 Goal locked — block already started</div>
+    </div>
+
+    <!-- Done note -->
+    <div class="detail-section">
+      <div class="detail-section-label">✍️ What was done</div>
+      <textarea class="note-area" id="dp-done-note" placeholder="Log what you actually covered..."></textarea>
+      <div class="note-locked-msg" id="dp-done-locked" style="display:none">⏳ Available after block ends</div>
+    </div>
+
+    <div class="detail-save-row">
+      <button class="btn-detail-cancel" onclick="closeDetailPanel()">Discard</button>
+      <button class="btn-detail-save" onclick="saveDetail()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     EVENT MODAL (calendar)
+════════════════════════════════════════ -->
+<div class="modal-backdrop" id="event-modal-backdrop" onclick="closeEventModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="event-modal-title">New Event</div>
+    <div class="form-group"><label class="form-label">Event Name</label>
+      <input class="form-input" id="ev-name" type="text" placeholder="e.g. Physics revision"></div>
+    <div class="form-group"><label class="form-label">Date</label>
+      <input class="form-input" id="ev-date" type="date"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Start</label>
+        <input class="form-input" id="ev-start" type="time"></div>
+      <div class="form-group"><label class="form-label">End</label>
+        <input class="form-input" id="ev-end" type="time"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Colour</label>
+      <div class="color-grid" id="ev-colors"></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeEventModal()">Cancel</button>
+      <button class="btn btn-danger" id="ev-delete-btn" onclick="deleteEvent()" style="display:none">Delete</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLOT MODAL (edit timetable)
+════════════════════════════════════════ -->
+<div class="modal-backdrop" id="slot-modal-backdrop" onclick="closeSlotModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="slot-modal-title">New Time Block</div>
+    <div class="form-group"><label class="form-label">Label</label>
+      <input class="form-input" id="sl-name" type="text" placeholder="e.g. Physics Study"></div>
+    <div class="form-group"><label class="form-label">Time</label>
+      <div class="modal-time-display" id="sl-time-display">—</div></div>
+    <div class="form-group"><label class="form-label">Colour</label>
+      <div class="color-grid" id="sl-colors"></div></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeSlotModal()">Cancel</button>
+      <button class="btn btn-danger" id="sl-delete-btn" onclick="deleteSlot()" style="display:none">Delete</button>
+      <button class="btn btn-primary" onclick="saveSlot()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   CONSTANTS & CONFIG
+══════════════════════════════════════════ */
+const HOUR_H = 56; // px per hour (must match --hour-h CSS var)
+const COLORS = [
+  { hex: '#6366f1', label: 'Indigo'  },
+  { hex: '#3b82f6', label: 'Blue'    },
+  { hex: '#10b981', label: 'Green'   },
+  { hex: '#f59e0b', label: 'Amber'   },
+  { hex: '#e879f9', label: 'Pink'    },
+  { hex: '#ef4444', label: 'Red'     },
+  { hex: '#06b6d4', label: 'Cyan'    },
+  { hex: '#8b5cf6', label: 'Violet'  },
+  { hex: '#f97316', label: 'Orange'  },
+  { hex: '#64748b', label: 'Slate'   },
+];
+const DAY_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+/* ══════════════════════════════════════════
+   DATA STORAGE
+   ttSlots: permanent timetable structure
+   weekData: ephemeral, resets each Sunday
+══════════════════════════════════════════ */
+function storageGet(k, def=[]) {
+  try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; }
+}
+function storageSet(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+
+// ttSlots: [{id, day, startHour, endHour, label, color}]
+// startHour inclusive, endHour exclusive (e.g. 6–8 → startHour:6, endHour:8)
+let ttSlots    = storageGet('jv_tt_slots2', []);
+let ttSlotsSaved = JSON.parse(JSON.stringify(ttSlots)); // snapshot for cancel
+
+// weekData: {weekKey, entries:{[slotId]:{status,goalNote,doneNote}}}
+function getWeekKey() {
+  const d = new Date();
+  const sunday = new Date(d);
+  sunday.setHours(0,0,0,0);
+  sunday.setDate(sunday.getDate() - sunday.getDay());
+  return sunday.toISOString().split('T')[0];
+}
+function loadWeekData() {
+  const raw = storageGet('jv_tt_week', null);
+  const key = getWeekKey();
+  if (raw && raw.weekKey === key) return raw.entries || {};
+  return {}; // new week → fresh
+}
+function saveWeekData(entries) {
+  storageSet('jv_tt_week', { weekKey: getWeekKey(), entries });
+}
+let weekData = loadWeekData();
+
+// Calendar events
+let calEvents = storageGet('jv_cal_events2', []);
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════════
+   PAGE SWITCHING
+══════════════════════════════════════════ */
+function switchPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tab-'+p).classList.add('active');
+  if (p === 'timetable') { renderTimetableToolbar(); renderTimetable(); }
+}
+
+/* ══════════════════════════════════════════
+   CALENDAR STATE
+══════════════════════════════════════════ */
+const today = new Date();
+let calView = 'month';
+let curYear  = today.getFullYear();
+let curMonth = today.getMonth();
+let curWeekStart = getWeekStart(today);
+
+function getWeekStart(d) {
+  const dt = new Date(d); dt.setHours(0,0,0,0);
+  dt.setDate(dt.getDate() - dt.getDay()); return dt;
+}
+function fmtDate(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function setCalView(v) {
+  calView = v;
+  document.getElementById('vbtn-month').classList.toggle('active', v==='month');
+  document.getElementById('vbtn-week').classList.toggle('active', v==='week');
+  document.getElementById('view-month').style.display = v==='month' ? '' : 'none';
+  document.getElementById('view-week').style.display  = v==='week'  ? 'flex' : 'none';
+  renderCal();
+}
+
+function calNav(dir) {
+  if (calView==='month') {
+    curMonth += dir;
+    if (curMonth>11){curMonth=0;curYear++;} if(curMonth<0){curMonth=11;curYear--;}
+  } else {
+    curWeekStart = new Date(curWeekStart.getTime() + dir*7*86400000);
+  }
+  renderCal();
+}
+function calGoToday() {
+  curYear=today.getFullYear(); curMonth=today.getMonth(); curWeekStart=getWeekStart(today);
+  renderCal();
+}
+function renderCal() { if(calView==='month') renderMonth(); else renderWeek(); }
+
+/* ── Month View ── */
+function renderMonth() {
+  document.getElementById('cal-title').textContent = MONTH_NAMES[curMonth]+' '+curYear;
+  const grid = document.getElementById('month-grid'); grid.innerHTML='';
+  const first = new Date(curYear,curMonth,1); const startDay = first.getDay();
+  const daysInMonth = new Date(curYear,curMonth+1,0).getDate();
+  const prevDays = new Date(curYear,curMonth,0).getDate();
+  let cells=[];
+  for(let i=startDay-1;i>=0;i--) cells.push({date:new Date(curYear,curMonth-1,prevDays-i),other:true});
+  for(let d=1;d<=daysInMonth;d++) cells.push({date:new Date(curYear,curMonth,d),other:false});
+  const rem=42-cells.length;
+  for(let d=1;d<=rem;d++) cells.push({date:new Date(curYear,curMonth+1,d),other:true});
+  cells.forEach(cell=>{
+    const ds=fmtDate(cell.date); const isT=ds===fmtDate(today);
+    const div=document.createElement('div');
+    div.className='month-cell'+(cell.other?' other-month':'')+(isT?' today':'');
+    div.onclick=()=>openEventModal(ds,null);
+    const dateEl=document.createElement('div'); dateEl.className='cell-date';
+    dateEl.textContent=cell.date.getDate(); div.appendChild(dateEl);
+    const evWrap=document.createElement('div'); evWrap.className='cell-events';
+    const dayEvs=calEvents.filter(e=>e.date===ds).sort((a,b)=>a.start.localeCompare(b.start));
+    dayEvs.slice(0,3).forEach(ev=>{
+      const chip=document.createElement('div'); chip.className='cell-event-chip';
+      chip.style.background=ev.color+'28'; chip.style.color=ev.color;
+      chip.textContent=ev.name;
+      chip.onclick=e=>{e.stopPropagation();openEventModal(ds,ev.id);}; evWrap.appendChild(chip);
+    });
+    if(dayEvs.length>3){const m=document.createElement('div');m.style.cssText='font-size:0.58rem;color:var(--text-3);padding:1px 5px;';m.textContent='+'+(dayEvs.length-3)+' more';evWrap.appendChild(m);}
+    div.appendChild(evWrap); grid.appendChild(div);
+  });
+}
+
+/* ── Week View ── */
+function renderWeek() {
+  const ws=new Date(curWeekStart); const we=new Date(ws.getTime()+6*86400000);
+  const a=ws,b=we;
+  document.getElementById('cal-title').textContent =
+    a.getMonth()===b.getMonth()
+      ? MONTH_NAMES[a.getMonth()]+' '+a.getDate()+'–'+b.getDate()+', '+a.getFullYear()
+      : MONTH_NAMES[a.getMonth()]+' '+a.getDate()+' – '+MONTH_NAMES[b.getMonth()]+' '+b.getDate()+', '+b.getFullYear();
+
+  const hdr=document.getElementById('week-header'); hdr.innerHTML='<div class="week-header-spacer"></div>';
+  for(let i=0;i<7;i++){
+    const d=new Date(ws.getTime()+i*86400000); const isT=fmtDate(d)===fmtDate(today);
+    const col=document.createElement('div'); col.className='week-day-col-header'+(isT?' today-col':'');
+    col.innerHTML=`<div class="week-day-name">${DAY_SHORT[d.getDay()]}</div><div class="week-day-num">${d.getDate()}</div>`;
+    hdr.appendChild(col);
+  }
+  const body=document.getElementById('week-body'); body.innerHTML='';
+  const tCol=document.createElement('div'); tCol.className='week-time-col';
+  for(let h=0;h<24;h++){const l=document.createElement('div');l.className='week-hour-label';l.style.top=(h*HOUR_H)+'px';l.textContent=h===0?'':(h<12?h+' AM':h===12?'12 PM':(h-12)+' PM');tCol.appendChild(l);}
+  body.appendChild(tCol);
+  for(let i=0;i<7;i++){
+    const d=new Date(ws.getTime()+i*86400000); const ds=fmtDate(d);
+    const col=document.createElement('div'); col.className='week-day-col';
+    for(let h=0;h<24;h++){
+      const ln=document.createElement('div');ln.className='week-hour-line';ln.style.top=(h*HOUR_H)+'px';col.appendChild(ln);
+      const hl=document.createElement('div');hl.className='week-half-line';hl.style.top=(h*HOUR_H+28)+'px';col.appendChild(hl);
+      const sl=document.createElement('div');sl.className='week-hour-slot';sl.style.top=(h*HOUR_H)+'px';
+      const hs=String(h).padStart(2,'0')+':00'; const he=String(h<23?h+1:23).padStart(2,'0')+':'+(h<23?'00':'59');
+      sl.onclick=()=>openEventModal(ds,null,hs,he); col.appendChild(sl);
+    }
+    calEvents.filter(e=>e.date===ds).forEach(ev=>{
+      const [sh,sm]=ev.start.split(':').map(Number); const [eh,em]=ev.end.split(':').map(Number);
+      const sm2=sh*60+sm; const em2=Math.max(eh*60+em,sm2+20);
+      const evEl=document.createElement('div'); evEl.className='week-event';
+      evEl.style.cssText=`top:${(sm2/60)*HOUR_H}px;height:${Math.max(((em2-sm2)/60)*HOUR_H,20)}px;background:${ev.color}22;color:${ev.color};border-left-color:${ev.color};`;
+      evEl.innerHTML=`<div class="week-event-name">${escHtml(ev.name)}</div><div class="week-event-time">${ev.start}${ev.end?' – '+ev.end:''}</div>`;
+      evEl.onclick=e=>{e.stopPropagation();openEventModal(ds,ev.id);}; col.appendChild(evEl);
+    });
+    if(fmtDate(d)===fmtDate(today)){
+      const now2=new Date(); const nm=now2.getHours()*60+now2.getMinutes();
+      const nl=document.createElement('div');nl.className='now-line';nl.style.top=(nm/60*HOUR_H)+'px';
+      nl.innerHTML='<div class="now-dot"></div>'; col.appendChild(nl);
+    }
+    body.appendChild(col);
+  }
+  requestAnimationFrame(()=>{ const sc=document.getElementById('week-scroll'); if(sc&&sc.scrollTop===0) sc.scrollTop=6*HOUR_H; });
+}
+
+/* ══════════════════════════════════════════
+   CALENDAR EVENT MODAL
+══════════════════════════════════════════ */
+let editingEvId=null, selEvColor=COLORS[0].hex;
+
+function buildColorGrid(containerId, current, onSel) {
+  const g=document.getElementById(containerId); g.innerHTML='';
+  COLORS.forEach(c=>{
+    const sw=document.createElement('div'); sw.className='color-swatch'+(c.hex===current?' selected':'');
+    sw.style.background=c.hex; sw.title=c.label;
+    sw.onclick=()=>{g.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));sw.classList.add('selected');onSel(c.hex);};
+    g.appendChild(sw);
+  });
+}
+
+function openEventModal(dateStr,eventId,defaultStart,defaultEnd){
+  editingEvId=eventId;
+  const isEdit=!!eventId;
+  document.getElementById('event-modal-title').textContent=isEdit?'Edit Event':'New Event';
+  document.getElementById('ev-delete-btn').style.display=isEdit?'':'none';
+  if(isEdit){
+    const ev=calEvents.find(e=>e.id===eventId); if(!ev) return;
+    selEvColor=ev.color;
+    document.getElementById('ev-name').value=ev.name;
+    document.getElementById('ev-date').value=ev.date;
+    document.getElementById('ev-start').value=ev.start;
+    document.getElementById('ev-end').value=ev.end||'';
+  } else {
+    selEvColor=COLORS[0].hex;
+    document.getElementById('ev-name').value='';
+    document.getElementById('ev-date').value=dateStr||fmtDate(today);
+    document.getElementById('ev-start').value=defaultStart||'';
+    document.getElementById('ev-end').value=defaultEnd||'';
+  }
+  buildColorGrid('ev-colors',selEvColor,c=>{selEvColor=c;});
+  document.getElementById('event-modal-backdrop').classList.add('open');
+  setTimeout(()=>document.getElementById('ev-name').focus(),60);
+}
+function closeEventModal(e){
+  if(e&&e.target!==document.getElementById('event-modal-backdrop')) return;
+  document.getElementById('event-modal-backdrop').classList.remove('open'); editingEvId=null;
+}
+function saveEvent(){
+  const name=document.getElementById('ev-name').value.trim();
+  const date=document.getElementById('ev-date').value;
+  const start=document.getElementById('ev-start').value;
+  const end=document.getElementById('ev-end').value;
+  if(!name||!date){document.getElementById('ev-name').style.borderColor='#ef4444';return;}
+  document.getElementById('ev-name').style.borderColor='';
+  if(editingEvId){const i=calEvents.findIndex(e=>e.id===editingEvId);if(i>-1)calEvents[i]={id:editingEvId,name,date,start:start||'00:00',end:end||'01:00',color:selEvColor};}
+  else calEvents.push({id:uid(),name,date,start:start||'00:00',end:end||'01:00',color:selEvColor});
+  storageSet('jv_cal_events2',calEvents);
+  document.getElementById('event-modal-backdrop').classList.remove('open'); editingEvId=null; renderCal();
+}
+function deleteEvent(){
+  if(!editingEvId) return;
+  calEvents=calEvents.filter(e=>e.id!==editingEvId); storageSet('jv_cal_events2',calEvents);
+  document.getElementById('event-modal-backdrop').classList.remove('open'); editingEvId=null; renderCal();
+}
+
+/* ══════════════════════════════════════════
+   TIMETABLE STATE
+══════════════════════════════════════════ */
+let isEditMode = false;
+// selState: rectangular selection across days and hours
+let selState = { active: false, startDay: null, endDay: null, startHour: null, endHour: null };
+let dragState = { dragging: false, startDay: null, startHour: null };
+let editingSlotId = null;
+let selSlColor = COLORS[2].hex;
+
+// Helper: is cell occupied?
+function isCellOccupied(day, hour) {
+  return ttSlots.some(s => s.day === day && s.startHour <= hour && hour < s.endHour);
+}
+// Helper: slot that owns a cell
+function slotAtCell(day, hour) {
+  return ttSlots.find(s => s.day === day && s.startHour <= hour && hour < s.endHour);
+}
+
+/* ══════════════════════════════════════════
+   TIMETABLE TOOLBAR
+══════════════════════════════════════════ */
+function renderTimetableToolbar() {
+  const bar = document.getElementById('tt-toolbar');
+  if (isEditMode) {
+    bar.innerHTML = `
+      <div class="tt-title-group">
+        <span class="tt-title">Weekly Timetable</span>
+        <span class="tt-sub">Editing mode — drag across cells to select a range</span>
+      </div>
+      <div class="edit-badge"><div class="edit-badge-dot"></div>Editing</div>
+      <div class="tt-spacer"></div>
+      <button class="btn-toolbar btn-cancel" onclick="cancelEdit()">✕ Cancel</button>
+      <button class="btn-toolbar btn-confirm" onclick="confirmEdit()">✓ Confirm Changes</button>`;
+  } else {
+    bar.innerHTML = `
+      <div class="tt-title-group">
+        <span class="tt-title">Weekly Timetable</span>
+        <span class="tt-sub">Recurring weekly schedule</span>
+      </div>
+      <div class="tt-spacer"></div>
+      <span class="tt-edit-hint">Click a block to log progress</span>
+      <button class="btn-toolbar btn-edit" onclick="enterEdit()">✏️ Edit Timetable</button>`;
+  }
+}
+
+function enterEdit() {
+  ttSlotsSaved = JSON.parse(JSON.stringify(ttSlots));
+  isEditMode = true; selState = {active:false,startDay:null,endDay:null,startHour:null,endHour:null};
+  renderTimetableToolbar(); renderTimetable();
+  document.getElementById('page-timetable').classList.toggle('edit-mode', true);
+}
+function cancelEdit() {
+  ttSlots = JSON.parse(JSON.stringify(ttSlotsSaved));
+  isEditMode = false; selState = {active:false,startDay:null,endDay:null,startHour:null,endHour:null};
+  renderTimetableToolbar(); renderTimetable();
+  document.getElementById('page-timetable').classList.remove('edit-mode');
+  hidePill();
+}
+function confirmEdit() {
+  storageSet('jv_tt_slots2', ttSlots); ttSlotsSaved = JSON.parse(JSON.stringify(ttSlots));
+  isEditMode = false; selState = {active:false,startDay:null,endDay:null,startHour:null,endHour:null};
+  renderTimetableToolbar(); renderTimetable();
+  document.getElementById('page-timetable').classList.remove('edit-mode');
+  hidePill();
+}
+
+/* ══════════════════════════════════════════
+   TIMETABLE RENDER
+══════════════════════════════════════════ */
+function renderTimetable() {
+  const todayDow = today.getDay();
+
+  /* ── Sticky header ── */
+  const hdr = document.getElementById('tt-sticky-header'); hdr.innerHTML='';
+  const sp=document.createElement('div'); sp.className='tt-hdr-spacer'; hdr.appendChild(sp);
+  for(let d=0;d<7;d++){
+    const hd=document.createElement('div');
+    hd.className='tt-hdr-day'+(d===todayDow?' today-hdr':'');
+    hd.textContent=DAY_FULL[d].slice(0,3).toUpperCase();
+    hdr.appendChild(hd);
+  }
+
+  /* ── Body ── */
+  const body = document.getElementById('tt-body'); body.innerHTML='';
+
+  // Time column
+  const tCol=document.createElement('div'); tCol.className='tt-time-col';
+  for(let h=0;h<24;h++){
+    const lbl=document.createElement('div'); lbl.className='tt-time-lbl';
+    lbl.style.top=(h*HOUR_H)+'px';
+    lbl.textContent=h===0?'12 AM':h<12?h+' AM':h===12?'12 PM':(h-12)+' PM';
+    tCol.appendChild(lbl);
+  }
+  body.appendChild(tCol);
+
+  // 7 day columns
+  for(let d=0;d<7;d++){
+    const col=document.createElement('div'); col.className='tt-day-col'; col.id='tt-dcol-'+d;
+
+    // Hour lines
+    for(let h=0;h<24;h++){
+      const ln=document.createElement('div');ln.className='tt-hour-line-g';ln.style.top=(h*HOUR_H)+'px';col.appendChild(ln);
+      const hl=document.createElement('div');hl.className='tt-half-line-g';hl.style.top=(h*HOUR_H+28)+'px';col.appendChild(hl);
+    }
+
+    // Clickable zones (one per hour)
+    for(let h=0;h<24;h++){
+      const occupied=isCellOccupied(d,h);
+      const zone=document.createElement('div');
+      zone.className='tt-zone'+(occupied?'':' zone-free');
+      zone.style.top=(h*HOUR_H)+'px';
+      zone.dataset.day=d; zone.dataset.hour=h;
+      zone.id=`tz-${d}-${h}`;
+
+      // Selection highlight (rectangular across days)
+      if(selState.active) {
+        const dLo=Math.min(selState.startDay,selState.endDay);
+        const dHi=Math.max(selState.startDay,selState.endDay);
+        const hLo=Math.min(selState.startHour,selState.endHour);
+        const hHi=Math.max(selState.startHour,selState.endHour);
+        if(d>=dLo && d<=dHi && h>=hLo && h<=hHi && !occupied) {
+          zone.classList.add('zone-sel');
+          if(h===hLo) zone.classList.add('zone-sel-first');
+          if(h===hHi) zone.classList.add('zone-sel-last');
+        }
+      }
+
+      if(isEditMode && !occupied){
+        zone.addEventListener('mousedown',(e)=>{
+          if(e.button!==0) return;
+          e.preventDefault();
+          dragState={dragging:true,startDay:d,startHour:h};
+          selState={active:true,startDay:d,endDay:d,startHour:h,endHour:h};
+          renderTimetable();
+        });
+      }
+      col.appendChild(zone);
+    }
+
+    // Render slot blocks
+    ttSlots.filter(s=>s.day===d).forEach(slot=>{
+      const top=slot.startHour*HOUR_H+2;
+      const height=(slot.endHour-slot.startHour)*HOUR_H-4;
+      const wd=weekData[slot.id]||{};
+      const status = wd.status || null;
+      let borderColor, blockShadow;
+      if (status === 'done') {
+        borderColor = '#10b981';
+        blockShadow = '0 0 8px rgba(16,185,129,0.25), inset 0 0 14px rgba(16,185,129,0.06)';
+      } else if (status === 'partial') {
+        borderColor = '#f59e0b';
+        blockShadow = '0 0 8px rgba(245,158,11,0.25), inset 0 0 14px rgba(245,158,11,0.06)';
+      } else if (status === 'notdone') {
+        borderColor = '#ef4444';
+        blockShadow = '0 0 8px rgba(239,68,68,0.25), inset 0 0 14px rgba(239,68,68,0.06)';
+      } else {
+        borderColor = slot.color + '80';
+        blockShadow = 'none';
+      }
+
+      const block=document.createElement('div');
+      block.className='tt-slot-block';
+      block.style.cssText=`top:${top}px;height:${height}px;background:${slot.color}22;color:${slot.color};border-color:${borderColor};box-shadow:${blockShadow};`;
+      block.dataset.slotId=slot.id;
+
+      block.innerHTML=`
+        <div class="tt-slot-name">${escHtml(slot.label)}</div>
+        <div class="tt-slot-time">${fmtHour(slot.startHour)} – ${fmtHour(slot.endHour)}</div>
+        <button class="tt-slot-del" onclick="event.stopPropagation();deleteSlotById('${slot.id}')">×</button>`;
+
+      if(isEditMode){
+        block.onclick=()=>openSlotModalEdit(slot.id);
+      } else {
+        block.onclick=()=>openDetailPanel(slot.id);
+      }
+      col.appendChild(block);
+    });
+
+    body.appendChild(col);
+  }
+
+  // Reposition floating pill if selection active
+  if(selState.active) updatePill();
+  else hidePill();
+
+  // Scroll to 5am on first render
+  requestAnimationFrame(()=>{
+    const wrap=document.getElementById('tt-scroll-wrap');
+    if(wrap && wrap.scrollTop===0) wrap.scrollTop=5*HOUR_H+42; // +42 for sticky header
+  });
+}
+
+function fmtHour(h) {
+  const hh=h%24;
+  if(hh===0) return '12 AM'; if(hh<12) return hh+' AM';
+  if(hh===12) return '12 PM'; return (hh-12)+' PM';
+}
+
+/* ══════════════════════════════════════════
+   DRAG SELECTION — global mousemove + mouseup
+══════════════════════════════════════════ */
+document.addEventListener('mousemove',(e)=>{
+  if(!dragState.dragging||!isEditMode) return;
+  // Find zone element under cursor
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  const zone=el&&(el.classList.contains('tt-zone')?el:el.closest('.tt-zone'));
+  if(!zone) return;
+  const nd=parseInt(zone.dataset.day,10);
+  const nh=parseInt(zone.dataset.hour,10);
+  if(isNaN(nd)||isNaN(nh)) return;
+
+  // Build candidate rectangle
+  const dLo=Math.min(dragState.startDay,nd);
+  const dHi=Math.max(dragState.startDay,nd);
+  const hLo=Math.min(dragState.startHour,nh);
+  const hHi=Math.max(dragState.startHour,nh);
+
+  // Update — allow occupied cells in selection (they'll be skipped on save)
+  const changed=(selState.endDay!==nd||selState.endHour!==nh);
+  if(changed){
+    selState={active:true,startDay:dragState.startDay,endDay:nd,startHour:dragState.startHour,endHour:nh};
+    renderTimetable();
+  }
+});
+document.addEventListener('mouseup',()=>{ dragState.dragging=false; });
+
+/* ══════════════════════════════════════════
+   SELECTION PILL
+══════════════════════════════════════════ */
+function updatePill() {
+  if(!selState.active) { hidePill(); return; }
+  const dLo=Math.min(selState.startDay,selState.endDay);
+  const dHi=Math.max(selState.startDay,selState.endDay);
+  const hLo=Math.min(selState.startHour,selState.endHour);
+  const hHi=Math.max(selState.startHour,selState.endHour);
+
+  const dayCount=dHi-dLo+1;
+  const dayLabel=dayCount>1?DAY_SHORT[dLo]+' – '+DAY_SHORT[dHi]:DAY_FULL[dLo];
+  document.getElementById('sel-pill-label').textContent='Create: '+dayLabel+' · '+fmtHour(hLo)+' – '+fmtHour(hHi+1);
+
+  const pill=document.getElementById('sel-create-pill');
+  pill.classList.add('visible');
+
+  // Position pill: horizontally centered across selected columns, vertically centered on hour range
+  const colLo=document.getElementById('tt-dcol-'+dLo);
+  const colHi=document.getElementById('tt-dcol-'+dHi);
+  if(colLo && colHi){
+    const midColX = colLo.offsetLeft + (colHi.offsetLeft+colHi.offsetWidth - colLo.offsetLeft)/2 + 54;
+    const midTop = (hLo+hHi)/2*HOUR_H + HOUR_H/2 + 42;
+    pill.style.top=(midTop-16)+'px';
+    pill.style.left=midColX+'px';
+  }
+}
+function hidePill() {
+  document.getElementById('sel-create-pill').classList.remove('visible');
+}
+
+/* ══════════════════════════════════════════
+   SLOT MODAL (edit mode: create)
+══════════════════════════════════════════ */
+function openSlotModal() {
+  if(!selState.active) return;
+  const dLo=Math.min(selState.startDay,selState.endDay);
+  const dHi=Math.max(selState.startDay,selState.endDay);
+  const hLo=Math.min(selState.startHour,selState.endHour);
+  const hHi=Math.max(selState.startHour,selState.endHour);
+  editingSlotId=null; selSlColor=COLORS[0].hex;
+  document.getElementById('slot-modal-title').textContent='New Time Block';
+  document.getElementById('sl-delete-btn').style.display='none';
+  document.getElementById('sl-name').value='';
+  const dayLabel=dHi>dLo?DAY_FULL[dLo]+' – '+DAY_FULL[dHi]:DAY_FULL[dLo];
+  document.getElementById('sl-time-display').textContent=
+    dayLabel+' · '+fmtHour(hLo)+' – '+fmtHour(hHi+1);
+  buildColorGrid('sl-colors',selSlColor,c=>{selSlColor=c;});
+  document.getElementById('slot-modal-backdrop').classList.add('open');
+  setTimeout(()=>document.getElementById('sl-name').focus(),60);
+}
+function openSlotModalEdit(slotId) {
+  const slot=ttSlots.find(s=>s.id===slotId); if(!slot) return;
+  editingSlotId=slotId; selSlColor=slot.color;
+  document.getElementById('slot-modal-title').textContent='Edit Time Block';
+  document.getElementById('sl-delete-btn').style.display='';
+  document.getElementById('sl-name').value=slot.label;
+  document.getElementById('sl-time-display').textContent=
+    DAY_FULL[slot.day]+' · '+fmtHour(slot.startHour)+' – '+fmtHour(slot.endHour);
+  buildColorGrid('sl-colors',selSlColor,c=>{selSlColor=c;});
+  document.getElementById('slot-modal-backdrop').classList.add('open');
+  setTimeout(()=>document.getElementById('sl-name').focus(),60);
+}
+function closeSlotModal(e) {
+  if(e&&e.target!==document.getElementById('slot-modal-backdrop')) return;
+  document.getElementById('slot-modal-backdrop').classList.remove('open'); editingSlotId=null;
+}
+function saveSlot() {
+  const label=document.getElementById('sl-name').value.trim();
+  if(!label){document.getElementById('sl-name').style.borderColor='#ef4444';return;}
+  document.getElementById('sl-name').style.borderColor='';
+
+  if(editingSlotId){
+    const idx=ttSlots.findIndex(s=>s.id===editingSlotId);
+    if(idx>-1){ttSlots[idx].label=label;ttSlots[idx].color=selSlColor;}
+  } else {
+    const dLo=Math.min(selState.startDay,selState.endDay);
+    const dHi=Math.max(selState.startDay,selState.endDay);
+    const hLo=Math.min(selState.startHour,selState.endHour);
+    const hHi=Math.max(selState.startHour,selState.endHour);
+    for(let day=dLo;day<=dHi;day++){
+      // Only create if at least one hour in this day's range is free
+      let anyFree=false;
+      for(let h=hLo;h<=hHi;h++) if(!isCellOccupied(day,h)){anyFree=true;break;}
+      if(anyFree) ttSlots.push({id:uid(),day,startHour:hLo,endHour:hHi+1,label,color:selSlColor});
+    }
+    selState={active:false,startDay:null,endDay:null,startHour:null,endHour:null};
+  }
+  document.getElementById('slot-modal-backdrop').classList.remove('open');
+  editingSlotId=null;
+  renderTimetable();
+}
+function deleteSlot() {
+  if(!editingSlotId) return;
+  ttSlots=ttSlots.filter(s=>s.id!==editingSlotId);
+  delete weekData[editingSlotId]; saveWeekData(weekData);
+  document.getElementById('slot-modal-backdrop').classList.remove('open');
+  editingSlotId=null; renderTimetable();
+}
+function deleteSlotById(id) {
+  ttSlots=ttSlots.filter(s=>s.id!==id);
+  delete weekData[id]; saveWeekData(weekData);
+  renderTimetable();
+}
+
+/* ══════════════════════════════════════════
+   SLOT DETAIL PANEL (view mode)
+══════════════════════════════════════════ */
+let detailSlotId = null;
+let detailStatus = null;
+
+// Get the actual Date for this slot's occurrence this week
+function getSlotDate(dayOfWeek) {
+  const d=new Date(today);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate()-d.getDay()+dayOfWeek); // Sunday-based
+  return d;
+}
+function isGoalEditable(slot) {
+  const slotDate=getSlotDate(slot.day);
+  const slotStart=new Date(slotDate);
+  slotStart.setHours(slot.startHour,0,0,0);
+  return new Date()<slotStart;
+}
+function isDoneEditable(slot) {
+  const slotDate=getSlotDate(slot.day);
+  const slotEnd=new Date(slotDate);
+  slotEnd.setHours(slot.endHour,0,0,0);
+  return new Date()>=slotEnd;
+}
+
+function openDetailPanel(slotId) {
+  const slot=ttSlots.find(s=>s.id===slotId); if(!slot) return;
+  detailSlotId=slotId;
+  const wd=weekData[slotId]||{};
+  detailStatus=wd.status||null;
+
+  // Header
+  document.getElementById('dp-color-bar').style.background=slot.color;
+  document.getElementById('dp-name').textContent=slot.label;
+  document.getElementById('dp-time').textContent=
+    DAY_FULL[slot.day]+' · '+fmtHour(slot.startHour)+' – '+fmtHour(slot.endHour);
+
+  // Status buttons — only clickable after block ends
+  setStatus(detailStatus, false);
+  const canSetStatus = isDoneEditable(slot);
+  ['sb-done','sb-partial','sb-notdone'].forEach(id=>{
+    const btn=document.getElementById(id);
+    btn.disabled=!canSetStatus;
+    btn.style.opacity=canSetStatus?'':'0.38';
+    btn.style.cursor=canSetStatus?'':'not-allowed';
+    btn.title=canSetStatus?'':'Available after the block ends';
+  });
+
+  // Goal note
+  const goalEditable=isGoalEditable(slot);
+  const goalArea=document.getElementById('dp-goal');
+  const goalLocked=document.getElementById('dp-goal-locked');
+  goalArea.value=wd.goalNote||'';
+  goalArea.disabled=!goalEditable;
+  goalLocked.style.display=goalEditable?'none':'flex';
+
+  // Done note
+  const doneEditable=isDoneEditable(slot);
+  const doneArea=document.getElementById('dp-done-note');
+  const doneLocked=document.getElementById('dp-done-locked');
+  doneArea.value=wd.doneNote||'';
+  doneArea.disabled=!doneEditable;
+  doneLocked.style.display=doneEditable?'none':'flex';
+
+  document.getElementById('detail-backdrop').classList.add('open');
+}
+
+function setStatus(val, save=true) {
+  detailStatus=val;
+  const btns={done:'sb-done',partial:'sb-partial',notdone:'sb-notdone'};
+  const active={done:'active-done',partial:'active-partial',notdone:'active-notdone'};
+  Object.entries(btns).forEach(([k,id])=>{
+    const el=document.getElementById(id);
+    el.className='status-btn'+(val===k?' '+active[k]:'');
+  });
+}
+
+function closeDetailPanel(e) {
+  if(e&&e.target!==document.getElementById('detail-backdrop')) return;
+  document.getElementById('detail-backdrop').classList.remove('open');
+  detailSlotId=null; detailStatus=null;
+}
+
+function saveDetail() {
+  if(!detailSlotId) return;
+  const slot=ttSlots.find(s=>s.id===detailSlotId);
+  if(!slot){closeDetailPanel();return;}
+
+  const goalArea=document.getElementById('dp-goal');
+  const doneArea=document.getElementById('dp-done-note');
+
+  if(!weekData[detailSlotId]) weekData[detailSlotId]={};
+  weekData[detailSlotId].status=detailStatus;
+  if(!goalArea.disabled) weekData[detailSlotId].goalNote=goalArea.value;
+  if(!doneArea.disabled) weekData[detailSlotId].doneNote=doneArea.value;
+  saveWeekData(weekData);
+
+  document.getElementById('detail-backdrop').classList.remove('open');
+  detailSlotId=null; detailStatus=null;
+  renderTimetable();
+}
+
+/* ══════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+══════════════════════════════════════════ */
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    document.getElementById('event-modal-backdrop').classList.remove('open');
+    document.getElementById('slot-modal-backdrop').classList.remove('open');
+    document.getElementById('detail-backdrop').classList.remove('open');
+    if(selState.active){selState={active:false,startDay:null,endDay:null,startHour:null,endHour:null};renderTimetable();}
+  }
+});
+document.addEventListener('keyup', e=>{});
+
+document.getElementById('ev-name').addEventListener('keydown',e=>{if(e.key==='Enter')saveEvent();});
+document.getElementById('sl-name').addEventListener('keydown',e=>{if(e.key==='Enter')saveSlot();});
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+renderCal();
+renderTimetableToolbar();
+// Refresh now-line every minute
+setInterval(()=>{ if(calView==='week') renderWeek(); }, 60000);
+</script>
+</body>
+</html>
