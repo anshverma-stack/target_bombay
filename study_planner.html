@@ -287,30 +287,19 @@ body::before {
   position: relative;
 }
 
-.tt-sticky-header {
-  display: flex; position: sticky; top: 0; z-index: 50;
-  background: var(--surface-0); border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.tt-hdr-spacer {
-  width: 54px; flex-shrink: 0; border-right: 1px solid var(--border);
-}
-.tt-hdr-day {
-  flex: 1; min-width: 0; text-align: center; padding: 9px 4px;
-  border-right: 1px solid var(--border);
-  font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--text-3); font-weight: 500;
-}
-.tt-hdr-day.today-hdr { color: var(--accent); }
+/* tt-sticky/hdr overridden in mobile section */
 
 .tt-body {
-  display: flex; position: relative;
+  display: flex;
+  position: relative;
+  min-width: max-content;
 }
 
 .tt-time-col {
   width: 54px; flex-shrink: 0;
   border-right: 1px solid var(--border);
-  position: relative;
+  position: sticky; left: 0; z-index: 30;
+  background: var(--bg);
   height: calc(var(--slot-h) * 48);
 }
 .tt-time-lbl {
@@ -320,7 +309,6 @@ body::before {
 }
 
 .tt-day-col {
-  flex: 1; min-width: 0;
   border-right: 1px solid var(--border);
   position: relative;
   height: calc(var(--slot-h) * 48);
@@ -662,6 +650,76 @@ html.light #theme-toggle {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
+
+/* ══════════════════════════════════════════
+   AUTH / SYNC UI
+══════════════════════════════════════════ */
+.auth-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 9px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-2); font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.auth-btn:hover { border-color: rgba(99,102,241,0.4); color: var(--accent); }
+.auth-btn.signed-in { border-color: rgba(16,185,129,0.35); color: #34d399; }
+.auth-btn.signed-in:hover { background: rgba(16,185,129,0.08); }
+.auth-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #10b981;
+  box-shadow: 0 0 6px #10b981; flex-shrink: 0;
+}
+.sync-dot.saving { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; animation: blink 0.8s ease infinite; }
+.sync-dot.error  { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+
+/* ══════════════════════════════════════════
+   MOBILE TIMETABLE — horizontal scroll
+══════════════════════════════════════════ */
+.tt-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+}
+.tt-hdr-spacer {
+  width: 54px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  position: sticky; left: 0; z-index: 55;
+  background: var(--surface-0);
+}
+.tt-hdr-day {
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 9px 4px; text-align: center;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-3); font-weight: 500;
+}
+.tt-hdr-day.today-hdr { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .tt-hdr-day   { width: calc((100vw - 54px) / 3.2); min-width: 90px; }
+  .tt-day-col   { width: calc((100vw - 54px) / 3.2) !important; min-width: 90px !important; }
+  .tt-toolbar   { flex-wrap: wrap; gap: 6px; padding: 0.6rem 1rem; min-height: auto; }
+  .tt-title-group { order: 0; flex: 1; min-width: 120px; }
+  .edit-badge   { order: 1; }
+  .tt-spacer    { display: none; }
+  .tt-edit-hint { display: none; }
+  .btn-toolbar  { order: 2; font-size: 0.75rem; padding: 6px 12px; }
+  .cal-toolbar  { padding: 0.6rem 0.8rem; flex-wrap: wrap; gap: 6px; }
+  .cal-title    { font-size: 0.9rem; min-width: 130px; }
+  .add-event-btn { font-size: 0.74rem; padding: 5px 12px; }
+  .nav-tab span:last-child { display: none; }
+  .nav-back  { font-size: 0; gap: 0; padding: 6px 10px; }
+  .nav-back::before { content: "←"; font-size: 1rem; }
+}
+@media (min-width: 641px) {
+  .tt-hdr-day { flex: 1; }
+  .tt-day-col { flex: 1; min-width: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -690,6 +748,8 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
       <span>📋</span> Weekly Timetable
     </button>
   </div>
+  <button class="auth-btn" id="auth-btn" onclick="handleAuthClick()">Sign in with Google</button>
+  <div class="sync-dot" id="sync-dot" style="display:none" title="Synced"></div>
   <a href="index.html" class="nav-back">← Back to JEEverse</a>
 </nav>
 
@@ -1113,12 +1173,12 @@ function saveEvent(){
   document.getElementById('ev-name').style.borderColor='';
   if(editingEvId){const i=calEvents.findIndex(e=>e.id===editingEvId);if(i>-1)calEvents[i]={id:editingEvId,name,date,start:start||'00:00',end:end||'01:00',color:selEvColor};}
   else calEvents.push({id:uid(),name,date,start:start||'00:00',end:end||'01:00',color:selEvColor});
-  storageSet('jv_cal_events2',calEvents);
+  storageSet('jv_cal_events2',calEvents); scheduleSave();
   document.getElementById('event-modal-backdrop').classList.remove('open'); editingEvId=null; renderCal();
 }
 function deleteEvent(){
   if(!editingEvId) return;
-  calEvents=calEvents.filter(e=>e.id!==editingEvId); storageSet('jv_cal_events2',calEvents);
+  calEvents=calEvents.filter(e=>e.id!==editingEvId); storageSet('jv_cal_events2',calEvents); scheduleSave();
   document.getElementById('event-modal-backdrop').classList.remove('open'); editingEvId=null; renderCal();
 }
 
@@ -1186,7 +1246,7 @@ function confirmEdit() {
   isEditMode = false; selState = {active:false,startDay:null,endDay:null,startHour:null,endHour:null};
   renderTimetableToolbar(); renderTimetable();
   document.getElementById('page-timetable').classList.remove('edit-mode');
-  hidePill();
+  hidePill(); scheduleSave();
 }
 
 /* ══════════════════════════════════════════
@@ -1288,9 +1348,10 @@ function renderTimetable() {
       block.style.cssText=`top:${top}px;height:${height}px;background:${slot.color}22;color:${slot.color};border-color:${borderColor};box-shadow:${blockShadow};`;
       block.dataset.slotId=slot.id;
 
+      const isHalfHour = (slot.endHour - slot.startHour) <= 1;
       block.innerHTML=`
         <div class="tt-slot-name">${escHtml(slot.label)}</div>
-        <div class="tt-slot-time">${fmtHour(slot.startHour)} – ${fmtHour(slot.endHour)}</div>
+        ${isHalfHour ? '' : `<div class="tt-slot-time">${fmtHour(slot.startHour)} – ${fmtHour(slot.endHour)}</div>`}
         <button class="tt-slot-del" onclick="event.stopPropagation();deleteSlotById('${slot.id}')">×</button>`;
 
       if(isEditMode){
@@ -1557,7 +1618,7 @@ function saveDetail() {
   weekData[detailSlotId].status=detailStatus;
   if(!goalArea.disabled) weekData[detailSlotId].goalNote=goalArea.value;
   if(!doneArea.disabled) weekData[detailSlotId].doneNote=doneArea.value;
-  saveWeekData(weekData);
+  saveWeekData(weekData); scheduleSave();
 
   document.getElementById('detail-backdrop').classList.remove('open');
   detailSlotId=null; detailStatus=null;
@@ -1587,6 +1648,128 @@ renderCal();
 renderTimetableToolbar();
 // Refresh now-line every minute
 setInterval(()=>{ if(calView==='week') renderWeek(); }, 60000);
+
+/* ══════════════════════════════════════════
+   FIREBASE AUTH + CLOUD SYNC
+   Uses same project as JEEverse app
+══════════════════════════════════════════ */
+let _fbAuth = null, _fbDb = null, _fbUser = null;
+let _syncTimeout = null;
+
+(async function initFirebase() {
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+    const { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut }
+      = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+    const { getFirestore, doc, setDoc, getDoc }
+      = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+    const cfg = {
+      apiKey: "AIzaSyDMG2GapxBu9Tnry0fJx7IaQO1zwgA0sVw",
+      authDomain: "jee-progress-tracker-3d733.firebaseapp.com",
+      projectId: "jee-progress-tracker-3d733",
+      storageBucket: "jee-progress-tracker-3d733.firebasestorage.app",
+      messagingSenderId: "644810316053",
+      appId: "1:644810316053:web:aa531fc435469e3e2c311c"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+    _fbAuth = getAuth(app);
+    _fbDb   = getFirestore(app);
+
+    window._fbSignIn  = () => signInWithPopup(_fbAuth, new GoogleAuthProvider());
+    window._fbSignOut = () => signOut(_fbAuth);
+
+    onAuthStateChanged(_fbAuth, async (user) => {
+      _fbUser = user;
+      updateAuthUI(user);
+      if (user) {
+        setSyncDot('saving');
+        await loadFromCloud(user, getDoc, doc);
+        setSyncDot('synced');
+      }
+    });
+
+    window._fbSetDoc = setDoc;
+    window._fbDoc    = doc;
+  } catch(e) {
+    console.warn('Firebase init failed:', e);
+  }
+})();
+
+function updateAuthUI(user) {
+  const btn = document.getElementById('auth-btn');
+  const dot = document.getElementById('sync-dot');
+  if (!btn) return;
+  if (user) {
+    const name = user.displayName ? user.displayName.split(' ')[0] : 'You';
+    const photo = user.photoURL ? `<img class="auth-avatar" src="${user.photoURL}" alt="">` : '👤';
+    btn.innerHTML = photo + ' ' + escHtml(name) + ' · Sign out';
+    btn.classList.add('signed-in');
+    dot.style.display = '';
+  } else {
+    btn.innerHTML = 'Sign in with Google';
+    btn.classList.remove('signed-in');
+    dot.style.display = 'none';
+  }
+}
+
+function setSyncDot(state) {
+  const dot = document.getElementById('sync-dot');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (state === 'saving' ? ' saving' : state === 'error' ? ' error' : '');
+  dot.title = state === 'saving' ? 'Saving…' : state === 'error' ? 'Sync error' : 'Synced';
+}
+
+function handleAuthClick() {
+  if (_fbUser) { if(window._fbSignOut) window._fbSignOut(); }
+  else { if(window._fbSignIn) window._fbSignIn().catch(e => console.warn('Sign-in error:', e)); }
+}
+
+async function loadFromCloud(user, getDoc, doc) {
+  if (!_fbDb) return;
+  try {
+    const snap = await getDoc(doc(_fbDb, 'users', user.uid));
+    if (!snap.exists()) return;
+    const data = snap.data();
+    if (data.planner) {
+      const p = data.planner;
+      if (Array.isArray(p.ttSlots))  { ttSlots = p.ttSlots;  storageSet('jv_tt_slots2', ttSlots); }
+      if (Array.isArray(p.calEvents)){ calEvents = p.calEvents; storageSet('jv_cal_events2', calEvents); }
+      if (p.weekData && p.weekData.weekKey === getWeekKey()) {
+        weekData = p.weekData.entries || {};
+      } else if (p.weekData && p.weekData.weekKey !== getWeekKey()) {
+        weekData = {}; // new week, ignore old
+      }
+      saveWeekData(weekData);
+      renderCal();
+      const activePage = document.querySelector('.page.active');
+      if (activePage && activePage.id === 'page-timetable') renderTimetable();
+    }
+  } catch(e) { console.warn('Cloud load error:', e); setSyncDot('error'); }
+}
+
+async function saveToCloud() {
+  if (!_fbUser || !_fbDb || !window._fbSetDoc || !window._fbDoc) return;
+  setSyncDot('saving');
+  try {
+    await window._fbSetDoc(window._fbDoc(_fbDb, 'users', _fbUser.uid), {
+      planner: {
+        ttSlots,
+        calEvents,
+        weekData: { weekKey: getWeekKey(), entries: weekData }
+      }
+    }, { merge: true });
+    setSyncDot('synced');
+  } catch(e) { console.warn('Cloud save error:', e); setSyncDot('error'); }
+}
+
+// Debounced cloud save — called from any data-change function
+function scheduleSave() {
+  clearTimeout(_syncTimeout);
+  _syncTimeout = setTimeout(saveToCloud, 1200);
+}
+
 </script>
 </body>
 </html>
