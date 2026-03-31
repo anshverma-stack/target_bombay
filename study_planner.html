@@ -1256,8 +1256,8 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
         <div class="cat-chip" data-cat="Physics"     onclick="selectCatChip(this)">⚡ Physics</div>
         <div class="cat-chip" data-cat="Chemistry"   onclick="selectCatChip(this)">🧪 Chemistry</div>
         <div class="cat-chip" data-cat="Mathematics" onclick="selectCatChip(this)">📐 Maths</div>
-        <div class="cat-chip" data-cat="Break"       onclick="selectCatChip(this)">☕ step 3 backlog</div>
-        <div class="cat-chip" data-cat="Revision"    onclick="selectCatChip(this)">🔄 step 2 backlog</div>
+        <div class="cat-chip" data-cat="Break"       onclick="selectCatChip(this)">☕ Break</div>
+        <div class="cat-chip" data-cat="Revision"    onclick="selectCatChip(this)">🔄 Revision</div>
       </div>
       <input class="cat-custom-input" id="sl-cat-custom" placeholder="or type custom…" oninput="onCatCustomInput(this)" style="margin-top:6px;width:100%;">
     </div>
@@ -1571,6 +1571,7 @@ function renderTimetableToolbar() {
       </div>
       <div class="edit-badge"><div class="edit-badge-dot"></div>Editing</div>
       <div class="tt-spacer"></div>
+      <button class="btn-toolbar" onclick="clearAllGoals()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#fca5a5;" title="Remove all goal notes from every timetable block">🗑 Clear All Goals</button>
       <button class="btn-toolbar btn-cancel" onclick="cancelEdit()">✕ Cancel</button>
       <button class="btn-toolbar btn-confirm" onclick="confirmEdit()">✓ Confirm Changes</button>`;
   } else {
@@ -1604,6 +1605,18 @@ function confirmEdit() {
   renderTimetableToolbar(); renderTimetable();
   document.getElementById('page-timetable').classList.remove('edit-mode');
   hidePill(); scheduleSave();
+}
+
+function clearAllGoals() {
+  const count = Object.values(weekData).filter(v => v.goalNote).length;
+  if (count === 0) { alert('No goals are set on any timetable block.'); return; }
+  if (!confirm(`Clear goal notes from all ${count} timetable block${count !== 1 ? 's' : ''}? This cannot be undone.`)) return;
+  Object.keys(weekData).forEach(id => {
+    if (weekData[id]) weekData[id].goalNote = '';
+  });
+  saveWeekData(weekData);
+  scheduleSave();
+  renderTimetable();
 }
 
 /* ══════════════════════════════════════════
@@ -2542,6 +2555,7 @@ async function generateAIPlan() {
 
     output.innerHTML = html;
     window._lastAiTasks = tasks;
+    window._lastAiCat   = (useTt && ttCat) ? ttCat : null;
 
   } catch(err) {
     console.error(err);
@@ -2586,10 +2600,13 @@ function fillTimetableGoals() {
     if (!parsed) { skipped++; return; }
 
     // Find the timetable slot that contains this time
+    // If a category was used to generate the plan, only match slots of that category
+    const activeCat = window._lastAiCat;
     const slot = ttSlots.find(s =>
       s.day === parsed.dayIdx &&
       s.startHour <= parsed.slotIdx &&
-      parsed.slotIdx < s.endHour
+      parsed.slotIdx < s.endHour &&
+      (!activeCat || s.category === activeCat)
     );
 
     if (!slot) { skipped++; results.push({ label: t.scheduledSlot, ok: false }); return; }
