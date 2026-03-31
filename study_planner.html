@@ -1256,8 +1256,8 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
         <div class="cat-chip" data-cat="Physics"     onclick="selectCatChip(this)">⚡ Physics</div>
         <div class="cat-chip" data-cat="Chemistry"   onclick="selectCatChip(this)">🧪 Chemistry</div>
         <div class="cat-chip" data-cat="Mathematics" onclick="selectCatChip(this)">📐 Maths</div>
-        <div class="cat-chip" data-cat="Break"       onclick="selectCatChip(this)">☕ Break</div>
-        <div class="cat-chip" data-cat="Revision"    onclick="selectCatChip(this)">🔄 Revision</div>
+        <div class="cat-chip" data-cat="Break"       onclick="selectCatChip(this)">☕ step 3 backlog</div>
+        <div class="cat-chip" data-cat="Revision"    onclick="selectCatChip(this)">🔄 step 2 backlog</div>
       </div>
       <input class="cat-custom-input" id="sl-cat-custom" placeholder="or type custom…" oninput="onCatCustomInput(this)" style="margin-top:6px;width:100%;">
     </div>
@@ -2423,7 +2423,15 @@ async function generateAIPlan() {
 
   const customInstructions = document.getElementById('ai-custom-prompt')?.value.trim();
 
-  const prompt = `You are an expert JEE 2026 study planner AI.\n\nThe student has ${effectiveHours} hours available. Their backlog has ${totalBehind} incomplete chapters.\n\nSTUDENT'S BACKLOG (up to 60 chapters shown):\n${chapterSummary}\n\nINSTRUCTIONS:\n- Priority: ${priorityDesc}\n- Target: ${stageDesc}\n- Total time: ${effectiveHours} hours (${Math.round(effectiveHours*60)} minutes)\n- Create a realistic plan fitting within ${effectiveHours} hours\n- Assign specific time blocks in minutes per task\n- Choose 4-8 tasks maximum\n- Time estimates: Theory=45-60min, Examples=30-45min, Exercise=60-90min, Mains PYQ=60-90min, Advance PYQ=90-120min\n- Include a short motivational tip for each task${scheduleContext}${customInstructions ? `\n\nADDITIONAL INSTRUCTIONS FROM STUDENT:\n${customInstructions}` : ''}\n\nRespond ONLY with valid JSON array (no markdown, no explanation):\n[\n  {\n    "taskNumber": 1,\n    "chapterName": "chapter name",\n    "subject": "Physics/Chemistry/Mathematics",\n    "unit": "unit name",\n    "class": "11 or 12",\n    "currentStage": "current stage",\n    "targetStage": "stage to complete",\n    "timeMinutes": 60,\n    "scheduledSlot": "e.g. Monday 6:00 AM – 7:00 AM (or leave blank if no timetable used)",\n    "tip": "short tip",\n    "priority": "high/medium/low"\n  }\n]`;
+  // Current date/time context so AI never schedules tasks in the past
+  const _now = new Date();
+  const _dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const _todayName = _dayNames[_now.getDay()];
+  const _timeStr = _now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const _dateStr = _now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const nowContext = `\n\nCURRENT DATE & TIME: ${_dateStr}, ${_timeStr}\nIMPORTANT: Do NOT schedule any tasks on days or time slots that have already passed. Today is ${_todayName} and the current time is ${_timeStr}. For today, only schedule tasks in time slots that are AFTER the current time. For all past days this week, do not schedule anything at all.`;
+
+  const prompt = `You are an expert JEE 2026 study planner AI.\n\nThe student has ${effectiveHours} hours available. Their backlog has ${totalBehind} incomplete chapters.\n\nSTUDENT'S BACKLOG (up to 60 chapters shown):\n${chapterSummary}\n\nINSTRUCTIONS:\n- Priority: ${priorityDesc}\n- Target: ${stageDesc}\n- Total time: ${effectiveHours} hours (${Math.round(effectiveHours*60)} minutes)\n- Create a realistic plan fitting within ${effectiveHours} hours\n- Assign specific time blocks in minutes per task\n- Choose 4-8 tasks maximum\n- Time estimates: Theory=45-60min, Examples=30-45min, Exercise=60-90min, Mains PYQ=60-90min, Advance PYQ=90-120min\n- Include a short motivational tip for each task${nowContext}${scheduleContext}${customInstructions ? `\n\nADDITIONAL INSTRUCTIONS FROM STUDENT:\n${customInstructions}` : ''}\n\nRespond ONLY with valid JSON array (no markdown, no explanation):\n[\n  {\n    "taskNumber": 1,\n    "chapterName": "chapter name",\n    "subject": "Physics/Chemistry/Mathematics",\n    "unit": "unit name",\n    "class": "11 or 12",\n    "currentStage": "current stage",\n    "targetStage": "stage to complete",\n    "timeMinutes": 60,\n    "scheduledSlot": "e.g. Monday 6:00 AM – 7:00 AM (or leave blank if no timetable used)",\n    "tip": "short tip",\n    "priority": "high/medium/low"\n  }\n]`;
 
   btn.disabled   = true;
   btn.innerHTML  = `<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite"></div> Generating...`;
@@ -2589,7 +2597,9 @@ function fillTimetableGoals() {
     // Build a clean goal string
     const goalText = `${t.chapterName} — ${t.targetStage} (${t.timeMinutes} min)`;
     if (!weekData[slot.id]) weekData[slot.id] = {};
-    weekData[slot.id].goalNote = goalText;
+    // Append to existing goalNote so multiple tasks in the same block are all shown
+    const existing = weekData[slot.id].goalNote ? weekData[slot.id].goalNote.trim() : '';
+    weekData[slot.id].goalNote = existing ? existing + '\n' + goalText : goalText;
     filled++;
     results.push({ label: DAY_FULL[slot.day] + ' · ' + fmtHour(slot.startHour) + ' – ' + fmtHour(slot.endHour) + ' → ' + slot.label, goal: goalText, ok: true });
   });
