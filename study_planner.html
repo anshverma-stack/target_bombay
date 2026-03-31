@@ -1057,6 +1057,11 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
             <option value="Advance PYQ">🏆 Advance PYQ Backlog</option>
             <option value="Mastery">⭐ Mastery Backlog</option>
           </select>
+          <div style="display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:3px;gap:2px;">
+            <button id="bcl-both" onclick="setBacklogClass('both',this)" style="padding:6px 14px;border-radius:9px;border:none;background:var(--accent);color:white;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px var(--accent-glow);">Both</button>
+            <button id="bcl-11"   onclick="setBacklogClass('11',this)"   style="padding:6px 14px;border-radius:9px;border:none;background:transparent;color:var(--text-3);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Class 11</button>
+            <button id="bcl-12"   onclick="setBacklogClass('12',this)"   style="padding:6px 14px;border-radius:9px;border:none;background:transparent;color:var(--text-3);font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Class 12</button>
+          </div>
         </div>
       </div>
       <div id="backlog-summary-chips" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:1.4rem;"></div>
@@ -2135,40 +2140,145 @@ function scheduleSave() {
 const DATA = {
   physics: {
     '11': {
-      'Mechanics I': [{n:'Units & Measurements',s:'units-and-measurements'},{n:'Motion in a Straight Line',s:'motion-in-a-straight-line'},{n:'Motion in a Plane',s:'motion-in-a-plane'},{n:'Laws of Motion',s:'laws-of-motion'}],
-      'Mechanics II': [{n:'Work, Power & Energy',s:'work-power-and-energy'},{n:'System of Particles',s:'rotational-motion'},{n:'Gravitation',s:'gravitation'}],
-      'Properties of Matter': [{n:'Mechanical Prop of Solids',s:'properties-of-solids'},{n:'Mechanical Prop of Fluids',s:'properties-of-matter'},{n:'Thermal Properties',s:'thermal-properties-of-matter'}],
-      'Thermodynamics': [{n:'Thermodynamics',s:'thermodynamics'},{n:'Kinetic Theory',s:'kinetic-theory-of-gases'}],
-      'Oscillations & Waves': [{n:'Oscillations',s:'oscillations'},{n:'Waves',s:'waves'}]
+      'Mechanics I': [
+        {n:'Units & Measurements',s:'units-and-measurements'},
+        {n:'Motion in a Straight Line',s:'motion-in-a-straight-line'},
+        {n:'Motion in a Plane',s:'motion-in-a-plane'},
+        {n:'Laws of Motion',s:'laws-of-motion'}
+      ],
+      'Mechanics II': [
+        {n:'Work, Power & Energy',s:'work-power-and-energy'},
+        {n:'System of Particles & Rotational Motion',s:'rotational-motion'},
+        {n:'Gravitation',s:'gravitation'}
+      ],
+      'Properties of Matter': [
+        {n:'Mechanical Properties of Solids',s:'properties-of-solids'},
+        {n:'Mechanical Properties of Fluids',s:'properties-of-matter'},
+        {n:'Thermal Properties of Matter',s:'thermal-properties-of-matter'}
+      ],
+      'Thermodynamics': [
+        {n:'Thermodynamics',s:'thermodynamics'},
+        {n:'Kinetic Theory of Gases',s:'kinetic-theory-of-gases'}
+      ],
+      'Oscillations & Waves': [
+        {n:'Oscillations',s:'oscillations'},
+        {n:'Waves',s:'waves'}
+      ]
     },
     '12': {
-      'Electrodynamics': [{n:'Electric Charges & Fields',s:'electrostatics'},{n:'Electrostatic Potential',s:'electrostatic-potential-and-capacitance'},{n:'Current Electricity',s:'current-electricity'},{n:'Moving Charges & Mag',s:'magnetic-effect-of-current'},{n:'Magnetism & Matter',s:'magnetism-and-matter'},{n:'EMI',s:'electromagnetic-induction'},{n:'Alternating Current',s:'alternating-current'}],
-      'Optics': [{n:'EM Waves',s:'electromagnetic-waves'},{n:'Ray Optics',s:'ray-optics'},{n:'Wave Optics',s:'wave-optics'}],
-      'Modern Physics': [{n:'Dual Nature of Matter',s:'dual-nature-of-radiation-and-matter'},{n:'Atoms',s:'atoms'},{n:'Nuclei',s:'nuclei'},{n:'Semiconductors',s:'semiconductor'}]
+      'Electrodynamics': [
+        {n:'Electric Charges & Fields',s:'electrostatics'},
+        {n:'Electrostatic Potential & Capacitance',s:'electrostatic-potential-and-capacitance'},
+        {n:'Current Electricity',s:'current-electricity'},
+        {n:'Moving Charges & Magnetism',s:'magnetic-effect-of-current'},
+        {n:'Magnetism & Matter',s:'magnetism-and-matter'},
+        {n:'Electromagnetic Induction',s:'electromagnetic-induction'},
+        {n:'Alternating Current',s:'alternating-current'}
+      ],
+      'Optics': [
+        {n:'Electromagnetic Waves',s:'electromagnetic-waves'},
+        {n:'Ray Optics & Optical Instruments',s:'ray-optics'},
+        {n:'Wave Optics',s:'wave-optics'}
+      ],
+      'Modern Physics': [
+        {n:'Dual Nature of Radiation & Matter',s:'dual-nature-of-radiation-and-matter'},
+        {n:'Atoms',s:'atoms'},
+        {n:'Nuclei',s:'nuclei'},
+        {n:'Semiconductor Electronics',s:'semiconductor'},
+        {n:'Communication Systems',s:'communication-systems'}
+      ]
     }
   },
   chemistry: {
     '11': {
-      'Physical': [{n:'Basic Concepts',s:'some-basic-concepts-of-chemistry'},{n:'Structure of Atom',s:'structure-of-atom'},{n:'Thermodynamics',s:'chemical-thermodynamics'},{n:'Equilibrium',s:'chemical-equilibrium'},{n:'Redox Reactions',s:'redox-reactions'}],
-      'Inorganic': [{n:'Classification of Elements',s:'classification-of-elements-and-periodicity-in-properties'},{n:'Chemical Bonding',s:'chemical-bonding-and-molecular-structure'},{n:'p-Block (11)',s:'p-block-elements'}],
-      'Organic': [{n:'GOC Basics',s:'basics-of-organic-chemistry'},{n:'Hydrocarbons',s:'hydrocarbons'}]
+      'Physical Chemistry': [
+        {n:'Basic Concepts of Chemistry',s:'some-basic-concepts-of-chemistry'},
+        {n:'Structure of Atom',s:'structure-of-atom'},
+        {n:'States of Matter',s:'states-of-matter'},
+        {n:'Thermodynamics',s:'chemical-thermodynamics'},
+        {n:'Equilibrium',s:'chemical-equilibrium'},
+        {n:'Redox Reactions',s:'redox-reactions'}
+      ],
+      'Inorganic Chemistry': [
+        {n:'Classification of Elements & Periodicity',s:'classification-of-elements-and-periodicity-in-properties'},
+        {n:'Chemical Bonding & Molecular Structure',s:'chemical-bonding-and-molecular-structure'},
+        {n:'Hydrogen',s:'hydrogen'},
+        {n:'s-Block Elements (Alkali & Alkaline Earth)',s:'s-block-elements'},
+        {n:'p-Block Elements — Groups 13 & 14',s:'p-block-elements-11'}
+      ],
+      'Organic Chemistry': [
+        {n:'General Organic Chemistry (GOC)',s:'basics-of-organic-chemistry'},
+        {n:'Hydrocarbons',s:'hydrocarbons'},
+        {n:'Environmental Chemistry',s:'environmental-chemistry'}
+      ]
     },
     '12': {
-      'Physical': [{n:'Solutions',s:'solutions'},{n:'Electrochemistry',s:'electrochemistry'},{n:'Chemical Kinetics',s:'chemical-kinetics'}],
-      'Inorganic': [{n:'d & f Block',s:'d-and-f-block-elements'},{n:'Coordination Compounds',s:'coordination-compounds'}],
-      'Organic': [{n:'Haloalkanes',s:'haloalkanes-and-haloarenes'},{n:'Alcohols & Phenols',s:'alcohols-phenols-and-ethers'},{n:'Aldehydes & Ketones',s:'aldehydes-ketones-and-carboxylic-acids'},{n:'Amines',s:'amines'},{n:'Biomolecules',s:'biomolecules'}]
+      'Physical Chemistry': [
+        {n:'Solutions',s:'solutions'},
+        {n:'Electrochemistry',s:'electrochemistry'},
+        {n:'Chemical Kinetics',s:'chemical-kinetics'},
+        {n:'Surface Chemistry',s:'surface-chemistry'}
+      ],
+      'Inorganic Chemistry': [
+        {n:'General Principles of Isolation of Elements',s:'metallurgy'},
+        {n:'p-Block Elements — Groups 15, 16, 17, 18',s:'p-block-elements-12'},
+        {n:'d & f Block Elements',s:'d-and-f-block-elements'},
+        {n:'Coordination Compounds',s:'coordination-compounds'}
+      ],
+      'Organic Chemistry': [
+        {n:'Haloalkanes & Haloarenes',s:'haloalkanes-and-haloarenes'},
+        {n:'Alcohols, Phenols & Ethers',s:'alcohols-phenols-and-ethers'},
+        {n:'Aldehydes, Ketones & Carboxylic Acids',s:'aldehydes-ketones-and-carboxylic-acids'},
+        {n:'Amines',s:'amines'},
+        {n:'Biomolecules',s:'biomolecules'},
+        {n:'Polymers',s:'polymers'},
+        {n:'Chemistry in Everyday Life',s:'chemistry-in-everyday-life'}
+      ]
     }
   },
   mathematics: {
     '11': {
-      'Algebra': [{n:'Sets & Relations',s:'sets-and-relations'},{n:'Complex Numbers',s:'complex-numbers'},{n:'Quadratic Equations',s:'quadratic-equation-and-inequalities'},{n:'P & C',s:'permutations-and-combinations'},{n:'Binomial Theorem',s:'binomial-theorem'},{n:'Sequence & Series',s:'sequences-and-series'}],
-      'Coordinate': [{n:'Straight Lines',s:'straight-lines-and-pair-of-straight-lines'},{n:'Circles',s:'circle'},{n:'Conic Sections',s:'conic-sections'}],
-      'Trig': [{n:'Trigonometric Func',s:'trigonometric-functions'}]
+      'Algebra': [
+        {n:'Sets, Relations & Functions',s:'sets-and-relations'},
+        {n:'Complex Numbers',s:'complex-numbers'},
+        {n:'Quadratic Equations & Inequalities',s:'quadratic-equation-and-inequalities'},
+        {n:'Permutations & Combinations',s:'permutations-and-combinations'},
+        {n:'Binomial Theorem',s:'binomial-theorem'},
+        {n:'Sequences & Series',s:'sequences-and-series'},
+        {n:'Mathematical Induction',s:'mathematical-induction'}
+      ],
+      'Coordinate Geometry': [
+        {n:'Straight Lines & Pair of Lines',s:'straight-lines-and-pair-of-straight-lines'},
+        {n:'Circles',s:'circle'},
+        {n:'Conic Sections',s:'conic-sections'}
+      ],
+      'Trigonometry': [
+        {n:'Trigonometric Functions & Equations',s:'trigonometric-functions'},
+        {n:'Inverse Trigonometric Functions',s:'inverse-trigonometry'}
+      ],
+      'Statistics & Misc': [
+        {n:'Statistics & Measures of Dispersion',s:'statistics'},
+        {n:'Mathematical Reasoning',s:'mathematical-reasoning'}
+      ]
     },
     '12': {
-      'Calculus': [{n:'Limits & Continuity',s:'limits-continuity-and-differentiability'},{n:'Application of Derivatives',s:'applications-of-derivatives'},{n:'Indefinite Integrals',s:'indefinite-integration'},{n:'Definite Integrals',s:'definite-integration'},{n:'Differential Equations',s:'differential-equations'}],
-      'Vectors/3D': [{n:'Vector Algebra',s:'vector-algebra'},{n:'3D Geometry',s:'3d-geometry'}],
-      'Algebra/Prob': [{n:'Matrices',s:'matrices'},{n:'Determinants',s:'determinants'},{n:'Probability',s:'probability'}]
+      'Calculus': [
+        {n:'Limits, Continuity & Differentiability',s:'limits-continuity-and-differentiability'},
+        {n:'Application of Derivatives',s:'applications-of-derivatives'},
+        {n:'Indefinite Integration',s:'indefinite-integration'},
+        {n:'Definite Integration & Area',s:'definite-integration'},
+        {n:'Differential Equations',s:'differential-equations'}
+      ],
+      'Vectors & 3D Geometry': [
+        {n:'Vector Algebra',s:'vector-algebra'},
+        {n:'Three Dimensional Geometry',s:'3d-geometry'}
+      ],
+      'Algebra & Probability': [
+        {n:'Matrices',s:'matrices'},
+        {n:'Determinants',s:'determinants'},
+        {n:'Probability',s:'probability'},
+        {n:'Linear Programming',s:'linear-programming'}
+      ]
     }
   }
 };
@@ -2179,6 +2289,21 @@ let store = JSON.parse(localStorage.getItem('jee_command_v10')) || {};
 /* ══════════════════════════════════════════
    BACKLOG — CLASSIC PANEL
 ══════════════════════════════════════════ */
+let backlogClassFilter = 'both';
+
+function setBacklogClass(cls, btn) {
+  backlogClassFilter = cls;
+  ['bcl-both','bcl-11','bcl-12'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const active = (id === 'bcl-' + cls) || (cls === 'both' && id === 'bcl-both');
+    el.style.background    = active ? 'var(--accent)' : 'transparent';
+    el.style.color         = active ? 'white'         : 'var(--text-3)';
+    el.style.boxShadow     = active ? '0 2px 8px var(--accent-glow)' : 'none';
+  });
+  renderBacklog();
+}
+
 function renderBacklog() {
   const list    = document.getElementById('backlog-list');
   const chipsEl = document.getElementById('backlog-summary-chips');
@@ -2201,7 +2326,7 @@ function renderBacklog() {
   let totalBehind = 0, phyBehind = 0, chemBehind = 0, mathBehind = 0;
 
   Object.keys(DATA).forEach(sub => {
-    ['11','12'].forEach(cls => {
+    ['11','12'].filter(c => backlogClassFilter === 'both' || c === backlogClassFilter).forEach(cls => {
       Object.entries(DATA[sub][cls]).forEach(([unit, chapters]) => {
         chapters.forEach(ch => {
           const id    = `${sub}-${ch.s}`;
@@ -2727,74 +2852,100 @@ var sylOpenUnits = new Set();
 
 // ── Subtopics data ──
 const SUBTOPICS = {
-  'units-and-measurements':['Physical Quantities & Units','SI Units & Dimensions','Errors & Accuracy','Significant Figures','Dimensional Analysis'],
-  'motion-in-a-straight-line':['Distance & Displacement','Speed & Velocity','Acceleration','Equations of Motion','Motion under Gravity','Relative Motion (1D)'],
-  'motion-in-a-plane':['Vectors & Scalars','Addition & Resolution of Vectors','Projectile Motion','Circular Motion (Uniform)','Relative Velocity (2D)'],
-  'laws-of-motion':["Newton's Laws",'Free Body Diagrams','Friction (Static & Kinetic)','Pseudo Force & Non-inertial Frames','Pulley Systems','Connected Bodies'],
-  'work-power-and-energy':['Work by Constant & Variable Force','Work-Energy Theorem','Kinetic & Potential Energy','Conservation of Energy','Power','Collisions (Elastic & Inelastic)'],
-  'rotational-motion':['Centre of Mass','Linear Momentum & Impulse','Collisions','Torque & Moment of Inertia','Angular Momentum','Rolling Motion'],
-  'gravitation':["Kepler's Laws","Newton's Law of Gravitation",'Gravitational Field & Potential','Satellites & Orbital Velocity','Escape Velocity'],
-  'properties-of-solids':['Stress & Strain',"Young's Modulus",'Bulk & Rigidity Modulus','Elastic Potential Energy',"Poisson's Ratio"],
-  'properties-of-matter':['Pressure & Buoyancy',"Archimedes' Principle","Bernoulli's Equation","Viscosity & Stokes' Law",'Surface Tension & Capillarity'],
-  'thermal-properties-of-matter':['Temperature & Heat','Thermal Expansion','Specific Heat Capacity','Calorimetry','Heat Transfer (Conduction, Convection, Radiation)',"Newton's Law of Cooling"],
-  'thermodynamics':['Zeroth & First Law','Work done in Thermodynamic Processes','Second Law & Entropy','Carnot Engine','Heat Engines & Refrigerators'],
-  'kinetic-theory-of-gases':['Ideal Gas Equation','Kinetic Theory Assumptions','RMS Speed & Kinetic Energy','Degrees of Freedom','Mean Free Path'],
-  'oscillations':['SHM: Displacement, Velocity, Acceleration','Energy in SHM','Spring-Mass System','Simple & Physical Pendulum','Damped & Forced Oscillations'],
-  'waves':['Wave Equation & Speed','Superposition & Interference','Standing Waves','Beats','Doppler Effect'],
-  'electrostatics':["Coulomb's Law",'Electric Field (Point & Extended)',"Gauss's Law & Applications",'Electric Flux','Conductors & Insulators'],
-  'electrostatic-potential-and-capacitance':['Electric Potential & Potential Difference','Equipotential Surfaces','Potential Energy of System','Capacitors & Capacitance','Energy Stored in Capacitor','Dielectrics'],
-  'current-electricity':["Ohm's Law & Resistance",'Resistivity & Conductivity',"Kirchhoff's Laws",'Wheatstone Bridge','RC Circuits','Electrical Power & Energy'],
-  'magnetic-effect-of-current':['Biot-Savart Law',"Ampere's Law",'Force on Moving Charge (Lorentz)','Force on Current-Carrying Conductor','Cyclotron','Solenoid & Toroid'],
-  'magnetism-and-matter':['Bar Magnet & Magnetic Dipole',"Earth's Magnetism",'Diamagnetic, Paramagnetic, Ferromagnetic'],
-  'electromagnetic-induction':["Faraday's & Lenz's Laws",'Motional EMF','Self & Mutual Inductance','Energy Stored in Inductor','AC Generator'],
-  'alternating-current':['AC Quantities (Peak, RMS)','Phasors','R, L, C in AC Circuits','Series LCR & Resonance','Power Factor','Transformer'],
-  'electromagnetic-waves':["Maxwell's Equations (conceptual)",'EM Spectrum','Properties of EM Waves'],
-  'ray-optics':['Reflection & Mirror Formula',"Refraction & Snell's Law",'Total Internal Reflection','Prism & Dispersion','Lenses & Lens Formula','Optical Instruments'],
-  'wave-optics':["Huygens' Principle","Young's Double Slit Experiment",'Interference','Diffraction','Polarisation'],
-  'dual-nature-of-radiation-and-matter':['Photoelectric Effect',"Einstein's Equation","de Broglie Wavelength",'Davisson-Germer Experiment'],
-  'atoms':["Rutherford's Model","Bohr's Model",'Spectral Series','Hydrogen Spectrum'],
-  'nuclei':['Nuclear Size & Density','Binding Energy','Radioactivity (Alpha, Beta, Gamma)','Nuclear Fission & Fusion','Half-Life & Decay Law'],
-  'semiconductor':['Energy Bands','p-n Junction Diode','Rectifier Circuits','Zener Diode','Transistor (CB, CE)','Logic Gates'],
-  'some-basic-concepts-of-chemistry':['Mole Concept','Stoichiometry','Empirical & Molecular Formula','Limiting Reagent','Concentration Terms'],
-  'structure-of-atom':['Atomic Models (Bohr)','Quantum Numbers','Orbitals & Shapes','Aufbau, Hund\'s, Pauli','Electronic Configuration'],
-  'classification-of-elements-and-periodicity-in-properties':['Periodic Table History','s, p, d, f Blocks','Atomic Radius & Ionisation Energy','Electron Affinity','Electronegativity & Metallic Character'],
-  'chemical-bonding-and-molecular-structure':['Ionic & Covalent Bonding','Lewis Structures','VSEPR Theory','Polarity & Dipole Moment','Hybridisation','MO Theory (basics)','Hydrogen Bonding'],
-  'chemical-thermodynamics':['System & Surroundings',"Enthalpy & Hess's Law",'Bond Enthalpy','Entropy & Spontaneity','Gibbs Free Energy'],
-  'chemical-equilibrium':['Law of Mass Action & Kc, Kp',"Le Chatelier's Principle",'Ionic Equilibrium','pH & Buffer Solutions','Solubility Product'],
-  'redox-reactions':['Oxidation States','Half-Reaction Method','Balancing Redox (Acidic/Basic)'],
-  'p-block-elements':['Group 13 (Boron Family)','Group 14 (Carbon Family)','Group 15 (Nitrogen Family)','Group 16 (Oxygen Family)','Group 17 (Halogens)','Group 18 (Noble Gases)'],
-  'basics-of-organic-chemistry':['Hybridisation & Shapes','IUPAC Nomenclature','Isomerism','Inductive & Resonance Effects','Reaction Intermediates'],
-  'hydrocarbons':['Alkanes (Conformations, Reactions)','Alkenes (Addition, Markovnikov)','Alkynes','Aromatic Hydrocarbons (Benzene, EAS)'],
-  'solutions':["Types of Solutions","Raoult's Law",'Colligative Properties',"Van't Hoff Factor"],
-  'electrochemistry':['Electrochemical Cells','Nernst Equation','Electrolysis',"Kohlrausch's Law",'Batteries & Fuel Cells'],
-  'chemical-kinetics':['Rate of Reaction','Rate Law & Order','Integrated Rate Equations','Arrhenius Equation','Mechanisms & Catalysis'],
-  'd-and-f-block-elements':['General Properties of d-block','Important Compounds (KMnO4, K2Cr2O7)','Lanthanides & Actinides'],
-  'coordination-compounds':['Ligands & Coordination Number','IUPAC Nomenclature','Isomerism','Bonding (VBT & CFT)','Stability Constants'],
-  'haloalkanes-and-haloarenes':['Nomenclature','SN1 & SN2 Mechanisms','Elimination Reactions','Polyhalogen Compounds'],
-  'alcohols-phenols-and-ethers':['Preparation & Properties of Alcohols','Phenols (Acidity, Reactions)','Ethers (Preparation, Reactions)'],
-  'aldehydes-ketones-and-carboxylic-acids':['Nucleophilic Addition (Aldehydes/Ketones)','Aldol Condensation','Cannizzaro Reaction','Carboxylic Acid Derivatives'],
-  'amines':['Classification & Nomenclature','Preparation & Properties','Basicity of Amines','Diazonium Salts'],
-  'biomolecules':['Carbohydrates (Mono, Di, Poly)','Proteins & Amino Acids','Enzymes','Nucleic Acids (DNA, RNA)','Vitamins & Hormones'],
-  'sets-and-relations':['Sets & Operations','Venn Diagrams','Relations & Functions','Domain & Range','Types of Functions'],
-  'complex-numbers':['Algebra of Complex Numbers','Argument & Modulus','Polar Form',"De Moivre's Theorem",'nth Roots of Unity'],
-  'quadratic-equation-and-inequalities':['Nature of Roots (Discriminant)','Sum & Product of Roots','Quadratic Inequalities','Location of Roots','Common Roots'],
-  'permutations-and-combinations':['Fundamental Counting Principle','Permutations (with/without repetition)','Combinations','Circular Arrangements','Division into Groups'],
-  'binomial-theorem':['Binomial Expansion','General & Middle Term','Properties of Binomial Coefficients','Multinomial (basic)'],
-  'sequences-and-series':['AP: nth Term & Sum','GP: nth Term & Sum','Sum to Infinity of GP','AGP','Special Series (Σr, Σr²)'],
-  'straight-lines-and-pair-of-straight-lines':['Distance & Section Formulae','Slope & Equations of Line','Angle between Lines','Pair of Straight Lines'],
-  'circle':['Standard & General Equation','Tangent & Normal','Chord of Contact','Radical Axis','Family of Circles'],
-  'conic-sections':['Parabola (Standard Forms)','Ellipse (Foci, Eccentricity)','Hyperbola (Asymptotes)','Tangents & Normals','Chord of Contact'],
-  'trigonometric-functions':['Trigonometric Ratios & Identities','Compound Angle Formulae','Multiple & Sub-Multiple Angles','Trigonometric Equations','Properties of Triangles (Sine/Cosine Rule)'],
-  'limits-continuity-and-differentiability':["Limits (Standard Results, L'Hôpital)",'Continuity & Types of Discontinuity','Differentiability','Derivatives (Standard, Chain Rule)','Implicit & Parametric Differentiation'],
-  'applications-of-derivatives':['Tangent & Normal','Monotonicity','Maxima & Minima','Mean Value Theorems','Approximation & Rate of Change'],
-  'indefinite-integration':['Standard Integrals','Substitution Method','Integration by Parts','Partial Fractions','Special Integrals'],
-  'definite-integration':['Definite Integral Properties',"King's Property",'Gamma & Beta Functions (basic)',"Walli's Formula",'Area under Curves'],
-  'differential-equations':['Order & Degree','Variable Separable','Homogeneous Equations','Linear Differential Equations','Applications'],
-  'vector-algebra':['Vector Addition & Scalar Mult','Dot Product & Cross Product','Scalar Triple Product','Vector Triple Product'],
-  '3d-geometry':['Direction Cosines & Ratios','Equation of Line in 3D','Equation of Plane','Distance Formulae','Angle between Line & Plane'],
-  'matrices':['Types of Matrices','Matrix Operations','Transpose & Adjoint','Inverse of Matrix','Elementary Transformations'],
-  'determinants':['Properties of Determinants','Expansion (Cofactors)',"Cramer's Rule",'Area of Triangle'],
-  'probability':['Classical Probability','Conditional Probability',"Bayes' Theorem",'Random Variables & Distributions','Binomial Distribution']
+  /* ── PHYSICS 11 ── */
+  'units-and-measurements':['Physical Quantities & SI Units','Dimensions & Dimensional Formulae','Dimensional Analysis & Applications','Errors: Systematic & Random','Absolute, Relative & Percentage Error','Combinations of Errors','Significant Figures & Rounding','Least Count of Instruments','Vernier Callipers & Screw Gauge','Dimensional Consistency of Equations'],
+  'motion-in-a-straight-line':['Distance vs Displacement','Speed vs Velocity','Uniform & Non-uniform Acceleration','Equations of Motion (v-u-a-s-t)','Graphs: x-t, v-t, a-t','Motion under Gravity (free fall)','Relative Motion in 1D','Variable Acceleration (calculus method)','Reaction Time Problems','Multi-stage Motion Problems'],
+  'motion-in-a-plane':['Scalars & Vectors — Definitions','Vector Addition (Triangle & Parallelogram Laws)','Resolution of Vectors into Components','Unit Vectors & Position Vector','Projectile Motion (horizontal & angle)','Range, Time of Flight, Max Height','Uniform Circular Motion','Centripetal Acceleration & Force','Relative Velocity in 2D','River-Boat & Rain-Man Problems'],
+  'laws-of-motion':["Newton's First Law & Inertia","Newton's Second Law (F=ma)",'Newton\'s Third Law & Action-Reaction','Free Body Diagram Technique','Static & Kinetic Friction','Angle of Friction & Repose','Pseudo Force in Non-inertial Frames','Pulley Systems & Atwood Machine','Connected Body Problems','Circular Motion & Banking of Roads'],
+  'work-power-and-energy':['Work by Constant Force','Work by Variable Force (integration)','Work-Energy Theorem','Conservative & Non-conservative Forces','Potential Energy Concept','Conservation of Mechanical Energy','Power & its Units','Elastic & Inelastic Collisions','Head-on & Oblique Collisions','Spring PE & Spring Problems'],
+  'rotational-motion':['Centre of Mass of Systems & Bodies','Linear Momentum & Impulse','Conservation of Linear Momentum','Torque & Couple','Moment of Inertia (def, parallel & perp axis)','MI of Standard Bodies','Angular Momentum & its Conservation','Kinematics of Rotation','Rolling without Slipping','Angular Impulse & Torque Problems'],
+  'gravitation':["Kepler's Three Laws","Newton's Universal Law of Gravitation",'Gravitational Field & Field Lines','Gravitational Potential & Potential Energy','Variation of g with height, depth, rotation','Escape Velocity','Orbital Velocity & Satellites','Geostationary & Polar Satellites','Binding Energy of Satellite','Gravitational Self-energy'],
+  'properties-of-solids':['Elasticity & Plasticity','Stress: Longitudinal, Shear, Volumetric','Strain: Longitudinal, Shear, Volumetric',"Young's Modulus (Y)",'Bulk Modulus (K) & Rigidity Modulus (η)','Stress-Strain Curve (elastic limit, UTS)','Elastic Potential Energy stored in wire',"Poisson's Ratio",'Thermal Stress','Applications: Springs, Bridges'],
+  'properties-of-matter':['Pressure & Variation with Depth','Pascal\'s Law & Hydraulic Machines','Buoyancy & Archimedes\' Principle','Equation of Continuity','Bernoulli\'s Theorem & Applications','Venturimeter & Pitot Tube','Viscosity & Newton\'s Law of Viscosity','Stokes\' Law & Terminal Velocity','Surface Tension & Surface Energy','Capillarity & Angle of Contact'],
+  'thermal-properties-of-matter':['Temperature Scales & Conversion','Thermal Expansion: Linear, Areal, Volumetric','Anomalous Expansion of Water','Specific Heat Capacity & Molar Heat Capacity','Calorimetry & Mixing','Latent Heat (Fusion & Vaporisation)','Conduction: Fourier\'s Law, Thermal Resistance','Convection (natural & forced)','Radiation: Stefan-Boltzmann Law','Newton\'s Law of Cooling & Wien\'s Law'],
+  'thermodynamics':['Thermodynamic Systems & State Variables','Zeroth Law & Thermal Equilibrium','First Law of Thermodynamics (ΔU = Q - W)','Isochoric, Isobaric, Isothermal, Adiabatic Processes','Work done in Each Process','Second Law: Kelvin-Planck & Clausius Statements','Entropy & Disorder','Carnot Engine & Carnot Theorem','Efficiency of Heat Engines','Refrigerators & COP'],
+  'kinetic-theory-of-gases':['Ideal Gas Equation & Assumptions','Pressure derived from Kinetic Theory','RMS, Mean & Most Probable Speed','Kinetic Energy & Temperature Relation','Degrees of Freedom & Equipartition Theorem','Specific Heats Cv, Cp & γ','Mean Free Path','Real Gases & van der Waals Equation','Maxwell Speed Distribution (qualitative)','Applications: Evaporation, Humidity'],
+  'oscillations':['Definition of SHM & Conditions','Displacement, Velocity, Acceleration in SHM','Phase, Amplitude & Angular Frequency','Energy in SHM (KE + PE = const)','Spring-Mass System (horizontal & vertical)','Simple Pendulum & Small Angle Approx','Physical & Torsional Pendulum','Superposition of SHMs','Damped Oscillations & Q-factor','Resonance & Forced Oscillations'],
+  'waves':['Wave Parameters: λ, f, T, v','Speed of Transverse Wave on String','Speed of Sound in Medium','Principle of Superposition','Reflection & Transmission of Waves','Interference: Constructive & Destructive','Standing Waves on String & Organ Pipes','Modes & Harmonics','Beats & Beat Frequency','Doppler Effect (source/observer motion)'],
+
+  /* ── PHYSICS 12 ── */
+  'electrostatics':["Coulomb's Law & Superposition",'Electric Field: Point Charge & Dipole','Electric Field Lines (properties)','Continuous Charge Distributions (line, surface, volume)',"Gauss's Law & Applications",'Electric Field of Sphere, Cylinder, Plane','Conductors in Electrostatic Equilibrium','Cavity & Shielding','Electric Flux','Electrostatic Pressure'],
+  'electrostatic-potential-and-capacitance':['Electric Potential due to Point Charge & System','Relation between E and V','Equipotential Surfaces','Potential Energy of Charge System','Potential Energy in External Field','Work-Energy in Moving Charges','Capacitance: Parallel Plate, Spherical, Cylindrical','Capacitors in Series & Parallel','Energy Stored in Capacitor','Effect of Dielectric (Dielectric Constant, Polarisation)'],
+  'current-electricity':["Ohm's Law & its Limitations",'Resistivity & Temperature Dependence','Combination of Resistors (series, parallel, network)',"Kirchhoff's Current & Voltage Laws",'Wheatstone Bridge & Meter Bridge','Potentiometer (EMF, internal resistance)','Cell: EMF, Internal Resistance, Terminal Voltage','Combination of Cells','Electrical Power & Joule Heating','RC Circuit (charging & discharging)'],
+  'magnetic-effect-of-current':['Biot-Savart Law & Applications','Magnetic Field of Straight Wire, Circular Loop','Ampere\'s Circuital Law','Solenoid & Toroid','Force on Moving Charge: Lorentz Force','Motion of Charge in Magnetic Field (circular)','Velocity Selector & Mass Spectrometer','Force between Parallel Wires','Torque on Current Loop & Magnetic Dipole','Cyclotron'],
+  'magnetism-and-matter':['Magnetic Dipole Moment','Bar Magnet: Field on Axis & Equatorial',"Earth's Magnetism: BH, BV, Declination, Dip",'Tangent Law & Tangent Galvanometer','Dia, Para & Ferromagnetic Materials','Magnetic Susceptibility & Permeability','Hysteresis Loop & Applications','Permanent Magnets & Electromagnets','Curie Temperature','Magnetisation & Magnetic Intensity'],
+  'electromagnetic-induction':["Faraday's First & Second Laws","Lenz's Law & Conservation of Energy",'Motional EMF (rod in B)','Self-Inductance & Self-Induced EMF','Mutual Inductance & Coefficient','Energy Stored in Inductor','L-R Circuit (growth & decay)','Eddy Currents & Applications','AC Generator Principle','Rotating Coil in Magnetic Field'],
+  'alternating-current':['Instantaneous, Peak & RMS Values','Phase & Phasors','AC through Resistor (power dissipated)','AC through Inductor (inductive reactance, phase)','AC through Capacitor (capacitive reactance, phase)','Series LCR Circuit','Resonance: Frequency, Sharpness, Q-factor','Impedance & Phase Angle','Average Power & Power Factor','Ideal Transformer & Efficiency'],
+  'electromagnetic-waves':["Maxwell's Displacement Current Concept","Maxwell's Equations (conceptual overview)",'Electromagnetic Spectrum & Ranges','Properties of EM Waves','Energy & Momentum of EM Wave','Poynting Vector','Doppler Effect for EM Waves','Uses of Different EM Wave Bands','Polarisation of EM Waves'],
+  'ray-optics':['Reflection & Laws of Reflection','Mirror Formula & Magnification','Refraction & Snell\'s Law','Refractive Index & Speed of Light','Total Internal Reflection & Critical Angle','Prism: Deviation & Dispersion','Angular Dispersion & Resolving Power','Lens Formula, Power, Magnification','Combination of Lenses & Mirrors','Optical Instruments (Microscope, Telescope)'],
+  'wave-optics':["Huygens' Principle & Wave Fronts","Young's Double Slit Experiment",'Fringe Width & Conditions for Bright/Dark','Intensity in Interference','Diffraction at Single Slit (condition for minima)','Diffraction Grating','Resolving Power of Optical Instruments','Polarisation: Production & Detection','Brewster\'s Angle & Malus\' Law','Scattering of Light (Rayleigh)'],
+  'dual-nature-of-radiation-and-matter':['Photoelectric Effect: Observations','Threshold Frequency & Work Function',"Einstein's Photoelectric Equation",'Stopping Potential & Kinetic Energy of Photoelectrons','Photon Properties (E = hν, p = h/λ)',"de Broglie Hypothesis","de Broglie Wavelength of Particles",'Davisson-Germer Electron Diffraction Experiment','Heisenberg Uncertainty Principle (qualitative)','Matter Waves & Wave-Particle Duality'],
+  'atoms':["Thomson's Plum Pudding Model",'Alpha Particle Scattering & Rutherford Experiment',"Rutherford's Nuclear Model","Bohr's Postulates & Quantisation Condition",'Radii & Velocities of Bohr Orbits','Energy of Electron in nth Orbit (H-atom)','Hydrogen Spectrum: Series (Lyman to Pfund)','Spectral Wavelengths (Rydberg Formula)','Excitation & Ionisation Energy','Limitations of Bohr Model'],
+  'nuclei':['Nuclear Composition, Size & Density','Mass Number, Atomic Number, Isotopes','Mass Defect & Binding Energy','Binding Energy per Nucleon Curve','Radioactive Decay: α, β, γ','Laws of Radioactive Decay & Activity','Half-Life, Mean Life, Decay Constant','Radioactive Series & Equilibrium','Nuclear Fission & Chain Reaction','Nuclear Fusion & Stellar Energy'],
+  'semiconductor':['Energy Bands: Conductor, Semiconductor, Insulator','Intrinsic Semiconductor & Carrier Concentration','n-type & p-type Doping','p-n Junction & Depletion Region','Forward & Reverse Bias Characteristics','Half-Wave & Full-Wave Rectifiers','Zener Diode & Voltage Regulation','Transistor (NPN/PNP): Structure & Action','Transistor as Amplifier (CE config)','Logic Gates: AND, OR, NOT, NAND, NOR, XOR'],
+  'communication-systems':['Elements of Communication System','Bandwidth of Signals & Channels','Electromagnetic Spectrum for Communication','Propagation: Ground, Sky & Space Waves','Modulation: Need & Types (AM, FM, PM)','Amplitude Modulation: Equation & Sidebands','Frequency Modulation: Advantages','Demodulation & Detection','Multiplexing: TDM & FDM','Satellite & Digital Communication'],
+
+  /* ── CHEMISTRY 11 ── */
+  'some-basic-concepts-of-chemistry':['Mole Concept & Avogadro Number','Molar Mass & Gram Molar Volume','Percentage Composition','Empirical & Molecular Formula','Stoichiometry & Balancing Equations','Limiting Reagent','Percentage Yield & Atom Economy','Concentration Terms (Molarity, Molality, Mole Fraction)','Equivalent Concept & N-factor','POAC (Principle of Atom Conservation)'],
+  'structure-of-atom':['Atomic Models: Thomson, Rutherford','Bohr\'s Model for Hydrogen','Spectral Evidence & Rydberg Equation','Dual Nature of Electron (de Broglie)','Heisenberg Uncertainty Principle','Quantum Numbers (n, l, m, s)','Shapes of s, p, d Orbitals','Aufbau Principle, Hund\'s Rule, Pauli Exclusion','Electronic Configuration (Filling Order)','Stability of Half-filled & Fully-filled Orbitals'],
+  'states-of-matter':['Gas Laws: Boyle\'s, Charles\'s, Gay-Lussac\'s','Avogadro\'s Law & Ideal Gas Equation','Dalton\'s Law of Partial Pressures','Kinetic Molecular Theory of Gases','Maxwell-Boltzmann Speed Distribution','Real Gases: Deviation from Ideal Behaviour','van der Waals Equation','Critical Constants (Tc, Pc, Vc)','Liquefaction & Joule-Thomson Effect','Intermolecular Forces & Liquid State'],
+  'chemical-thermodynamics':['System, Surroundings & Types','Internal Energy & Enthalpy','Hess\'s Law & Born-Haber Cycle','Standard Enthalpy of Formation & Combustion','Bond Enthalpy & Resonance Energy','Entropy: Definition & Disorder','Second Law & Spontaneity','Gibbs Free Energy (ΔG = ΔH - TΔS)','Relationship: ΔG & Equilibrium Constant (ΔG° = -RT lnK)','Third Law of Thermodynamics'],
+  'chemical-equilibrium':['Law of Mass Action & Kc Expression','Kp & Relationship between Kc and Kp',"Le Chatelier's Principle","Factors Affecting Equilibrium (T, P, Conc)",'Applications: Haber & Contact Process','Ionic Equilibrium: Strong & Weak Electrolytes','Ostwald Dilution Law & Degree of Dissociation','pH Scale & Calculation','Buffer Solutions & Henderson-Hasselbalch','Solubility Product (Ksp) & Common Ion Effect'],
+  'redox-reactions':['Oxidation Number Rules','Identifying Oxidising & Reducing Agents','Half-Reaction (Ion-Electron) Method','Oxidation Number Change Method','Balancing in Acidic & Basic Medium','Disproportionation Reactions','Comproportionation Reactions','Equivalent Concept in Redox','Applications: Titrations, Electrochemistry preview'],
+  'classification-of-elements-and-periodicity-in-properties':['Development of Periodic Table (Döbereiner to Moseley)','Modern Periodic Law & Table Structure','s, p, d, f Block Elements','Periodic Trends: Atomic Radius (covalent, ionic, vdW)','Ionisation Enthalpy (1st, 2nd, exceptions)','Electron Gain Enthalpy','Electronegativity (Pauling Scale)','Metallic & Non-metallic Character','Oxidation States Trend','Diagonal Relationship'],
+  'chemical-bonding-and-molecular-structure':['Kossel-Lewis Approach & Octet Rule','Formal Charge Calculation','Ionic Bond: Formation, Lattice Energy','Covalent Bond: VBT (overlap)','VSEPR Theory & Molecular Shapes','Hybridisation: sp, sp², sp³, dsp², d²sp³','Bond Parameters (length, angle, enthalpy)','Polarity, Dipole Moment','Molecular Orbital Theory: Bonding & Antibonding MOs','Hydrogen Bonding (inter & intra)'],
+  'hydrogen':['Position of Hydrogen in Periodic Table','Isotopes of Hydrogen (Protium, D, T)','Preparation of Dihydrogen (lab & industrial)','Physical & Chemical Properties of H₂','Hydrides: Ionic, Covalent & Interstitial','Water: Structure & Properties','Heavy Water (D₂O): Preparation & Uses','Hydrogen Peroxide: Preparation, Structure & Properties','Uses of Hydrogen as Fuel','Hard & Soft Water; Water Treatment'],
+  's-block-elements':['General Characteristics of Group 1 & 2','Electronic Configuration & Trends','Anomalous Properties of Li & Be','Compounds of Sodium: NaOH, Na₂CO₃, NaHCO₃, NaCl','Industrial Preparation of Sodium Compounds','Biological Importance of Na & K','Compounds of Calcium & Magnesium: CaO, Ca(OH)₂, CaCO₃','Plaster of Paris & Cement','Diagonal Relationship (Li-Mg, Be-Al)','Flame Tests & Applications'],
+  'p-block-elements-11':['Group 13: Electronic Configuration & Properties','Boron: Allotropes, BF₃, B₂H₆ (structure & bonding)','Aluminium: Extraction (Hall-Héroult), Al₂O₃, AlCl₃','Group 14: Electronic Configuration & Allotropy','Carbon: Diamond, Graphite, Fullerenes (structures & properties)','Oxides of Carbon (CO, CO₂) & Uses','Silicon: SiO₂, Silicates, Silicones','Tin & Lead: Properties & Compounds','Anomalous Behaviour of C & Si','Trends in Group 13 & 14'],
+  'basics-of-organic-chemistry':['Hybridisation: sp, sp², sp³ in Carbon','Classification of Organic Compounds','IUPAC Nomenclature (up to 3 functional groups)','Structural & Stereo Isomerism','Electronic Displacement: Inductive Effect','Resonance & Mesomeric Effect','Hyperconjugation','Carbocations, Carbanions, Free Radicals, Carbenes','Types of Organic Reactions (substitution, addition, elimination)','Nucleophiles & Electrophiles'],
+  'hydrocarbons':['Alkanes: IUPAC, Conformations (Newman), Reactions (halogenation, combustion)','Free Radical Mechanism & Markovnikov','Alkenes: Geometric Isomerism (cis-trans, E-Z)','Alkenes: Addition Reactions (HX, H₂O, Br₂, H₂SO₄)','Mechanism of Electrophilic Addition','Alkynes: Acidic Nature, Addition Reactions','Alkynes: Reactions with HX, H₂O (tautomerism)','Benzene: Structure, Resonance, Aromaticity (Hückel)','Electrophilic Aromatic Substitution (EAS)','Directive Effects in EAS'],
+  'environmental-chemistry':['Segments of Environment (atm, hydrosphere, lithosphere)','Tropospheric Pollution: CO, SO₂, NOₓ','Smog (Classical & Photochemical)','Acid Rain: Causes & Effects','Greenhouse Effect & Global Warming','Ozone Layer: Depletion & Consequences','Water Pollution: BOD, COD, Heavy Metals','Soil Pollution: Pesticides, Fertilisers','Green Chemistry Principles','Industrial Effluents & Control'],
+
+  /* ── CHEMISTRY 12 ── */
+  'solutions':['Types of Solutions & Solubility','Expressing Concentration (all terms)','Vapour Pressure & Raoult\'s Law','Ideal & Non-ideal Solutions','Colligative Properties: Relative Lowering of VP','Elevation in Boiling Point','Depression in Freezing Point','Osmosis & Osmotic Pressure',"Van't Hoff Factor for Electrolytes",'Abnormal Molar Mass & Association/Dissociation'],
+  'electrochemistry':['Electrochemical Cells: Galvanic & Electrolytic','Cell Notation & Salt Bridge','Standard Electrode Potential & SHE','EMF of Cell & Nernst Equation',"Kohlrausch's Law (limiting molar conductivity)",'Molar & Equivalent Conductance','Degree of Dissociation from Conductance','Electrolysis: Faraday\'s First & Second Laws','Products of Electrolysis (examples)','Batteries (Lead-Acid, Ni-Cd, Li-ion) & Fuel Cells'],
+  'chemical-kinetics':['Rate of Reaction (average & instantaneous)','Rate Law & Rate Constant','Order & Molecularity: Definitions & Differences','Zero-order Reaction: Integrated Rate Law & Half-life','First-order Reaction: Integrated Rate Law & Half-life','Second-order Reaction','Pseudo-first-order Reactions','Arrhenius Equation & Activation Energy','Effect of Temperature (Q₁₀ Rule)','Catalysis: Homogeneous, Heterogeneous & Enzyme'],
+  'surface-chemistry':['Adsorption: Physisorption vs Chemisorption','Freundlich Adsorption Isotherm','Langmuir Adsorption Isotherm','Catalysis: Types & Promoters/Poisons','Catalytic Mechanism (adsorption theory)','Colloids: Definition, Classification (lyophilic/lyophobic)','Preparation of Colloids','Properties: Tyndall Effect, Brownian Motion, Electrophoresis','Coagulation & Peptisation','Emulsions & Gels; Applications'],
+  'metallurgy':['Occurrence of Metals & Ores','Concentration of Ores: Gravity, Magnetic, Froth Flotation','Roasting, Calcination & Smelting','Reduction Methods (C, Al, electrolysis)','Refining: Electrolytic, Zone, Vapour Phase','Ellingham Diagram & Feasibility','Extraction of Fe (Blast Furnace)','Extraction of Cu (Electrolytic)','Extraction of Al (Hall-Héroult)','Alloys & their Compositions'],
+  'p-block-elements-12':['Group 15: Electronic Config, Allotropy (P₄, N₂)','Compounds of Nitrogen: NH₃, HNO₂, HNO₃ (preparation, properties)','Phosphorus Compounds: PCl₃, PCl₅, P₄O₁₀','Group 16: Electronic Config, Allotropy of S','Compounds of Sulphur: SO₂, SO₃, H₂SO₄ (contact process)','Ozone: Preparation, Properties & Bleaching','Group 17 (Halogens): Trends & HX Acids','Interhalogen Compounds','Group 18 (Noble Gases): Properties & Compounds of Xe','Trends & Comparisons across Groups 15-18'],
+  'd-and-f-block-elements':['General Properties of d-block (configuration, variable OS)','Colour of Transition Metal Ions','Magnetic Properties & Paramagnetism','Catalytic Properties & Alloy Formation','Interstitial Compounds','Important Compounds: K₂Cr₂O₇ (dichromate reactions)','Important Compounds: KMnO₄ (permanganate reactions)','Potassium Dichromate: Oxidising Properties','Lanthanides: Electronic Config, Lanthanide Contraction','Actinides: Electronic Config & Comparison with Lanthanides'],
+  'coordination-compounds':['Ligands: Types & Denticity','IUPAC Nomenclature of Coordination Compounds','Coordination Number & Geometry','Isomerism: Structural (ionisation, linkage, hydrate)','Stereoisomerism: Geometric & Optical','Valence Bond Theory (VBT): sp³, dsp², sp³d²','Crystal Field Theory (CFT): Splitting (Δ)','High Spin vs Low Spin Complexes','Colour in Coordination Compounds (d-d transition)','Stability Constants & Applications (EAN rule)'],
+  'haloalkanes-and-haloarenes':['IUPAC Nomenclature of Alkyl & Aryl Halides','Nature of C-X Bond & Physical Properties','SN1 Mechanism (racemisation, rate)','SN2 Mechanism (inversion, rate)','Factors: SN1 vs SN2 Preference','Elimination: E1 & E2 (Zaitsev Rule)','Reaction with Mg (Grignard Reagent)','Reactions: NaOH, KCN, AgNO₃, NH₃','Polyhalogen Compounds: CHCl₃, CCl₄, DDT, Freons','Aryl Halides: Less Reactive, Nucleophilic Aromatic Substitution'],
+  'alcohols-phenols-and-ethers':['Classification & IUPAC Nomenclature','Preparation of Alcohols (hydration, reduction, Grignard)','Physical Properties (H-bonding, BP)','Reactions of Alcohols: Dehydration, Oxidation, Esterification','Lucas Test & Victor Meyer Test','Preparation of Phenols (from benzene diazonium salt)','Acidic Nature of Phenols (Comparison with Alcohols)','Reactions of Phenols: Kolbe, Reimer-Tiemann, Fries Rearrangement','EAS on Phenol (ortho/para directive)','Preparation & Reactions of Ethers (Williamson Synthesis)'],
+  'aldehydes-ketones-and-carboxylic-acids':['Preparation of Aldehydes & Ketones','Physical Properties & Comparison','Nucleophilic Addition Reactions (mechanism)','Reactions: Addition of HCN, RMgX, H₂','Aldol Condensation & Cross-Aldol','Cannizzaro Reaction','Clemmensen & Wolff-Kishner Reduction','Carboxylic Acids: Preparation & Acidity (inductive effect)','Reactions of Carboxylic Acids (with SOCl₂, PCl₅, NH₃, LiAlH₄)','Acid Derivatives: Esters, Amides, Anhydrides'],
+  'amines':['Classification: 1°, 2°, 3° Amines & Quaternary Ammonium','IUPAC Nomenclature','Preparation: Reduction of nitro, amide, nitrile; Hofmann Degradation','Physical Properties & Basicity','Basicity Comparison: 1°, 2°, 3° Amines & NH₃','Electronic & Steric Effects on Basicity','Reactions: Acylation, Carbylamine, Hinsberg Test','Electrophilic Aromatic Substitution on Aniline','Diazonium Salts: Preparation & Stability','Coupling Reactions & Synthetic Applications'],
+  'biomolecules':['Carbohydrates: Classification (mono/di/polysaccharides)','Structure of Glucose (open chain & ring)','Anomers & Mutarotation','Fructose, Sucrose, Starch, Cellulose, Glycogen','Proteins: Amino Acids (essential vs non-essential)','Peptide Bond Formation & Peptide Chain','Protein Structure (1°, 2°, 3°, 4°)','Denaturation & Renaturation','Enzymes: Classification & Mechanism','Nucleic Acids: DNA & RNA Structure; Biological Role'],
+  'polymers':['Monomers, Polymers & Degree of Polymerisation','Addition Polymerisation (free radical, cationic, anionic)','Condensation Polymerisation','Copolymers & Block Polymers','Natural Rubber: Vulcanisation & Properties','Synthetic Rubber: Buna-S, Buna-N, Neoprene','Fibres: Nylon-6, Nylon-6,6, Dacron','Plastics: Polythene, PVC, Bakelite, Melamine','Biodegradable Polymers (PHBV)','Classification by Properties: Thermoplastic vs Thermosetting'],
+  'chemistry-in-everyday-life':['Drugs: Types & Drug-Target Interaction','Analgesics, Antipyretics & Antibiotics','Antacids, Antihistamines & Antimicrobials','Food Preservatives: BHA, BHT, Sodium Benzoate','Artificial Sweeteners: Aspartame, Saccharin','Dyes: Classification & Mechanism','Detergents vs Soaps: Comparison','Hard Water & Soap','Chemicals in Agriculture: Fertilisers & Pesticides','Importance of Chemicals in Medicines & Health'],
+
+  /* ── MATHEMATICS 11 ── */
+  'sets-and-relations':['Sets: Notation, Types (null, finite, infinite, equal, universal)','Subsets, Power Set & Universal Set','Venn Diagrams & Operations (∪, ∩, complement, difference)','Laws of Set Algebra (De Morgan\'s)','Cartesian Product of Sets','Relations: Definition, Domain, Codomain, Range','Types of Relations (reflexive, symmetric, transitive, equivalence)','Functions: Definition & Difference from Relation','Types of Functions (injective, surjective, bijective)','Composition & Inverse of Functions'],
+  'complex-numbers':['Imaginary Unit i & Powers of i','Algebraic Operations on Complex Numbers','Conjugate, Modulus & Argument','Polar Form (r(cosθ + i sinθ))','Euler\'s Form (re^{iθ))',"De Moivre's Theorem & Applications",'nth Roots of Unity (sum, product)','Cube Roots of Unity (ω)','Geometry of Complex Numbers (distance, section)','Modulus-Argument Inequalities'],
+  'quadratic-equation-and-inequalities':['Nature of Roots (Discriminant)','Sum & Product of Roots (Vieta\'s)','Formation of Quadratic from Roots','Transformation of Equations','Quadratic Inequalities (wavy curve method)','Location of Roots: Both Roots in (a,b)','One Root in (a,b)','Common Roots (both or one)','Maximum & Minimum of Quadratic Expression','Modulus & Absolute Value Inequalities'],
+  'permutations-and-combinations':['Fundamental Counting Principle','Factorial Notation & Properties','Permutation (nPr): with & without repetition','Circular Permutations','Arrangements with Identical Elements','Combinations (nCr): Definition & Properties','Selection Problems','Distribution into Groups','Rank of Word in Dictionary','Use of P&C in Geometry (collinear, concurrent)'],
+  'binomial-theorem':['Binomial Theorem for Positive Integer n','General Term T_{r+1}','Finding Specific Terms (middle, r-th from end)','Properties of Binomial Coefficients','Sum of Coefficients & Alternating Sum','Binomial Theorem for Any Index (|x|<1)','Greatest Binomial Coefficient & Greatest Term','Multinomial Theorem (basic)','Binomial Approximations','Applications in Divisibility & Number Theory'],
+  'sequences-and-series':['AP: nth Term & Sum of n Terms','AP: Arithmetic Mean (AM), Insertion of Means','GP: nth Term & Sum (finite)','GP: Sum to Infinity (|r|<1)','Geometric Mean (GM), Insertion of Means','Relation AM ≥ GM ≥ HM','Arithmetico-Geometric Progression (AGP)','Special Sums: Σr, Σr², Σr³','Telescoping Series','Harmonic Progression & Harmonic Mean'],
+  'mathematical-induction':['Principle of Mathematical Induction (Peano\'s)','Steps: Base Case, Inductive Hypothesis, Inductive Step','Proving Divisibility Results','Proving Inequalities','Proving Formulae for Sums','Strong Induction','Well-Ordering Principle','Deductive vs Inductive Reasoning','Common Mistakes in Induction Proofs'],
+  'straight-lines-and-pair-of-straight-lines':['Distance & Section Formulae','Area of Triangle & Collinearity','Slope & Intercept Forms of Line','Normal & Symmetric Forms','Reduction of General Equation Ax+By+C=0','Angle between Two Lines','Distance from a Point to a Line','Concurrent Lines & Condition','Pair of Straight Lines: Homogeneous Equation ax²+2hxy+by²=0','Pair: Angle between Pair, Condition for Perpendicular/Coincident'],
+  'circle':['Standard Equation: Centre-Radius Form','General Equation & Finding Centre, Radius','Equation of Circle through 3 Points','Intercepts on Axes','Tangent from External Point & Length','Condition for Tangency (external & internal)','Chord of Contact','Normal to a Circle','Radical Axis & Radical Centre','Family of Circles: Coaxial Systems'],
+  'conic-sections':['Parabola: Standard Forms (y²=4ax etc.), Focus, Directrix','Tangent & Normal to Parabola','Chord joining two points on Parabola','Ellipse: Standard Form, Foci, Eccentricity','Tangent & Normal to Ellipse','Hyperbola: Standard Form, Asymptotes, Eccentricity','Tangent & Normal to Hyperbola','Chord of Contact for all Conics','Director Circle & Auxiliary Circle','Parametric Equations of Conics'],
+  'trigonometric-functions':['Angles: Degrees, Radians, Arc Length','Trigonometric Ratios & Basic Identities','Values at Standard Angles','Compound Angle Formulae (sin(A±B), cos(A±B), tan(A±B))','Multiple Angle Formulae (sin 2A, cos 2A, etc.)','Sub-multiple & Half-angle Formulae','Product-to-Sum & Sum-to-Product Formulae','Trigonometric Equations & General Solutions','Properties of Triangles (Sine Rule, Cosine Rule)','Circumradius, Inradius & Area of Triangle'],
+  'inverse-trigonometry':['Definition & Domain-Range of sin⁻¹, cos⁻¹, tan⁻¹','Domain-Range of cot⁻¹, sec⁻¹, cosec⁻¹','Principal Values & Their Calculation','Properties: sin⁻¹(-x), cos⁻¹(-x) etc.','Relations: sin⁻¹x + cos⁻¹x = π/2','Addition Formulae for Inverse Trig','Multiple Angle: 2 tan⁻¹x, 3 tan⁻¹x','Inverse Trig of Trigonometric Expression','Equation Solving using Inverse Trig','Applications in Geometry'],
+  'statistics':['Measures of Central Tendency: Mean (raw, grouped, step-deviation)','Median (raw & grouped data)','Mode (raw & grouped data)','Measures of Dispersion: Range','Mean Deviation about Mean & Median','Variance & Standard Deviation (raw & grouped)','Coefficient of Variation','Comparison of Two Distributions','Frequency Distribution & Ogives','Short-cut Methods for Variance'],
+  'mathematical-reasoning':['Statements & Negation','Compound Statements: Conjunction, Disjunction','Conditional (if-then) & Biconditional Statements','Converse, Inverse & Contrapositive','Tautology, Contradiction & Contingency','Quantifiers: ∃ and ∀','Methods of Proof: Direct, Contrapositive, Contradiction','Proof by Mathematical Induction (link)','Truth Tables'],
+
+  /* ── MATHEMATICS 12 ── */
+  'limits-continuity-and-differentiability':['Concept of Limit (Left, Right & Two-sided)','Standard Limits (sin x/x, (aˣ-1)/x, etc.)',"L'Hôpital's Rule",'Continuity: Definition & Types of Discontinuity (removable, jump, infinite)','Differentiability & Relation to Continuity','Derivatives of Standard Functions','Chain Rule, Product Rule, Quotient Rule','Implicit Differentiation','Parametric Differentiation','Higher-order Derivatives'],
+  'applications-of-derivatives':['Rate of Change of Quantities','Tangent & Normal to a Curve','Angle between Two Curves','Monotonicity: Increasing & Decreasing Functions','Maxima & Minima (local & global)','Second Derivative Test','Rolle\'s Theorem & Geometrical Interpretation','Mean Value Theorem (Lagrange\'s)','Linear Approximation & Errors','Optimisation Problems'],
+  'indefinite-integration':['Standard Integration Formulae','Integration by Substitution (direct & indirect)','Integration by Parts (ILATE Rule)','Integration of Rational Functions (Partial Fractions)','Integration of √(ax²+bx+c) & 1/√(...)','Special Integrals (∫e^x[f(x)+f\'(x)]dx etc.)','Reduction Formulae','Integration of Irrational Functions','Trigonometric Substitutions','Euler Substitution'],
+  'definite-integration':['Definite Integral as Limit of Sum','Fundamental Theorem of Calculus','Properties of Definite Integrals (P0–P6)',"King's Property (∫f(x)=∫f(a+b-x))",'Definite Integral of Even/Odd & Periodic Functions',"Walli's Formula","Gamma Function (basic)",'Area under Curve (single curve)','Area between Two Curves','Length of Curve (basic)'],
+  'differential-equations':['Order & Degree of Differential Equations','Formation of DE from Families of Curves','Variable Separable Method','Homogeneous Differential Equations','Linear DE: Integrating Factor Method','Bernoulli\'s Equation','Exact Differential Equations','Clairaut\'s Equation','Applications: Growth/Decay, Newton\'s Cooling','Applications: Trajectories'],
+  'vector-algebra':['Scalars vs Vectors','Types of Vectors (unit, zero, parallel, coplanar)','Addition of Vectors (Triangle & Parallelogram Law)','Section Formula in 3D','Dot Product (Scalar Product) & Properties','Cross Product (Vector Product) & Properties','Scalar Triple Product & Geometric Meaning (volume)','Vector Triple Product (expansion formula)','Position Vectors & Applications','Coplanarity Condition'],
+  '3d-geometry':['Direction Cosines & Direction Ratios','Angle between Lines (using DCs)','Equation of Line in 3D (vector & Cartesian)','Shortest Distance between Skew Lines','Distance of a Point from a Line','Equation of Plane (various forms)','Angle between Planes & Line-Plane Angle','Distance of Point from Plane','Intersection of Line & Plane','Family of Planes'],
+  'matrices':['Types of Matrices','Matrix Operations (addition, scalar mult, multiplication)','Transpose & Properties','Symmetric & Skew-Symmetric Matrices','Elementary Row & Column Transformations','Echelon Form','Rank of Matrix','Inverse by Row Reduction (Gauss-Jordan)','Inverse using Adjoint','System of Equations: Consistency using Rank'],
+  'determinants':['Definition & Expansion (Sarrus Rule & Cofactors)','Properties of Determinants (rows/columns swap, scalar mult)','Minors & Cofactors','Adjoint of a Matrix','Inverse of Matrix using Determinant','Cramer\'s Rule for 2×2 & 3×3 Systems','Area of Triangle using Determinant','Condition for Collinearity','Product of Determinants','Application in Consistency of Linear System'],
+  'probability':['Classical Probability & Axioms','Addition Theorem for Two & Three Events','Conditional Probability & Multiplication Theorem','Independent Events','Bayes\' Theorem & Prior/Posterior','Total Probability Theorem','Random Variable & Probability Distribution','Expected Value & Variance','Binomial Distribution (B(n,p))','Poisson Distribution (basic)'],
+  'linear-programming':['Formulation of LPP','Graphical Method: Feasible Region & Corner Points','Maximisation & Minimisation','Bounded & Unbounded Feasible Regions','Infeasible & Redundant Constraints','Multiple Optimal Solutions','Transportation Problem (basic)','Applications: Diet, Production, Profit']
 };
 
 // ── Stage colours & sequence ──
