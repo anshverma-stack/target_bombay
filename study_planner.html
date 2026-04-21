@@ -965,6 +965,21 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
 .cal-12m-card-preview { font-size:0.8rem; color:var(--text-3); line-height:1.55; flex:1; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
 .cal-12m-card-goals { display:inline-flex; align-items:center; gap:3px; font-size:0.65rem; font-weight:700; padding:3px 9px; border-radius:20px; background:rgba(99,102,241,0.1); color:var(--accent); margin-top:10px; }
 
+/* ── Drag-and-drop: week goals → day columns ── */
+.cal-goal-drag-handle { color:var(--text-3); cursor:grab; font-size:0.95rem; padding:0 3px; flex-shrink:0; line-height:1; transition:color 0.15s; }
+.cal-goal-drag-handle:hover { color:var(--accent); }
+.cal-goal-drag-handle:active { cursor:grabbing; }
+.cal-goal-item.dragging { opacity:0.35; background:rgba(99,102,241,0.12); }
+.cal-day-goals-zone { border:1.5px dashed transparent; border-radius:10px; transition:all 0.18s; padding:3px; margin-top:6px; }
+.cal-day-goals-zone.drop-ready { border-color:rgba(99,102,241,0.28); background:rgba(99,102,241,0.03); }
+.cal-day-goals-zone.drag-over { border-color:var(--accent) !important; background:rgba(99,102,241,0.1) !important; box-shadow:0 0 0 2px rgba(99,102,241,0.18); }
+.cal-day-goals-empty { font-size:0.63rem; color:var(--text-3); text-align:center; padding:8px 4px; opacity:0.65; pointer-events:none; }
+.cal-day-goals-drop-hint { font-size:0.6rem; color:var(--text-3); text-align:center; padding:3px 4px; opacity:0.45; pointer-events:none; }
+.cal-day-goals-list { display:flex; flex-direction:column; gap:4px; }
+.cal-day-goals-list .cal-goal-item { padding:4px 7px; }
+.cal-day-goals-list .cal-goal-text { font-size:0.74rem; }
+.cal-drag-hint { display:flex; align-items:center; gap:5px; font-size:0.67rem; color:var(--text-3); margin-bottom:8px; padding:5px 8px; background:rgba(99,102,241,0.05); border:1px dashed rgba(99,102,241,0.2); border-radius:8px; }
+
 /* ══════════════════════════════════════════
    BACKLOG & AI COVERAGE
 ══════════════════════════════════════════ */
@@ -3786,7 +3801,7 @@ function calRenderWeek() {
 
   const todayStr = new Date().toISOString().slice(0,10);
 
-  // Pre-compute day data for both rows
+  // Pre-compute day data
   const dayMeta = dayNames.map((dn, i) => {
     const d = new Date(monDate); d.setDate(d.getDate()+i);
     const ds = d.toISOString().slice(0,10);
@@ -3801,21 +3816,39 @@ function calRenderWeek() {
     </div>`
   ).join('');
 
-  // Row 2: textarea entries
-  const taRow = dayMeta.map(({ ds, past, dayData }) =>
-    `<div class="cal-day-ta-cell">
-      <textarea class="cal-textarea" style="min-height:80px;font-size:0.78rem;width:100%;box-sizing:border-box;" placeholder="${past?'What did you study?':'Plans'}"
+  // Row 2: textarea + day goals (with drop zone)
+  const taRow = dayMeta.map(({ ds, past, dayData }) => {
+    const dayGoals = dayData.goals || [];
+    const dayGoalsHtml = dayGoals.map((g, gi) => `
+      <div class="cal-goal-item">
+        <input type="checkbox" class="cal-goal-cb" ${g.done?'checked':''} onchange="calDayGoalToggle('${key}','${ds}',${gi},this.checked)">
+        <span class="cal-goal-text${g.done?' done':''}" onclick="this.previousElementSibling.click()">${escHtml(g.text)}</span>
+        <button class="cal-goal-del" onclick="calDayGoalDel('${key}','${ds}',${gi})" title="Remove">✕</button>
+      </div>`).join('');
+
+    return `<div class="cal-day-ta-cell">
+      <textarea class="cal-textarea" style="min-height:70px;font-size:0.78rem;width:100%;box-sizing:border-box;" placeholder="${past?'What did you study?':'Plans'}"
         oninput="calSaveDayNote('${key}','${ds}',this.value)">${escHtml(dayData.note||'')}</textarea>
-    </div>`
-  ).join('');
+      <div class="cal-day-goals-zone" id="dgz-${ds}"
+        ondragover="event.preventDefault();document.getElementById('dgz-${ds}').classList.add('drag-over')"
+        ondragleave="document.getElementById('dgz-${ds}').classList.remove('drag-over')"
+        ondrop="calGoalDrop(event,'${key}','${ds}')">
+        ${dayGoals.length
+          ? `<div class="cal-day-goals-list">${dayGoalsHtml}</div><div class="cal-day-goals-drop-hint">＋ Drop more goals here</div>`
+          : `<div class="cal-day-goals-empty">🎯 Drop goals here</div>`}
+      </div>
+    </div>`;
+  }).join('');
 
   const dayRows = `<div class="cal-day-log-grid">${nameRow}${taRow}</div>`;
 
-  // Weekly summary and goals
-  const summaryVal = (data.summary||'').replace(/"/g,'&quot;');
+  // Weekly goals with drag handles
   const goals = data.goals || [];
   const goalsHtml = goals.map((g,gi) => `
-    <div class="cal-goal-item" id="wcg-${key}-${gi}">
+    <div class="cal-goal-item" id="wcg-${key}-${gi}" draggable="true"
+      ondragstart="calGoalDragStart(event,'${key}',${gi})"
+      ondragend="calGoalDragEnd(event)">
+      <span class="cal-goal-drag-handle" title="Drag to assign to a day">⠿</span>
       <input type="checkbox" class="cal-goal-cb" ${g.done?'checked':''} onchange="calWeekGoalToggle('${key}',${gi},this.checked)">
       <span class="cal-goal-text${g.done?' done':''}" onclick="this.previousElementSibling.click()">${escHtml(g.text)}</span>
       <button class="cal-goal-del" onclick="calWeekGoalDel('${key}',${gi})" title="Remove">✕</button>
@@ -3846,6 +3879,7 @@ function calRenderWeek() {
           <span class="cal-section-title" style="margin-bottom:0;">Week Goals</span>
           <span style="margin-left:auto;font-size:0.65rem;color:var(--text-3);">${goals.filter(g=>g.done).length}/${goals.length} done</span>
         </div>
+        ${goals.length ? `<div class="cal-drag-hint"><span>⠿</span> Drag any goal into a day column above to assign it</div>` : ''}
         <div class="cal-goals-list" id="wgl-${key}">${goalsHtml}</div>
         <div class="cal-add-goal">
           <input class="cal-add-goal-input" id="wgi-${key}" placeholder="Add a goal for this week..." onkeydown="if(event.key==='Enter')calWeekGoalAdd('${key}')">
@@ -3891,6 +3925,67 @@ function calWeekGoalToggle(key, idx, done) {
 function calWeekGoalDel(key, idx) {
   const data = calLoad(key);
   if (data.goals) { data.goals.splice(idx,1); calSave(key, data); }
+  calRenderWeek();
+}
+
+// ── Drag-and-drop: week goals → day columns ──
+function calGoalDragStart(e, key, gi) {
+  const data = calLoad(key);
+  const goal = data.goals?.[gi];
+  if (!goal) return;
+  e.dataTransfer.effectAllowed = 'copy';
+  e.dataTransfer.setData('text/plain', JSON.stringify({ text: goal.text }));
+  e.currentTarget.classList.add('dragging');
+  // Highlight all drop zones so it's obvious where to drop
+  document.querySelectorAll('.cal-day-goals-zone').forEach(z => z.classList.add('drop-ready'));
+}
+
+function calGoalDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.cal-day-goals-zone').forEach(z => {
+    z.classList.remove('drop-ready', 'drag-over');
+  });
+}
+
+function calGoalDrop(e, key, ds) {
+  e.preventDefault();
+  const zone = document.getElementById('dgz-' + ds);
+  if (zone) { zone.classList.remove('drag-over', 'drop-ready'); }
+  document.querySelectorAll('.cal-day-goals-zone').forEach(z => z.classList.remove('drop-ready', 'drag-over'));
+
+  let goalData;
+  try { goalData = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(err) { return; }
+  if (!goalData?.text) return;
+
+  const data = calLoad(key);
+  if (!data.days) data.days = {};
+  if (!data.days[ds]) data.days[ds] = {};
+  if (!data.days[ds].goals) data.days[ds].goals = [];
+
+  // Avoid exact duplicates in the same day
+  if (!data.days[ds].goals.some(g => g.text === goalData.text)) {
+    data.days[ds].goals.push({ text: goalData.text, done: false });
+    calSave(key, data);
+    calRenderWeek();
+  }
+}
+
+// ── Day-level goal CRUD ──
+function calDayGoalToggle(key, ds, gi, done) {
+  const data = calLoad(key);
+  if (data.days?.[ds]?.goals?.[gi] !== undefined) {
+    data.days[ds].goals[gi].done = done;
+    calSave(key, data);
+  }
+  calRenderWeek();
+}
+
+function calDayGoalDel(key, ds, gi) {
+  const data = calLoad(key);
+  if (data.days?.[ds]?.goals) {
+    data.days[ds].goals.splice(gi, 1);
+    calSave(key, data);
+  }
   calRenderWeek();
 }
 
