@@ -919,7 +919,33 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
 .cal-goals-list { display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
 .cal-goal-item { display:flex; align-items:center; gap:9px; padding:7px 10px; background:rgba(0,0,0,0.15); border-radius:10px; border:1px solid rgba(255,255,255,0.04); transition:background 0.1s; }
 .cal-goal-item:hover { background:rgba(0,0,0,0.25); }
-.cal-goal-cb { width:16px; height:16px; cursor:pointer; accent-color:var(--accent); flex-shrink:0; }
+.cal-goal-cb {
+  appearance:none; -webkit-appearance:none;
+  width:17px; height:17px; flex-shrink:0; cursor:pointer;
+  border-radius:5px;
+  border:1.5px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.04);
+  position:relative; transition:all 0.18s;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.cal-goal-cb:hover { border-color:var(--accent); background:rgba(99,102,241,0.1); }
+.cal-goal-cb:checked {
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color:transparent;
+  box-shadow:0 2px 8px rgba(99,102,241,0.45);
+}
+.cal-goal-cb:checked::after {
+  content:'';
+  position:absolute;
+  left:4px; top:1.5px;
+  width:5px; height:9px;
+  border:2px solid white;
+  border-top:none; border-left:none;
+  transform:rotate(45deg);
+}
+html.light .cal-goal-cb { border-color:rgba(0,0,0,0.2); background:rgba(0,0,0,0.03); }
+html.light .cal-goal-cb:hover { border-color:var(--accent); background:rgba(79,70,229,0.06); }
+html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
 .cal-goal-text { flex:1; font-size:0.8rem; color:var(--text-2); cursor:pointer; }
 .cal-goal-text.done { text-decoration:line-through; opacity:0.45; }
 .cal-goal-del { background:none; border:none; color:var(--text-3); font-size:0.9rem; cursor:pointer; padding:0 3px; opacity:0.5; transition:opacity 0.15s; }
@@ -979,6 +1005,8 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
 .cal-day-goals-list .cal-goal-item { padding:4px 7px; }
 .cal-day-goals-list .cal-goal-text { font-size:0.74rem; }
 .cal-drag-hint { display:flex; align-items:center; gap:5px; font-size:0.67rem; color:var(--text-3); margin-bottom:8px; padding:5px 8px; background:rgba(99,102,241,0.05); border:1px dashed rgba(99,102,241,0.2); border-radius:8px; }
+.cal-goal-day-chips { display:flex; gap:3px; flex-shrink:0; margin-left:auto; margin-right:4px; }
+.cal-goal-day-chip { font-family:'DM Mono',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.04em; padding:2px 5px; border-radius:5px; background:rgba(99,102,241,0.18); color:var(--accent); border:1px solid rgba(99,102,241,0.3); line-height:1.4; }
 
 /* ══════════════════════════════════════════
    BACKLOG & AI COVERAGE
@@ -3842,17 +3870,31 @@ function calRenderWeek() {
 
   const dayRows = `<div class="cal-day-log-grid">${nameRow}${taRow}</div>`;
 
-  // Weekly goals with drag handles
+  // Weekly goals with drag handles + day assignment chips
   const goals = data.goals || [];
-  const goalsHtml = goals.map((g,gi) => `
+  const dayAbbrevs = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const goalsHtml = goals.map((g,gi) => {
+    // Find which days this goal has been assigned to
+    const assignedDays = dayMeta
+      .map(({ dayData }, i) => {
+        const hasGoal = (dayData.goals||[]).some(dg => dg.text === g.text);
+        return hasGoal ? dayAbbrevs[i] : null;
+      })
+      .filter(Boolean);
+    const dayChipsHtml = assignedDays.map(abbr =>
+      `<span class="cal-goal-day-chip">${abbr}</span>`
+    ).join('');
+    return `
     <div class="cal-goal-item" id="wcg-${key}-${gi}" draggable="true"
       ondragstart="calGoalDragStart(event,'${key}',${gi})"
       ondragend="calGoalDragEnd(event)">
       <span class="cal-goal-drag-handle" title="Drag to assign to a day">⠿</span>
       <input type="checkbox" class="cal-goal-cb" ${g.done?'checked':''} onchange="calWeekGoalToggle('${key}',${gi},this.checked)">
       <span class="cal-goal-text${g.done?' done':''}" onclick="this.previousElementSibling.click()">${escHtml(g.text)}</span>
+      ${assignedDays.length ? `<span class="cal-goal-day-chips">${dayChipsHtml}</span>` : ''}
       <button class="cal-goal-del" onclick="calWeekGoalDel('${key}',${gi})" title="Remove">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   cnt.innerHTML = `
     <div class="cal-card" style="margin-bottom:1.2rem;">
