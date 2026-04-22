@@ -1119,11 +1119,25 @@ html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
    DAILY QUESTIONS PAGE
 ══════════════════════════════════════════ */
 .dq-root {
-  max-width: 780px; margin: 0 auto; padding: 1.8rem 1.5rem 3rem;
+  max-width: 1400px; width: 100%; margin: 0 auto; padding: 1.8rem 2rem 3rem;
 }
 .dq-header {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 1.8rem; flex-wrap: wrap; gap: 12px;
+}
+
+/* Two-column layout on wide screens */
+.dq-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.dq-left { display: flex; flex-direction: column; gap: 14px; }
+.dq-right { display: flex; flex-direction: column; gap: 14px; }
+
+@media (max-width: 900px) {
+  .dq-body { grid-template-columns: 1fr; }
 }
 .dq-brand { display: flex; align-items: center; gap: 12px; }
 .dq-brand-icon {
@@ -1193,7 +1207,6 @@ html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
 .dq-subjects-card {
   background: var(--surface-1); border: 1px solid var(--border);
   border-radius: 20px; padding: 1.4rem 1.6rem;
-  margin-bottom: 14px;
 }
 .dq-subjects-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
@@ -1238,7 +1251,7 @@ html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
 /* TREND */
 .dq-trend-section, .dq-heatmap-section {
   background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: 20px; padding: 1.6rem; margin-bottom: 14px;
+  border-radius: 20px; padding: 1.6rem;
 }
 .dq-trend-title {
   font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800;
@@ -1263,6 +1276,7 @@ html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
   .dq-stats-row { grid-template-columns: 1fr; }
   .dq-subjects-grid { grid-template-columns: 1fr; }
   .dq-brand-title { font-size: 1.3rem; }
+  .dq-root { padding: 1rem 1rem 2rem; }
 }
 
 </style>
@@ -1525,65 +1539,79 @@ html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
       </div>
     </div>
 
-    <!-- TOP STATS ROW -->
-    <div class="dq-stats-row">
-      <div class="dq-stat-card dq-streak-card">
-        <div class="dq-streak-icon">🔥</div>
-        <div>
-          <div class="dq-stat-label">STREAK</div>
-          <div class="dq-stat-val"><span id="dq-streak-val">0</span> <span class="dq-stat-unit">Days</span></div>
-        </div>
-      </div>
-      <div class="dq-stat-card dq-target-card">
-        <div>
-          <div class="dq-stat-label">DAILY TARGET</div>
-          <div class="dq-stat-val"><span id="dq-target-val">0</span> <span class="dq-stat-unit">Qs</span></div>
-          <div class="dq-target-progress-bar"><div class="dq-target-progress-fill" id="dq-target-fill"></div></div>
-        </div>
-        <div class="dq-target-icon" onclick="dqOpenTargetModal()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-        </div>
-      </div>
-    </div>
+    <div class="dq-body">
 
-    <!-- SUBJECT INPUT CARDS -->
-    <div class="dq-subjects-card">
-      <div class="dq-subjects-grid">
-        <div class="dq-subject-col">
-          <div class="dq-subject-label">PHYSICS</div>
-          <input class="dq-subject-input" id="dq-inp-physics" type="number" min="0" placeholder="0" oninput="dqUpdateTotal()">
-        </div>
-        <div class="dq-subject-col">
-          <div class="dq-subject-label">CHEMISTRY</div>
-          <input class="dq-subject-input" id="dq-inp-chemistry" type="number" min="0" placeholder="0" oninput="dqUpdateTotal()">
-        </div>
-        <div class="dq-subject-col">
-          <div class="dq-subject-label">MATHS</div>
-          <input class="dq-subject-input" id="dq-inp-maths" type="number" min="0" placeholder="0" oninput="dqUpdateTotal()">
-        </div>
-      </div>
-      <div class="dq-total-row">
-        <div>
-          <div class="dq-total-label">TOTAL SOLVED</div>
-          <div class="dq-total-val"><span id="dq-total-val">0</span><span class="dq-total-of" id="dq-total-of">/0</span></div>
-        </div>
-        <button class="dq-save-btn" onclick="dqSaveDay()">Save Update</button>
-      </div>
-    </div>
+      <!-- LEFT COLUMN: stats + entry -->
+      <div class="dq-left">
 
-    <!-- 7 DAY TREND -->
-    <div class="dq-trend-section">
-      <div class="dq-trend-title">Last 7 Days Trend</div>
-      <div class="dq-chart-wrap">
-        <canvas id="dq-chart" height="180"></canvas>
-      </div>
-    </div>
+        <!-- TOP STATS ROW -->
+        <div class="dq-stats-row">
+          <div class="dq-stat-card dq-streak-card">
+            <div class="dq-streak-icon">🔥</div>
+            <div>
+              <div class="dq-stat-label">STREAK</div>
+              <div class="dq-stat-val"><span id="dq-streak-val">0</span> <span class="dq-stat-unit">Days</span></div>
+            </div>
+          </div>
+          <div class="dq-stat-card dq-target-card">
+            <div>
+              <div class="dq-stat-label">DAILY TARGET</div>
+              <div class="dq-stat-val"><span id="dq-target-val">0</span> <span class="dq-stat-unit">Qs</span></div>
+              <div class="dq-target-progress-bar"><div class="dq-target-progress-fill" id="dq-target-fill"></div></div>
+            </div>
+            <div class="dq-target-icon" onclick="dqOpenTargetModal()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            </div>
+          </div>
+        </div>
 
-    <!-- MONTHLY HEATMAP -->
-    <div class="dq-heatmap-section">
-      <div class="dq-trend-title" style="margin-bottom:1rem;">Monthly Activity</div>
-      <div class="dq-heatmap" id="dq-heatmap"></div>
-    </div>
+        <!-- SUBJECT INPUT CARDS -->
+        <div class="dq-subjects-card">
+          <div class="dq-subjects-grid">
+            <div class="dq-subject-col">
+              <div class="dq-subject-label">PHYSICS</div>
+              <input class="dq-subject-input" id="dq-inp-physics" type="number" min="0" placeholder="0" oninput="dqUpdateTotal()">
+            </div>
+            <div class="dq-subject-col">
+              <div class="dq-subject-label">CHEMISTRY</div>
+              <input class="dq-subject-input" id="dq-inp-chemistry" type="number" min="0" placeholder="0" oninput="dqUpdateTotal()">
+            </div>
+            <div class="dq-subject-col">
+              <div class="dq-subject-label">MATHS</div>
+              <input class="dq-subject-input" id="dq-inp-maths" type="number" min="0" placeholder="0" oninput="dqUpdateTotal()">
+            </div>
+          </div>
+          <div class="dq-total-row">
+            <div>
+              <div class="dq-total-label">TOTAL SOLVED</div>
+              <div class="dq-total-val"><span id="dq-total-val">0</span><span class="dq-total-of" id="dq-total-of">/0</span></div>
+            </div>
+            <button class="dq-save-btn" onclick="dqSaveDay()">Save Update</button>
+          </div>
+        </div>
+
+      </div><!-- /dq-left -->
+
+      <!-- RIGHT COLUMN: charts -->
+      <div class="dq-right">
+
+        <!-- 7 DAY TREND -->
+        <div class="dq-trend-section">
+          <div class="dq-trend-title">Last 7 Days Trend</div>
+          <div class="dq-chart-wrap">
+            <canvas id="dq-chart" height="180"></canvas>
+          </div>
+        </div>
+
+        <!-- MONTHLY HEATMAP -->
+        <div class="dq-heatmap-section">
+          <div class="dq-trend-title" style="margin-bottom:1rem;">Monthly Activity</div>
+          <div class="dq-heatmap" id="dq-heatmap"></div>
+        </div>
+
+      </div><!-- /dq-right -->
+
+    </div><!-- /dq-body -->
 
   </div>
 </div>
