@@ -812,6 +812,89 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
 }
 .tt-hdr-day.today-hdr { color: var(--accent); }
 
+/* ══════════════════════════════════════════
+   HAMBURGER SIDEBAR NAV (small screens)
+══════════════════════════════════════════ */
+.nav-hamburger {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-2); cursor: pointer; font-size: 1.25rem;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.nav-hamburger:hover { border-color: var(--border-2); color: var(--text); background: rgba(255,255,255,0.04); }
+
+.nav-sidebar-backdrop {
+  display: none;
+  position: fixed; inset: 0; z-index: 598;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.nav-sidebar-backdrop.open { opacity: 1; display: block; }
+
+.nav-sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 599;
+  width: 240px;
+  background: rgba(8,15,30,0.98);
+  backdrop-filter: blur(24px);
+  border-right: 1px solid var(--border-2);
+  display: flex; flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 4px 0 32px rgba(0,0,0,0.5);
+}
+.nav-sidebar.open { transform: translateX(0); }
+
+.nav-sidebar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.nav-sidebar-brand {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1rem; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  text-decoration: none;
+}
+.nav-sidebar-close {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-2); cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.nav-sidebar-close:hover { border-color: var(--border-2); color: var(--text); background: rgba(255,255,255,0.05); }
+
+.nav-sidebar-tabs {
+  flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 12px 10px;
+}
+.nav-sidebar-tabs .nav-tab {
+  width: 100%; justify-content: flex-start;
+  padding: 10px 14px; border-radius: 10px;
+  font-size: 0.88rem;
+}
+.nav-sidebar-tabs .streak-badge {
+  width: 100%; justify-content: flex-start;
+  border-radius: 10px; padding: 10px 14px;
+}
+
+.nav-sidebar-footer {
+  padding: 12px 10px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.nav-sidebar-footer .auth-btn,
+.nav-sidebar-footer .nav-back {
+  width: 100%; justify-content: center; font-size: 0.82rem;
+}
+
 @media (max-width: 640px) {
   .tt-hdr-day   { width: calc((100vw - 54px) / 3.2); min-width: 90px; }
   .tt-day-col   { width: calc((100vw - 54px) / 3.2) !important; min-width: 90px !important; }
@@ -824,9 +907,15 @@ html.light #theme-toggle:hover { background: rgba(0,0,0,0.09); }
   .cal-toolbar  { padding: 0.6rem 0.8rem; flex-wrap: wrap; gap: 6px; }
   .cal-title    { font-size: 0.9rem; min-width: 130px; }
   .add-event-btn { font-size: 0.74rem; padding: 5px 12px; }
-  .nav-tab span:last-child { display: none; }
   .nav-back  { font-size: 0; gap: 0; padding: 6px 10px; }
-  .nav-back::before { content: "←"; font-size: 1rem; }
+  .nav-back::before { content: ""; font-size: 1rem; }
+
+  /* Hide top-nav items; show hamburger */
+  .top-nav .nav-tabs  { display: none; }
+  .top-nav .auth-btn  { display: none; }
+  .top-nav .sync-dot  { display: none !important; }
+  .top-nav .nav-back  { display: none; }
+  .nav-hamburger { display: flex; }
 }
 @media (min-width: 641px) {
   .tt-hdr-day { flex: 1; }
@@ -1518,18 +1607,117 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
   color:#fbbf24; font-size:0.78rem; line-height:1.5;
 }
 
-.focus-goal-select {
-  width:100%; padding:12px 36px 12px 14px; border-radius:11px;
-  border:1px solid var(--border); background:var(--surface-2); color:var(--text);
-  font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; outline:none;
-  cursor:pointer; appearance:none;
-  background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 10 10%22><path d=%22M1 3l4 4 4-4%22 stroke=%22%2394a3b8%22 stroke-width=%221.5%22 fill=%22none%22/></svg>');
-  background-repeat:no-repeat; background-position:right 12px center;
-  transition:border-color 0.14s; margin-bottom:1rem;
+/* ── Focus Sub-tabs (Timer / Pomodoro) ── */
+.focus-subtab-row {
+  display:flex; gap:4px; padding:4px; border-radius:12px;
+  background:var(--surface-2); border:1px solid var(--border);
+  margin-bottom:1.2rem; width:100%;
 }
-.focus-goal-select:focus { border-color:var(--accent); }
-.focus-goal-select:disabled { opacity:0.5; cursor:not-allowed; }
-.focus-goal-select option { background:var(--surface-2); color:var(--text); }
+.focus-subtab {
+  flex:1; padding:8px 0; border-radius:9px; border:none;
+  background:transparent; color:var(--text-3);
+  font-family:'DM Sans',sans-serif; font-size:0.84rem; font-weight:700;
+  cursor:pointer; transition:all 0.16s;
+}
+.focus-subtab:hover { color:var(--text-2); background:rgba(255,255,255,0.04); }
+.focus-subtab.active {
+  background:rgba(99,102,241,0.15); color:var(--accent);
+  border:1px solid rgba(99,102,241,0.3);
+  box-shadow:0 2px 8px rgba(99,102,241,0.12);
+}
+
+/* ── Custom Goal Picker ── */
+.focus-goal-picker { position:relative; margin-bottom:1rem; user-select:none; }
+.focus-goal-trigger {
+  width:100%; padding:11px 40px 11px 14px; border-radius:11px;
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; gap:10px;
+  transition:border-color 0.16s, box-shadow 0.16s; position:relative;
+}
+.focus-goal-trigger:hover { border-color:var(--border-2); }
+.focus-goal-trigger.open { border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
+.focus-goal-trigger.disabled-trigger { opacity:0.45; cursor:not-allowed; pointer-events:none; }
+.focus-goal-trigger-icon { font-size:1rem; flex-shrink:0; }
+.focus-goal-trigger-text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.focus-goal-trigger-arrow {
+  position:absolute; right:13px; top:50%; transform:translateY(-50%);
+  color:var(--text-3); transition:transform 0.18s; flex-shrink:0;
+}
+.focus-goal-trigger.open .focus-goal-trigger-arrow { transform:translateY(-50%) rotate(180deg); }
+
+.focus-goal-dropdown {
+  display:none; position:absolute; top:calc(100% + 6px); left:0; right:0;
+  background:var(--surface-1); border:1px solid var(--border-2); border-radius:14px;
+  z-index:200; overflow:hidden;
+  box-shadow:0 16px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(99,102,241,0.1);
+  animation:goalDropIn 0.15s ease;
+}
+.focus-goal-dropdown.open { display:block; }
+@keyframes goalDropIn {
+  from { opacity:0; transform:translateY(-6px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.focus-goal-dropdown-header {
+  padding:10px 14px 8px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:7px;
+}
+.focus-goal-dropdown-week {
+  font-family:'DM Mono',monospace; font-size:0.6rem; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--accent);
+}
+.focus-goal-week-badge {
+  margin-left:auto; padding:2px 8px; border-radius:6px;
+  background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.22);
+  font-family:'DM Mono',monospace; font-size:0.58rem; font-weight:700;
+  color:var(--accent);
+}
+
+.focus-goal-list { max-height:230px; overflow-y:auto; padding:6px; }
+.focus-goal-list::-webkit-scrollbar { width:4px; }
+.focus-goal-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:4px; }
+
+.focus-goal-opt {
+  display:flex; align-items:flex-start; gap:10px; padding:10px 10px;
+  border-radius:9px; cursor:pointer; transition:background 0.1s;
+  border:1px solid transparent; margin-bottom:2px;
+}
+.focus-goal-opt:last-child { margin-bottom:0; }
+.focus-goal-opt:hover { background:rgba(99,102,241,0.08); border-color:rgba(99,102,241,0.15); }
+.focus-goal-opt.selected { background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.28); }
+.focus-goal-opt.locked-opt { opacity:0.55; cursor:not-allowed; }
+.focus-goal-opt-num {
+  flex-shrink:0; width:20px; height:20px; border-radius:6px;
+  background:var(--surface-3); border:1px solid var(--border-2);
+  font-family:'DM Mono',monospace; font-size:0.62rem; font-weight:700;
+  color:var(--text-3); display:flex; align-items:center; justify-content:center;
+  margin-top:1px;
+}
+.focus-goal-opt.selected .focus-goal-opt-num { background:rgba(99,102,241,0.2); border-color:var(--accent); color:var(--accent); }
+.focus-goal-opt-body { flex:1; min-width:0; }
+.focus-goal-opt-text { font-size:0.84rem; font-weight:600; color:var(--text); line-height:1.4; word-break:break-word; }
+.focus-goal-opt.locked-opt .focus-goal-opt-text { text-decoration:line-through; color:var(--text-3); }
+.focus-goal-opt-status { margin-top:3px; font-size:0.68rem; font-weight:700; }
+.focus-goal-opt-status.s-done { color:var(--green); }
+.focus-goal-opt-status.s-locked { color:#fbbf24; }
+.focus-goal-opt-status.s-pending { color:var(--text-3); }
+.focus-goal-opt-check { flex-shrink:0; margin-top:3px; font-size:0.85rem; }
+
+.focus-goal-none-opt {
+  padding:10px 10px; border-radius:9px; cursor:pointer;
+  transition:background 0.1s; display:flex; align-items:center; gap:9px;
+  color:var(--text-3); font-size:0.84rem; font-weight:500;
+  border:1px solid transparent; margin-bottom:2px;
+}
+.focus-goal-none-opt:hover { background:rgba(255,255,255,0.04); border-color:var(--border); }
+.focus-goal-none-opt.selected { color:var(--text-2); background:rgba(255,255,255,0.05); }
+
+.focus-goal-empty {
+  padding:20px 12px; text-align:center;
+  color:var(--text-3); font-size:0.78rem; line-height:1.6;
+}
+.focus-goal-empty strong { color:var(--text-2); display:block; margin-bottom:4px; font-size:0.84rem; }
 
 .focus-selected-goal { padding:14px 16px; border-radius:12px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.25); margin-bottom:1rem; }
 .focus-selected-label { font-family:'DM Mono',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.16em; color:var(--accent); margin-bottom:6px; }
@@ -1551,6 +1739,48 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
 .focus-lock-desc { font-size:0.72rem; color:var(--text-3); line-height:1.5; }
 
 .focus-history-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+
+/* ── Pomodoro sequences ── */
+.focus-pomo-section { margin-bottom:1.2rem; }
+.focus-pomo-label { font-family:'DM Mono',monospace; font-size:0.6rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-3); margin-bottom:8px; }
+.focus-pomo-grid { display:flex; flex-direction:column; gap:6px; }
+.focus-pomo-btn {
+  width:100%; padding:10px 14px; border-radius:11px;
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text-2);
+  font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600;
+  cursor:pointer; text-align:left; transition:all 0.14s; line-height:1.4;
+}
+.focus-pomo-btn:hover { border-color:rgba(99,102,241,0.4); color:var(--text); background:rgba(99,102,241,0.06); }
+.focus-pomo-btn.active { border-color:rgba(99,102,241,0.6); background:rgba(99,102,241,0.12); color:var(--accent); }
+.focus-pomo-btn.running { border-color:rgba(16,185,129,0.5); background:rgba(16,185,129,0.08); color:#34d399; }
+.focus-pomo-name { font-weight:700; margin-bottom:2px; }
+.focus-pomo-steps { font-size:0.7rem; color:var(--text-3); font-weight:500; }
+.focus-pomo-btn.active .focus-pomo-steps, .focus-pomo-btn.running .focus-pomo-steps { color:inherit; opacity:0.75; }
+.focus-pomo-phase { margin-top:10px; padding:10px 14px; border-radius:10px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); font-size:0.8rem; color:var(--text-2); display:none; }
+.focus-pomo-phase.visible { display:block; }
+.focus-pomo-phase-label { font-family:'DM Mono',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.14em; color:var(--accent); margin-bottom:4px; }
+.focus-pomo-phase-name { font-weight:700; color:var(--text); }
+
+/* ── Fullscreen lock overlay ── */
+#focus-fs-overlay {
+  display:none; position:fixed; inset:0; z-index:9000;
+  background:#000;
+  flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  color:#fff;
+}
+#focus-fs-overlay.visible { display:flex; }
+.focus-fs-timer { font-family:'Syne',sans-serif; font-size:clamp(4rem,16vw,9rem); font-weight:800; letter-spacing:-0.04em; color:#fff; line-height:1; }
+.focus-fs-phase { font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.3); letter-spacing:0.16em; text-transform:uppercase; margin-bottom:16px; }
+.focus-fs-warn { margin-top:16px; padding:12px 24px; border-radius:14px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#f87171; font-size:0.9rem; font-weight:700; text-align:center; line-height:1.6; display:none; }
+.focus-fs-warn.visible { display:block; }
+.focus-fs-countdown { font-family:'DM Mono',monospace; font-size:1.4rem; font-weight:700; color:#f87171; }
+.focus-fs-syllabus-btn {
+  margin-top:40px; padding:9px 20px; border-radius:10px;
+  border:1px solid rgba(255,255,255,0.08); background:transparent;
+  color:rgba(255,255,255,0.2); font-family:'DM Sans',sans-serif;
+  font-size:0.72rem; font-weight:600; cursor:pointer; transition:all 0.2s; letter-spacing:0.02em;
+}
+.focus-fs-syllabus-btn:hover { border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.55); }
 .focus-history-item {
   padding:10px 12px; border-radius:9px; background:var(--surface-2); border:1px solid var(--border);
   display:flex; align-items:center; gap:10px; font-size:0.78rem;
@@ -1558,6 +1788,32 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
 .focus-history-time { font-family:'DM Mono',monospace; font-weight:700; color:var(--accent); min-width:60px; }
 .focus-history-goal { color:var(--text-2); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .focus-history-empty { font-size:0.76rem; color:var(--text-3); padding:8px 0; }
+
+/* ── Stopwatch mode: simplified UI ── */
+.stopwatch-mode .focus-subtab-row { display:none !important; }
+.stopwatch-mode .focus-right-card { display:none !important; }
+.stopwatch-mode .focus-grid { grid-template-columns:1fr !important; max-width:520px; margin:0 auto; }
+.stopwatch-mode #focus-pause-btn { display:none !important; }
+.stopwatch-mode #focus-reset-btn { display:none !important; }
+.stopwatch-mode #focus-duration-row { display:none !important; }
+
+/* ── Fullscreen overlay extra buttons ── */
+.focus-fs-btn-row { display:flex; gap:14px; margin-top:32px; flex-wrap:wrap; justify-content:center; }
+.focus-fs-stop-btn {
+  padding:13px 36px; border-radius:14px;
+  border:1px solid rgba(239,68,68,0.5); background:rgba(239,68,68,0.15);
+  color:#f87171; font-family:'DM Sans',sans-serif; font-size:0.96rem; font-weight:800;
+  cursor:pointer; transition:all 0.18s; letter-spacing:0.02em;
+}
+.focus-fs-stop-btn:hover { background:rgba(239,68,68,0.28); border-color:rgba(239,68,68,0.8); color:#fff; }
+.focus-fs-mark-done-btn {
+  padding:13px 36px; border-radius:14px;
+  border:1px solid rgba(16,185,129,0.5); background:rgba(16,185,129,0.15);
+  color:#34d399; font-family:'DM Sans',sans-serif; font-size:0.96rem; font-weight:800;
+  cursor:pointer; transition:all 0.18s; letter-spacing:0.02em; display:none;
+}
+.focus-fs-mark-done-btn:hover { background:rgba(16,185,129,0.28); border-color:rgba(16,185,129,0.8); color:#fff; }
+.focus-fs-mark-done-btn.visible { display:block; }
 
 /* Locked-done indicator on calendar goals */
 .cal-goal-locked-icon {
@@ -1596,8 +1852,31 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
 })();
 </script>
 
+<!-- ── SIDEBAR NAV (mobile) ── -->
+<div class="nav-sidebar-backdrop" id="nav-sidebar-backdrop" onclick="navSidebarClose()"></div>
+<div class="nav-sidebar" id="nav-sidebar">
+  <div class="nav-sidebar-header">
+    <a href="index.html" class="nav-sidebar-brand">JEEverse</a>
+    <button class="nav-sidebar-close" onclick="navSidebarClose()" aria-label="Close menu">&#x2715;</button>
+  </div>
+  <div class="nav-sidebar-tabs" id="nav-sidebar-tabs">
+    <button class="nav-tab" id="stab-timetable" onclick="switchPage('timetable');navSidebarClose()"><span>&#x1F4CB;</span> Weekly Timetable</button>
+    <button class="nav-tab" id="stab-syllabus" onclick="switchPage('syllabus');navSidebarClose()"><span>&#x1F4DA;</span> Syllabus Tracker</button>
+    <button class="nav-tab" id="stab-backlog" onclick="switchPage('backlog');navSidebarClose()"><span>&#x1F4CB;</span> Backlog <span class="nav-ai-badge" style="font-size:0.48rem;padding:1px 5px;">AI</span></button>
+    <button class="nav-tab" id="stab-calendar" onclick="switchPage('calendar');navSidebarClose()"><span>&#x1F4C5;</span> Calendar</button>
+    <button class="nav-tab" id="stab-focus" onclick="switchPage('focus');navSidebarClose()"><span>&#x23F1;&#xFE0F;</span> Focus</button>
+    <button class="nav-tab" id="stab-dq" onclick="switchPage('dq');navSidebarClose()"><span>&#x2611;&#xFE0F;</span> Daily Questions</button>
+    <div class="streak-badge" id="streak-badge-sidebar" title="Daily goals streak">&#x1F525; <span class="streak-num" id="streak-num-sidebar">0</span></div>
+  </div>
+  <div class="nav-sidebar-footer">
+    <button class="auth-btn" id="auth-btn-sidebar" onclick="handleAuthClick();navSidebarClose()">Sign in with Google</button>
+    <a href="index.html" class="nav-back" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-left:0;">Back to JEEverse</a>
+  </div>
+</div>
+
 <!-- ── TOP NAV ── -->
 <nav class="top-nav">
+  <button class="nav-hamburger" id="nav-hamburger" onclick="navSidebarOpen()" aria-label="Open menu">&#9776;</button>
   <a href="index.html" class="nav-brand">JEEverse</a>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-timetable" onclick="switchPage('timetable')">
@@ -1623,7 +1902,7 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
 
   <button class="auth-btn" id="auth-btn" onclick="handleAuthClick()">Sign in with Google</button>
   <div class="sync-dot" id="sync-dot" style="display:none" title="Synced"></div>
-  <a href="index.html" class="nav-back">← Back to JEEverse</a>
+  <a href="index.html" class="nav-back">Back to JEEverse</a>
 </nav>
 
 <!-- ════════════════════════════════════════
@@ -1696,6 +1975,8 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
   <div class="syl-stats-sheet-handle"></div>
   <div id="syl-stats-sheet-body"></div>
 </div>
+<!-- ════════════════════════════════════════
+     PAGE 3: BACKLOG
 ════════════════════════════════════════ -->
 <div id="page-backlog" class="page">
   <div style="flex:1;overflow-y:auto;min-height:0;">
@@ -1845,11 +2126,17 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
     <div class="focus-grid">
       <!-- Left: Timer / Display -->
       <div class="focus-card focus-display-card">
-        <div class="focus-mode-label" id="focus-mode-label">Pomodoro Timer</div>
+        <!-- Sub-tabs: Timer vs Pomodoro -->
+        <div class="focus-subtab-row">
+          <button class="focus-subtab active" id="fstab-timer" onclick="focusSubTab('timer')">&#x23F2;&#xFE0F; Timer</button>
+          <button class="focus-subtab" id="fstab-pomo" onclick="focusSubTab('pomo')">&#x1F345; Pomodoro</button>
+        </div>
+
+        <div class="focus-mode-label" id="focus-mode-label" style="display:none;">Pomodoro Timer</div>
 
         <div class="focus-time-display" id="focus-time-display">25:00</div>
 
-        <!-- Timer-only: duration picker -->
+        <!-- Timer tab: duration picker -->
         <div class="focus-duration-row" id="focus-duration-row">
           <span class="focus-section-label">Duration</span>
           <div class="focus-preset-row">
@@ -1859,6 +2146,36 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
             <button class="focus-preset-btn" onclick="focusSetDuration(60)">60m</button>
             <button class="focus-preset-btn" onclick="focusSetDuration(90)">90m</button>
             <input type="number" class="focus-custom-input" id="focus-custom-min" min="1" max="600" placeholder="Custom" onchange="focusSetDuration(this.value)">
+          </div>
+        </div>
+
+        <!-- Pomodoro tab: sequence picker (moved here from right card) -->
+        <div id="focus-pomo-left" style="display:none;">
+          <div class="focus-pomo-grid">
+            <button class="focus-pomo-btn" id="pomo-0" onclick="focusPomoSelect(0)">
+              <div class="focus-pomo-name">Standard Double</div>
+              <div class="focus-pomo-steps">60m study → 5m break → 60m study</div>
+            </button>
+            <button class="focus-pomo-btn" id="pomo-1" onclick="focusPomoSelect(1)">
+              <div class="focus-pomo-name">Long Haul</div>
+              <div class="focus-pomo-steps">90m study → 15m break → 60m study</div>
+            </button>
+            <button class="focus-pomo-btn" id="pomo-2" onclick="focusPomoSelect(2)">
+              <div class="focus-pomo-name">Short Bursts</div>
+              <div class="focus-pomo-steps">30m study → 5m break → 30m study</div>
+            </button>
+            <button class="focus-pomo-btn" id="pomo-3" onclick="focusPomoSelect(3)">
+              <div class="focus-pomo-name">Warm-up to Deep</div>
+              <div class="focus-pomo-steps">30m study → 25m break → 120m study</div>
+            </button>
+            <button class="focus-pomo-btn" id="pomo-none" onclick="focusPomoSelect(-1)">
+              <div class="focus-pomo-name">No sequence</div>
+              <div class="focus-pomo-steps">Use the duration set above</div>
+            </button>
+          </div>
+          <div class="focus-pomo-phase" id="focus-pomo-phase-info">
+            <div class="focus-pomo-phase-label">CURRENT PHASE</div>
+            <div class="focus-pomo-phase-name" id="focus-pomo-phase-name">—</div>
           </div>
         </div>
 
@@ -1875,16 +2192,27 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
       </div>
 
       <!-- Right: Goal selection + lock mode -->
-      <div class="focus-card">
+      <div class="focus-card focus-right-card">
         <div class="cal-card-header" style="margin-bottom:14px;">
           <span style="font-size:1.1rem;">🎯</span>
           <span class="cal-section-title" style="margin-bottom:0;">Linked Week Goal</span>
         </div>
 
         <div class="focus-section-label">Pick a goal from this week</div>
-        <select class="focus-goal-select" id="focus-goal-select" onchange="focusSelectGoal(this.value)">
-          <option value="">— No goal selected —</option>
-        </select>
+        <div class="focus-goal-picker" id="focus-goal-picker">
+          <div class="focus-goal-trigger" id="focus-goal-trigger" onclick="focusGoalPickerToggle()">
+            <span class="focus-goal-trigger-icon">🎯</span>
+            <span class="focus-goal-trigger-text" id="focus-goal-trigger-text">— No goal selected —</span>
+            <svg class="focus-goal-trigger-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="focus-goal-dropdown" id="focus-goal-dropdown">
+            <div class="focus-goal-dropdown-header">
+              <span class="focus-goal-dropdown-week">📅 This Week's Goals</span>
+              <span class="focus-goal-week-badge" id="focus-goal-week-badge">0 goals</span>
+            </div>
+            <div class="focus-goal-list" id="focus-goal-list"></div>
+          </div>
+        </div>
 
         <div class="focus-selected-goal" id="focus-selected-goal" style="display:none;">
           <div class="focus-selected-label">SELECTED GOAL</div>
@@ -1896,7 +2224,7 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
           <input type="checkbox" id="focus-lock-mode" onchange="focusToggleLockMode(this.checked)">
           <div>
             <div class="focus-lock-title">🔒 Lock Mode</div>
-            <div class="focus-lock-desc">Disables pause &amp; stop until your selected goal is marked done. Once you finish in lock mode, the goal is <strong>permanently completed</strong> everywhere — it can't be unmarked.</div>
+            <div class="focus-lock-desc">Disables pause &amp; stop. Activates fullscreen — exiting for over 1 minute resets the timer. Once done, goal is <strong>permanently completed</strong>.</div>
           </div>
         </label>
 
@@ -2267,11 +2595,19 @@ function escHtml(s) {
 const VALID_PAGES = ['timetable','syllabus','backlog','calendar','focus','dq'];
 
 function switchPage(p, pushState = true) {
+  // If lock mode overlay is visible, only allow syllabus
+  const overlay = document.getElementById('focus-fs-overlay');
+  if (overlay && overlay.classList.contains('visible') && p !== 'syllabus') {
+    _calShowToast('Only Syllabus Tracker is accessible during Lock Mode.');
+    return;
+  }
   if (!VALID_PAGES.includes(p)) p = 'timetable';
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.getElementById('tab-'+p).classList.add('active');
+  const stab = document.getElementById('stab-'+p);
+  if (stab) stab.classList.add('active');
   if (p === 'timetable') { renderTimetableToolbar(); renderTimetable(); }
   if (p === 'syllabus')  { sylRender(); }
   if (p === 'backlog')   { renderBacklog(); }
@@ -2297,6 +2633,24 @@ function pageFromHash() {
   const h = location.hash.replace('#', '').trim();
   return VALID_PAGES.includes(h) ? h : 'timetable';
 }
+
+/* ── Sidebar nav helpers ── */
+function navSidebarOpen() {
+  document.getElementById('nav-sidebar').classList.add('open');
+  const bd = document.getElementById('nav-sidebar-backdrop');
+  bd.style.display = 'block';
+  requestAnimationFrame(() => bd.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+}
+function navSidebarClose() {
+  document.getElementById('nav-sidebar').classList.remove('open');
+  const bd = document.getElementById('nav-sidebar-backdrop');
+  bd.classList.remove('open');
+  setTimeout(() => { bd.style.display = 'none'; }, 260);
+  document.body.style.overflow = '';
+}
+// Close sidebar on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') navSidebarClose(); });
 
 function sylStatsSheetOpen() {
   document.getElementById('syl-stats-backdrop').classList.add('open');
@@ -3109,17 +3463,21 @@ var _syncTimeout = null;
 
 function updateAuthUI(user) {
   const btn = document.getElementById('auth-btn');
+  const btnSb = document.getElementById('auth-btn-sidebar');
   const dot = document.getElementById('sync-dot');
   if (!btn) return;
   if (user) {
     const name = user.displayName ? user.displayName.split(' ')[0] : 'You';
     const photo = user.photoURL ? `<img class="auth-avatar" src="${user.photoURL}" alt="">` : '👤';
-    btn.innerHTML = photo + ' ' + escHtml(name) + ' · Sign out';
+    const html = photo + ' ' + escHtml(name) + ' · Sign out';
+    btn.innerHTML = html;
     btn.classList.add('signed-in');
+    if (btnSb) { btnSb.innerHTML = html; btnSb.classList.add('signed-in'); }
     dot.style.display = '';
   } else {
     btn.innerHTML = 'Sign in with Google';
     btn.classList.remove('signed-in');
+    if (btnSb) { btnSb.innerHTML = 'Sign in with Google'; btnSb.classList.remove('signed-in'); }
     dot.style.display = 'none';
   }
 }
@@ -4956,14 +5314,23 @@ function updateStreakBadge() {
   const n = calComputeGoalStreak();
   const numEl = document.getElementById('streak-num');
   const badge  = document.getElementById('streak-badge');
-  if (!numEl || !badge) return;
-  numEl.textContent = n;
-  badge.classList.toggle('streak-hot', n >= 3);
-  badge.title = n === 0
+  const numElSb = document.getElementById('streak-num-sidebar');
+  const badgeSb = document.getElementById('streak-badge-sidebar');
+  const title = n === 0
     ? 'No streak yet — complete all goals on a day to start one!'
     : n === 1
       ? '1-day streak — keep it going!'
       : n + '-day streak — on fire!';
+  if (numEl && badge) {
+    numEl.textContent = n;
+    badge.classList.toggle('streak-hot', n >= 3);
+    badge.title = title;
+  }
+  if (numElSb && badgeSb) {
+    numElSb.textContent = n;
+    badgeSb.classList.toggle('streak-hot', n >= 3);
+    badgeSb.title = title;
+  }
 }
 
 function calLoad(key) {
@@ -5688,7 +6055,8 @@ var focusState = {
   selectedText:   null,             // remembered text in case index shifts
   lockMode:       false,
   goalDoneInLock: false,            // user marked done while in lock-mode current run
-  history:        []                // array of {time, text, mode, ts}
+  history:        [],               // array of {time, text, mode, ts}
+  hiddenAt:       null              // wall-clock time when page was hidden (for 1-min grace)
 };
 
 // Persist a few settings across reloads
@@ -5769,6 +6137,9 @@ function focusSetMode(m) {
   document.getElementById('fmode-stopwatch').classList.toggle('active', m === 'stopwatch');
   document.getElementById('focus-mode-label').textContent = m === 'timer' ? 'Pomodoro Timer' : 'Stopwatch';
   document.getElementById('focus-duration-row').style.display = m === 'timer' ? '' : 'none';
+  // Stopwatch mode: simplified layout
+  const focusPage = document.getElementById('page-focus');
+  if (focusPage) focusPage.classList.toggle('stopwatch-mode', m === 'stopwatch');
   _focusPersist();
   focusRender();
 }
@@ -5801,6 +6172,7 @@ function focusStart() {
   focusState.startTimestamp = Date.now();
   _focusStartInterval();
   _focusUpdateButtons();
+  if (focusState.lockMode || focusState.mode === 'stopwatch') { focusFsEnter(); }
 }
 
 function focusPause() {
@@ -5865,6 +6237,7 @@ function _focusFinishSession(manualStop) {
   }
   _focusStopInterval();
   focusState.running = false;
+  if (focusState.lockMode || focusState.mode === 'stopwatch') { try { focusFsExit(); } catch(e) {} }
 
   // If lock mode + selected goal + goal was marked done during this session
   // → permanently lock the goal everywhere.
@@ -5937,6 +6310,8 @@ function _focusLockGoalPermanent() {
 function _focusStartInterval() {
   _focusStopInterval();
   focusState.intervalId = setInterval(_focusTick, 250);
+  // Reset hidden-at whenever the session (re)starts so grace period is fresh
+  focusState.hiddenAt = null;
   _focusUpdateDisplay();
 }
 
@@ -5946,6 +6321,97 @@ function _focusStopInterval() {
     focusState.intervalId = null;
   }
 }
+
+// ── Background-grace logic ────────────────────────────────────────────────────
+// Rules:
+//   • Real away (tab/app switch) → record timestamp in localStorage so it
+//     survives browser throttling and brief page reloads.
+//   • Brief UI flickers (<= 800 ms) are ignored via a debounce timer —
+//     this prevents in-app SPA navigation from falsely triggering a reset.
+//   • On return: if away < 60 s → resume (shows time away + grace remaining).
+//               if away >= 60 s → reset & show exactly how long you were gone.
+//   • Each return resets the 60-s budget for the next departure.
+// ─────────────────────────────────────────────────────────────────────────────
+(function _focusRegisterVisibility() {
+  var LS_KEY    = 'focus_hidden_at';
+  var GRACE_MS  = 60000;  // 1 minute
+  var DEBOUNCE  = 800;    // ms — ignore hides shorter than this (SPA nav flickers)
+  var _debounceTimer = null;
+
+  function _fmtAwayTime(ms) {
+    if (ms < 60000) return Math.round(ms / 1000) + 's';
+    var mins = Math.floor(ms / 60000);
+    var secs = Math.round((ms % 60000) / 1000);
+    return mins + 'm' + (secs ? ' ' + secs + 's' : '');
+  }
+
+  function _onHide() {
+    if (!focusState.running) return;
+    // Debounce: only record if still hidden after DEBOUNCE ms
+    if (_debounceTimer !== null) return;
+    _debounceTimer = setTimeout(function() {
+      _debounceTimer = null;
+      if (!focusState.running) return;
+      var now = Date.now();
+      try { localStorage.setItem(LS_KEY, String(now)); } catch(e) {}
+      focusState.hiddenAt = now;
+    }, DEBOUNCE);
+  }
+
+  function _onShow() {
+    if (_debounceTimer !== null) {
+      // Came back before debounce fired — was a flicker, nothing to do
+      clearTimeout(_debounceTimer);
+      _debounceTimer = null;
+      return;
+    }
+    if (!focusState.running) return;
+
+    // Prefer localStorage stamp (survives throttling), fall back to memory
+    var stamp = null;
+    try { stamp = parseInt(localStorage.getItem(LS_KEY), 10) || null; } catch(e) {}
+    if (!stamp && focusState.hiddenAt) stamp = focusState.hiddenAt;
+    if (!stamp) return;
+
+    try { localStorage.removeItem(LS_KEY); } catch(e) {}
+    focusState.hiddenAt = null;
+
+    var awayMs = Date.now() - stamp;
+
+    if (awayMs >= GRACE_MS) {
+      _focusStopInterval();
+      focusState.running = false;
+      focusState.remainingMs = focusState.durationMs;
+      focusState.elapsedMs = 0;
+      focusState.goalDoneInLock = false;
+      _focusUpdateButtons();
+      _focusUpdateDisplay();
+      _calShowToast('⏱️ Away for ' + _fmtAwayTime(awayMs) + ' — timer reset.');
+    } else {
+      var remaining = Math.ceil((GRACE_MS - awayMs) / 1000);
+      _focusUpdateDisplay();
+      _calShowToast('▶ Back! Away ' + _fmtAwayTime(awayMs) + ' — ' + remaining + 's grace left.');
+    }
+  }
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden) { _onHide(); } else { _onShow(); }
+  });
+
+  // window blur/focus catches desktop tab switches that visibilitychange may miss
+  window.addEventListener('blur', _onHide);
+  window.addEventListener('focus', function() {
+    if (!document.hidden) _onShow();
+  });
+
+  // pagehide/pageshow for bfcache restores (iOS Safari app-switch)
+  window.addEventListener('pagehide', function(e) {
+    if (e.persisted) _onHide();
+  });
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) _onShow();
+  });
+})();
 
 function _focusTick() {
   if (!focusState.running) return;
@@ -5957,6 +6423,11 @@ function _focusTick() {
       el.textContent = _focusFmtTime(liveRemaining);
       el.classList.toggle('warning', liveRemaining <= 60_000 && liveRemaining > 0);
       el.classList.toggle('done', liveRemaining <= 0);
+    }
+    // Update fullscreen overlay timer
+    const fsEl = document.getElementById('focus-fs-timer');
+    if (fsEl && document.getElementById('focus-fs-overlay')?.classList.contains('visible')) {
+      fsEl.textContent = _focusFmtTime(Math.max(0, liveRemaining));
     }
     if (liveRemaining <= 0) {
       // Timer ran out
@@ -5971,12 +6442,22 @@ function _focusTick() {
         _calShowToast('⏰ Time\'s up! Mark your goal as done to release lock mode.');
         return;
       }
+      // Check if pomodoro sequence should advance
+      if (focusState.lockMode && focusState.pomoIdx >= 0) {
+        _focusAdvancePomoPhase();
+        return;
+      }
       _focusFinishSession(false);
     }
   } else {
     const liveElapsed = focusState.elapsedMs + segMs;
     const el = document.getElementById('focus-time-display');
     if (el) el.textContent = _focusFmtTime(liveElapsed);
+    // Update fullscreen overlay for stopwatch
+    const fsEl = document.getElementById('focus-fs-timer');
+    if (fsEl && document.getElementById('focus-fs-overlay')?.classList.contains('visible')) {
+      fsEl.textContent = _focusFmtTime(liveElapsed);
+    }
   }
 }
 
@@ -6004,7 +6485,7 @@ function _focusUpdateButtons() {
   const markBtn  = document.getElementById('focus-mark-done-btn');
   const lockWarn = document.getElementById('focus-lock-warning');
   const modeBtns = document.querySelectorAll('.focus-mode-btn');
-  const goalSel  = document.getElementById('focus-goal-select');
+  const goalTrigger = document.getElementById('focus-goal-trigger');
   if (!startBtn) return;
 
   startBtn.disabled = focusState.running;
@@ -6014,9 +6495,14 @@ function _focusUpdateButtons() {
   stopBtn.disabled  = !focusState.running || lockBlock;
   resetBtn.disabled = focusState.running && lockBlock;
 
+  // Stopwatch mode: hide pause & reset buttons
+  const isStopwatch = focusState.mode === 'stopwatch';
+  pauseBtn.style.display = isStopwatch ? 'none' : '';
+  resetBtn.style.display = isStopwatch ? 'none' : '';
+
   // Mode switching disabled while running
   modeBtns.forEach(b => b.disabled = focusState.running);
-  if (goalSel) goalSel.disabled = focusState.running;
+  if (goalTrigger) goalTrigger.classList.toggle('disabled-trigger', focusState.running);
 
   // Mark-done button enabled if a goal is selected, lock mode is on, and timer is running
   const sel = _focusGetSelectedGoal();
@@ -6024,12 +6510,44 @@ function _focusUpdateButtons() {
   markBtn.disabled = !canMark;
 
   lockWarn.style.display = lockBlock ? '' : 'none';
+
+  // Fullscreen overlay: stop button (always shown in fs), mark-done button (only in lock mode with goal)
+  const fsFsMarkBtn = document.getElementById('focus-fs-mark-done-btn');
+  const fsFsStopBtn = document.getElementById('focus-fs-stop-btn');
+  if (fsFsMarkBtn) fsFsMarkBtn.classList.toggle('visible', !!(focusState.lockMode && sel && focusState.running && !sel.goal.done));
+  // Stop button in overlay: for stopwatch always; for timer only when not lockBlocked
+  if (fsFsStopBtn) fsFsStopBtn.style.display = (isStopwatch || !lockBlock) ? '' : 'none';
+}
+
+function focusSubTab(tab) {
+  if (focusState.running) {
+    _calShowToast('Stop the session before switching tabs.');
+    return;
+  }
+  focusState.subTab = tab;
+  // Tab buttons
+  document.getElementById('fstab-timer').classList.toggle('active', tab === 'timer');
+  document.getElementById('fstab-pomo').classList.toggle('active', tab === 'pomo');
+  // Show/hide panels
+  const durRow = document.getElementById('focus-duration-row');
+  const pomoLeft = document.getElementById('focus-pomo-left');
+  if (durRow)   durRow.style.display   = tab === 'timer' ? '' : 'none';
+  if (pomoLeft) pomoLeft.style.display = tab === 'pomo'  ? '' : 'none';
+  // If switching to timer tab, clear pomodoro selection
+  if (tab === 'timer') {
+    focusState.pomoIdx = -1;
+    focusState.pomoPhase = 0;
+    document.querySelectorAll('.focus-pomo-btn').forEach(b => b.classList.remove('active','running'));
+    _focusHidePomoPhaseInfo();
+  }
 }
 
 function focusToggleLockMode(checked) {
   if (focusState.running) {
     // Don't allow toggling lock during run
     document.getElementById('focus-lock-mode').checked = focusState.lockMode;
+  // Restore sub-tab state
+  if (focusState.subTab) focusSubTab(focusState.subTab);
     _calShowToast('Stop the session before changing Lock Mode.');
     return;
   }
@@ -6037,6 +6555,186 @@ function focusToggleLockMode(checked) {
   _focusPersist();
   _focusUpdateButtons();
 }
+
+/* ════════════════════════════════════
+   POMODORO SEQUENCES
+════════════════════════════════════ */
+const POMO_SEQUENCES = [
+  { name: 'Standard Double', steps: [
+      { label: 'Study', mins: 60, isBreak: false },
+      { label: 'Short Break', mins: 5, isBreak: true },
+      { label: 'Study', mins: 60, isBreak: false }
+  ]},
+  { name: 'Long Haul', steps: [
+      { label: 'Study', mins: 90, isBreak: false },
+      { label: 'Long Break', mins: 15, isBreak: true },
+      { label: 'Study', mins: 60, isBreak: false }
+  ]},
+  { name: 'Short Bursts', steps: [
+      { label: 'Study', mins: 30, isBreak: false },
+      { label: 'Short Break', mins: 5, isBreak: true },
+      { label: 'Study', mins: 30, isBreak: false }
+  ]},
+  { name: 'Warm-up to Deep', steps: [
+      { label: 'Warm-up Study', mins: 30, isBreak: false },
+      { label: 'Long Break', mins: 25, isBreak: true },
+      { label: 'Deep Study', mins: 120, isBreak: false }
+  ]}
+];
+
+// -1 = no sequence, 0-3 = index into POMO_SEQUENCES
+// pomodoro phase index within the sequence
+if (focusState.pomoIdx === undefined) focusState.pomoIdx = -1;
+if (!focusState.pomoPhase) focusState.pomoPhase = 0;
+if (!focusState.subTab) focusState.subTab = 'timer';
+
+function focusPomoSelect(idx) {
+  // Switch to pomo tab if not already
+  if (focusState.subTab !== 'pomo') focusSubTab('pomo');
+  if (focusState.running) {
+    _calShowToast('Stop the session before changing the sequence.');
+    return;
+  }
+  focusState.pomoIdx = idx;
+  focusState.pomoPhase = 0;
+  // Update button styles
+  document.querySelectorAll('.focus-pomo-btn').forEach((b, i) => {
+    b.classList.remove('active', 'running');
+  });
+  const btnId = idx === -1 ? 'pomo-none' : 'pomo-' + idx;
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
+  // Update timer duration to first phase
+  if (idx >= 0) {
+    const seq = POMO_SEQUENCES[idx];
+    const step = seq.steps[0];
+    focusSetDuration(step.mins);
+    _focusUpdatePomoPhaseInfo();
+  } else {
+    _focusHidePomoPhaseInfo();
+  }
+}
+
+function _focusAdvancePomoPhase() {
+  if (focusState.pomoIdx < 0) return;
+  const seq = POMO_SEQUENCES[focusState.pomoIdx];
+  focusState.pomoPhase++;
+  if (focusState.pomoPhase >= seq.steps.length) {
+    // Sequence done - toast and reset
+    _calShowToast('\uD83C\uDF89 Pomodoro sequence complete! Great work.');
+    focusState.pomoPhase = 0;
+    focusState.pomoIdx = -1;
+    document.querySelectorAll('.focus-pomo-btn').forEach(b => b.classList.remove('active','running'));
+    const noneBtn = document.getElementById('pomo-none');
+    if (noneBtn) noneBtn.classList.add('active');
+    _focusHidePomoPhaseInfo();
+    focusStop();
+    return;
+  }
+  const step = seq.steps[focusState.pomoPhase];
+  // reset timer to new phase duration
+  focusState.remainingMs = step.mins * 60 * 1000;
+  focusState.durationMs  = focusState.remainingMs;
+  focusState.running = true;
+  focusState.startTimestamp = Date.now();
+  _focusStartInterval();
+  _focusUpdateButtons();
+  _focusUpdateDisplay();
+  _focusUpdatePomoPhaseInfo();
+  if (focusState.lockMode) { _focusFsUpdatePhase(); }
+  _calShowToast((step.isBreak ? '\u23F8\uFE0F Break: ' : '\uD83D\uDCDA Study: ') + step.mins + ' minutes');
+}
+
+function _focusUpdatePomoPhaseInfo() {
+  if (focusState.pomoIdx < 0) { _focusHidePomoPhaseInfo(); return; }
+  const seq = POMO_SEQUENCES[focusState.pomoIdx];
+  const step = seq.steps[focusState.pomoPhase];
+  const el = document.getElementById('focus-pomo-phase-info');
+  const nameEl = document.getElementById('focus-pomo-phase-name');
+  if (el && nameEl) {
+    el.classList.add('visible');
+    nameEl.textContent = (step.isBreak ? '\u23F8\uFE0F ' : '\uD83D\uDCDA ') + step.label + ' — ' + step.mins + 'm (Phase ' + (focusState.pomoPhase + 1) + '/' + seq.steps.length + ')';
+  }
+}
+
+function _focusHidePomoPhaseInfo() {
+  const el = document.getElementById('focus-pomo-phase-info');
+  if (el) el.classList.remove('visible');
+}
+
+/* ════════════════════════════════════
+   FULLSCREEN LOCK MODE
+════════════════════════════════════ */
+let _fsExitTimeout = null;
+let _fsCountdownInterval = null;
+let _fsCountdownSec = 0;
+
+function focusFsEnter() {
+  // Show black overlay — no browser fullscreen API needed
+  const overlay = document.getElementById('focus-fs-overlay');
+  if (overlay) overlay.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  _focusFsUpdatePhase();
+}
+
+function focusFsExit() {
+  const overlay = document.getElementById('focus-fs-overlay');
+  if (overlay) overlay.classList.remove('visible');
+  document.body.style.overflow = '';
+  _fsClearCountdown();
+}
+
+function focusFsOpenSyllabus() {
+  // Only allowed escape: open syllabus tracker — resets timer
+  focusFsExit();
+  switchPage('syllabus');
+  _focusStopInterval();
+  focusState.running = false;
+  focusState.remainingMs = focusState.durationMs;
+  focusState.elapsedMs = 0;
+  focusState.pomoPhase = 0;
+  _focusUpdateButtons();
+  _focusUpdateDisplay();
+  _calShowToast('Timer reset. Syllabus Tracker opened.');
+}
+
+function focusFsStop() {
+  // Stop from fullscreen — allowed for stopwatch always, for timer only when not lock-blocked
+  const lockBlock = focusState.lockMode && !focusState.goalDoneInLock;
+  if (focusState.mode === 'timer' && lockBlock) {
+    _calShowToast('🔒 Lock Mode: mark your goal as done first.');
+    return;
+  }
+  _focusFinishSession(true);
+}
+
+function _focusFsUpdatePhase() {
+  const el = document.getElementById('focus-fs-timer');
+  const phaseEl = document.getElementById('focus-fs-phase');
+  if (!el) return;
+  // Phase label
+  if (focusState.mode === 'stopwatch') {
+    if (phaseEl) phaseEl.textContent = '⏱️ STOPWATCH';
+  } else if (focusState.pomoIdx >= 0) {
+    const seq = POMO_SEQUENCES[focusState.pomoIdx];
+    const step = seq.steps[focusState.pomoPhase];
+    if (phaseEl) phaseEl.textContent = (step.isBreak ? '\u23F8\uFE0F BREAK' : '\uD83D\uDCDA STUDY') + ' — Phase ' + (focusState.pomoPhase + 1) + ' of ' + seq.steps.length;
+  } else {
+    if (phaseEl) phaseEl.textContent = '\uD83D\uDCDA STUDY SESSION';
+  }
+  // Time
+  const ms = focusState.mode === 'timer' ? focusState.remainingMs : focusState.elapsedMs;
+  el.textContent = _focusFmtTime(ms);
+}
+
+function _fsClearCountdown() {
+  clearTimeout(_fsExitTimeout);
+  clearInterval(_fsCountdownInterval);
+  _fsExitTimeout = null;
+  _fsCountdownInterval = null;
+}
+
+// Overlay is a fixed black div — no browser fullscreen API needed
 
 function focusSelectGoal(val) {
   if (focusState.running) return;
@@ -6111,29 +6809,110 @@ function _focusRenderSelectedGoalCard() {
 }
 
 function _focusRenderGoalDropdown() {
-  const sel = document.getElementById('focus-goal-select');
-  if (!sel) return;
-  // Build options from current week + adjacent weeks (so user has context)
-  const opts = ['<option value="">— No goal selected —</option>'];
-  const offsets = [0, -1, 1]; // current, last, next
-  const labels  = { 0: 'This Week', '-1': 'Last Week', '1': 'Next Week' };
-  offsets.forEach(off => {
-    const key = calWeekKey(off);
-    const data = calLoad(key);
-    const goals = data.goals || [];
-    if (goals.length === 0) return;
-    opts.push(`<optgroup label="${labels[off]}">`);
-    goals.forEach((g, i) => {
-      const val = `${key}|${i}`;
-      const isSel = focusState.selectedKey === key && focusState.selectedIdx === i;
-      const status = g.lockedDone ? ' 🔒' : (g.done ? ' ✓' : '');
-      const txt = g.text.length > 60 ? g.text.slice(0,60) + '…' : g.text;
-      opts.push(`<option value="${val}"${isSel?' selected':''}${g.lockedDone?' disabled':''}>${escHtml(txt)}${status}</option>`);
-    });
-    opts.push('</optgroup>');
+  const list   = document.getElementById('focus-goal-list');
+  const badge  = document.getElementById('focus-goal-week-badge');
+  const triggerText = document.getElementById('focus-goal-trigger-text');
+  if (!list) return;
+
+  // Only current week's goals
+  const key   = calWeekKey(0);
+  const data  = calLoad(key);
+  const goals = data.goals || [];
+
+  if (badge) badge.textContent = goals.length + ' goal' + (goals.length !== 1 ? 's' : '');
+
+  // Update trigger label
+  if (triggerText) {
+    if (focusState.selectedKey && focusState.selectedIdx !== null) {
+      const d2 = calLoad(focusState.selectedKey);
+      const g  = d2.goals?.[focusState.selectedIdx];
+      if (g) {
+        const lbl = g.text.length > 50 ? g.text.slice(0,50) + '\u2026' : g.text;
+        triggerText.textContent = lbl;
+      } else {
+        triggerText.textContent = '\u2014 No goal selected \u2014';
+      }
+    } else {
+      triggerText.textContent = '\u2014 No goal selected \u2014';
+    }
+  }
+
+  if (goals.length === 0) {
+    list.innerHTML = `<div class="focus-goal-empty"><strong>No goals this week</strong>Head to the Calendar tab and add weekly goals to link them here.</div>`;
+    return;
+  }
+
+  const rows = [];
+  // "None" option
+  const noneSelected = !focusState.selectedKey;
+  rows.push(`<div class="focus-goal-none-opt${noneSelected?' selected':''}" onclick="focusGoalPickerSelect('')">
+    <span style="font-size:1rem;opacity:0.6">\u2715</span> No goal selected
+  </div>`);
+
+  goals.forEach((g, i) => {
+    const val = `${key}|${i}`;
+    const isSel = focusState.selectedKey === key && focusState.selectedIdx === i;
+    const locked = !!g.lockedDone;
+    let statusHtml = '';
+    let statusClass = '';
+    if (g.lockedDone) {
+      statusHtml = '\uD83D\uDD12 Permanently locked';
+      statusClass = 's-locked';
+    } else if (g.done) {
+      statusHtml = '\u2713 Done';
+      statusClass = 's-done';
+    } else {
+      statusHtml = 'Pending';
+      statusClass = 's-pending';
+    }
+    rows.push(`<div class="focus-goal-opt${isSel?' selected':''}${locked?' locked-opt':''}"
+      onclick="${locked ? '' : `focusGoalPickerSelect('${val}')`}"
+      title="${escHtml(g.text)}">
+      <div class="focus-goal-opt-num">${i + 1}</div>
+      <div class="focus-goal-opt-body">
+        <div class="focus-goal-opt-text">${escHtml(g.text)}</div>
+        <div class="focus-goal-opt-status ${statusClass}">${statusHtml}</div>
+      </div>
+      ${isSel ? '<div class="focus-goal-opt-check" style="color:var(--accent)">\u2713</div>' : ''}
+    </div>`);
   });
-  sel.innerHTML = opts.join('');
+
+  list.innerHTML = rows.join('');
 }
+
+function focusGoalPickerToggle() {
+  if (focusState.running) return;
+  const trigger  = document.getElementById('focus-goal-trigger');
+  const dropdown = document.getElementById('focus-goal-dropdown');
+  if (!trigger || !dropdown) return;
+  const isOpen = dropdown.classList.contains('open');
+  if (isOpen) {
+    dropdown.classList.remove('open');
+    trigger.classList.remove('open');
+  } else {
+    _focusRenderGoalDropdown();
+    dropdown.classList.add('open');
+    trigger.classList.add('open');
+  }
+}
+
+function focusGoalPickerClose() {
+  const trigger  = document.getElementById('focus-goal-trigger');
+  const dropdown = document.getElementById('focus-goal-dropdown');
+  if (dropdown) dropdown.classList.remove('open');
+  if (trigger)  trigger.classList.remove('open');
+}
+
+function focusGoalPickerSelect(val) {
+  focusSelectGoal(val);
+  _focusRenderGoalDropdown();
+  focusGoalPickerClose();
+}
+
+document.addEventListener('click', function(e) {
+  const picker = document.getElementById('focus-goal-picker');
+  if (picker && !picker.contains(e.target)) focusGoalPickerClose();
+});
 
 function _focusRenderHistory() {
   const list = document.getElementById('focus-history-list');
@@ -6155,6 +6934,9 @@ function focusRender() {
   document.getElementById('fmode-stopwatch').classList.toggle('active', focusState.mode === 'stopwatch');
   document.getElementById('focus-mode-label').textContent = focusState.mode === 'timer' ? 'Pomodoro Timer' : 'Stopwatch';
   document.getElementById('focus-duration-row').style.display = focusState.mode === 'timer' ? '' : 'none';
+  // Stopwatch mode: simplified layout
+  const focusPage = document.getElementById('page-focus');
+  if (focusPage) focusPage.classList.toggle('stopwatch-mode', focusState.mode === 'stopwatch');
   // Reflect duration preset selection
   const minutes = Math.round(focusState.durationMs / 60000);
   document.querySelectorAll('#focus-duration-row .focus-preset-btn').forEach(b => {
@@ -6226,5 +7008,20 @@ try {
   console.warn('Firebase init failed:', e);
 }
 </script>
+<!-- ── Fullscreen Lock Overlay ── -->
+<div id="focus-fs-overlay">
+  <div class="focus-fs-phase" id="focus-fs-phase">STUDY SESSION</div>
+  <div class="focus-fs-timer" id="focus-fs-timer">00:00</div>
+  <div class="focus-fs-warn" id="focus-fs-warn">
+    <div>You tried to leave! Timer resets in</div>
+    <div class="focus-fs-countdown" id="focus-fs-countdown">60s</div>
+  </div>
+  <div class="focus-fs-btn-row">
+    <button class="focus-fs-mark-done-btn" id="focus-fs-mark-done-btn" onclick="focusMarkGoalDone()">&#x2713; Mark Goal as Done</button>
+    <button class="focus-fs-stop-btn" id="focus-fs-stop-btn" onclick="focusFsStop()">&#x25A0; Stop</button>
+  </div>
+  <button class="focus-fs-syllabus-btn" onclick="focusFsOpenSyllabus()">&#x1F4DA; Open Syllabus Tracker</button>
+</div>
+
 </body>
 </html>
