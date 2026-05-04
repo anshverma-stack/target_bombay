@@ -2570,7 +2570,7 @@ function getWeekKey() {
   const sunday = new Date(d);
   sunday.setHours(0,0,0,0);
   sunday.setDate(sunday.getDate() - sunday.getDay());
-  return sunday.toISOString().split('T')[0];
+  return localDateStr(sunday);
 }
 function loadWeekData() {
   const raw = storageGet('jv_tt_week', null);
@@ -5243,6 +5243,14 @@ function calSetMonthMode(mode) {
   calRenderMonth();
 }
 
+// Returns YYYY-MM-DD in LOCAL time (toISOString gives UTC which shifts the date in UTC+ timezones)
+function localDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
 function calWeekKey(offset) {
   const d = new Date();
   // Anchor to Monday (ISO week start) — same as calRenderWeek's monDate calculation
@@ -5294,12 +5302,12 @@ function calDayIsComplete(dateStr) {
 }
 
 function calComputeGoalStreak() {
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = localDateStr(new Date());
   let streak = 0;
   // Walk backwards from today. Stop when a day has no goals or incomplete goals.
   for (let i = 0; i < 365; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const ds = d.toISOString().slice(0, 10);
+    const ds = localDateStr(d);
     if (calDayIsComplete(ds)) {
       streak++;
     } else {
@@ -5389,12 +5397,12 @@ function calRenderWeek() {
   const monDate = new Date();
   monDate.setDate(monDate.getDate() - (monDate.getDay()+6)%7 + calWeekOffset*7);
 
-  const todayStr = new Date().toISOString().slice(0,10);
+  const todayStr = localDateStr(new Date());
 
   // Pre-compute day data
   const dayMeta = dayNames.map((dn, i) => {
     const d = new Date(monDate); d.setDate(d.getDate()+i);
-    const ds = d.toISOString().slice(0,10);
+    const ds = localDateStr(d);
     return { dn, d, ds, isToday: ds===todayStr, past: d < new Date(todayStr), dayData: data.days?.[ds]||{} };
   });
 
