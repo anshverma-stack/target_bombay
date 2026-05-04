@@ -1129,6 +1129,8 @@ html.light .cal-goal-cb:checked { box-shadow:0 2px 8px rgba(79,70,229,0.3); }
 .cal-goal-text.done { text-decoration:line-through; opacity:0.45; }
 .cal-goal-del { background:none; border:none; color:var(--text-3); font-size:0.9rem; cursor:pointer; padding:0 3px; opacity:0.5; transition:opacity 0.15s; }
 .cal-goal-del:hover { opacity:1; color:#ef4444; }
+.cal-goal-edit { background:none; border:none; color:var(--text-3); font-size:0.82rem; cursor:pointer; padding:0 3px; opacity:0.5; transition:all 0.15s; }
+.cal-goal-edit:hover { opacity:1; color:var(--accent); }
 .cal-add-goal { display:flex; gap:8px; }
 .cal-add-goal-input { flex:1; background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:9px; padding:8px 12px; color:var(--text); font-size:0.8rem; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
 .cal-add-goal-input:focus { border-color:var(--accent); }
@@ -5479,6 +5481,7 @@ function calRenderWeek() {
       `<span class="cal-goal-day-chip">${abbr}</span>`
     ).join('');
     const isLocked = !!g.lockedDone;
+    const editBtn = isLocked ? '' : '<button class="cal-goal-edit" onclick="calWeekGoalEdit(\'' + key + '\',' + gi + ')" title="Edit goal">&#9998;</button>';
     return `
     <div class="cal-goal-item" id="wcg-${key}-${gi}" ${isLocked?'':'draggable="true"'}
       ${isLocked?'':`ondragstart="calGoalDragStart(event,'${key}',${gi})" ondragend="calGoalDragEnd(event)"`}>
@@ -5488,6 +5491,7 @@ function calRenderWeek() {
       <span class="cal-goal-text${g.done?' done':''}" ${isLocked?'':"onclick=\"this.previousElementSibling.click()\""}>${escHtml(g.text)}</span>
       ${assignedDays.length ? `<span class="cal-goal-day-chips">${dayChipsHtml}</span>` : ''}
       <button class="cal-goal-copy${_goalClipboard.includes(g.text)?' in-clip':''}" onclick="calGoalToggleClip(this.dataset.t)" data-t="${escHtml(g.text)}" title="${_goalClipboard.includes(g.text)?'Remove from selection':'Add to clipboard'}">⎘</button>
+      ${editBtn}
       <button class="cal-goal-del${isLocked?' disabled-locked':''}" onclick="calWeekGoalDel('${key}',${gi})" title="${isLocked?'Locked goals cannot be deleted':'Remove'}">✕</button>
     </div>`;
   }).join('');
@@ -5592,6 +5596,70 @@ function calWeekGoalDel(key, idx) {
   }
   if (data.goals) { data.goals.splice(idx,1); calSave(key, data); }
   calRenderWeek();
+}
+
+function calWeekGoalEdit(key, idx) {
+  const row = document.getElementById('wcg-' + key + '-' + idx);
+  if (!row) return;
+  if (row.querySelector('.cal-goal-edit-wrap')) return;
+  const data = calLoad(key);
+  if (!data.goals?.[idx]) return;
+  const oldText = data.goals[idx].text;
+
+  const textSpan = row.querySelector('.cal-goal-text');
+  const editBtn  = row.querySelector('.cal-goal-edit');
+  const delBtn   = row.querySelector('.cal-goal-del');
+  const copyBtn  = row.querySelector('.cal-goal-copy');
+  if (textSpan) textSpan.style.display = 'none';
+  if (editBtn)  editBtn.style.display  = 'none';
+  if (delBtn)   delBtn.style.display   = 'none';
+  if (copyBtn)  copyBtn.style.display  = 'none';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'cal-goal-edit-wrap';
+  wrap.style.cssText = 'display:flex;gap:6px;flex:1;align-items:center;';
+
+  const inp = document.createElement('input');
+  inp.value = oldText;
+  inp.style.cssText = 'flex:1;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.4);border-radius:7px;padding:4px 9px;color:var(--text);font-size:0.8rem;font-family:inherit;outline:none;';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = '✓';
+  saveBtn.style.cssText = 'background:var(--accent);color:white;border:none;border-radius:6px;padding:3px 9px;cursor:pointer;font-size:0.85rem;font-weight:700;';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = '✕';
+  cancelBtn.style.cssText = 'background:rgba(255,255,255,0.07);color:var(--text-3);border:none;border-radius:6px;padding:3px 9px;cursor:pointer;font-size:0.85rem;';
+
+  wrap.appendChild(inp);
+  wrap.appendChild(saveBtn);
+  wrap.appendChild(cancelBtn);
+
+  const cb = row.querySelector('.cal-goal-cb');
+  if (cb) cb.after(wrap); else row.appendChild(wrap);
+  inp.focus(); inp.select();
+
+  function doSave() {
+    const trimmed = inp.value.trim();
+    if (trimmed && trimmed !== oldText) {
+      data.goals[idx].text = trimmed;
+      if (data.days) {
+        Object.values(data.days).forEach(dayData => {
+          (dayData.goals || []).forEach(g => { if (g.text === oldText) g.text = trimmed; });
+        });
+      }
+      calSave(key, data);
+      _calShowToast('✏️ Goal updated');
+    }
+    calRenderWeek();
+  }
+
+  saveBtn.onclick = doSave;
+  cancelBtn.onclick = function() { calRenderWeek(); };
+  inp.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter')  { e.preventDefault(); doSave(); }
+    if (e.key === 'Escape') { e.preventDefault(); calRenderWeek(); }
+  });
 }
 
 // ── Goal clipboard (copy / paste) — supports multiple goals ──
