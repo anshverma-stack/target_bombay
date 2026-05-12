@@ -1567,12 +1567,6 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
 .focus-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:1.6rem; }
 @media (max-width:1000px) { .focus-grid { grid-template-columns:1fr; } }
 
-/* Daily panel */
-.focus-daily-panel-inner { display:grid; grid-template-columns:1fr 1.4fr; gap:1.6rem; }
-@media (max-width:900px) { .focus-daily-panel-inner { grid-template-columns:1fr; } }
-.focus-daily-left-card { text-align:left; }
-.focus-daily-right-card { }
-
 .focus-card { background:var(--surface-1); border:1px solid var(--border); border-radius:18px; padding:1.8rem; }
 .focus-display-card { display:flex; flex-direction:column; align-items:center; text-align:center; }
 
@@ -1764,6 +1758,23 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
 .focus-pomo-name { font-weight:700; margin-bottom:2px; }
 .focus-pomo-steps { font-size:0.7rem; color:var(--text-3); font-weight:500; }
 .focus-pomo-btn.active .focus-pomo-steps, .focus-pomo-btn.running .focus-pomo-steps { color:inherit; opacity:0.75; }
+.focus-pomo-wrap { position:relative; display:flex; flex-direction:column; }
+.focus-pomo-wrap .pomo-del-btn {
+  position:absolute; top:5px; right:5px;
+  width:20px; height:20px; border-radius:50%;
+  background:rgba(239,68,68,0); border:none;
+  color:rgba(239,68,68,0); font-size:0.75rem;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s; z-index:5; line-height:1;
+  pointer-events:none;
+}
+.focus-pomo-wrap:hover .pomo-del-btn {
+  background:rgba(239,68,68,0.14); color:#f87171; pointer-events:all;
+}
+.focus-pomo-wrap .pomo-del-btn:hover { background:rgba(239,68,68,0.28) !important; color:#ef4444 !important; }
+.pomo-restore-row { display:flex; justify-content:center; margin-top:2px; }
+.pomo-restore-btn { background:none; border:none; color:var(--text-3); font-size:0.68rem; cursor:pointer; padding:3px 8px; border-radius:6px; transition:color 0.14s; }
+.pomo-restore-btn:hover { color:var(--accent); }
 .focus-pomo-phase { margin-top:10px; padding:10px 14px; border-radius:10px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); font-size:0.8rem; color:var(--text-2); display:none; }
 .focus-pomo-phase.visible { display:block; }
 .focus-pomo-phase-label { font-family:'DM Mono',monospace; font-size:0.58rem; font-weight:700; letter-spacing:0.14em; color:var(--accent); margin-bottom:4px; }
@@ -1789,85 +1800,72 @@ html.light .dq-heatmap-cell-num { color: rgba(0,0,0,0.72); }
   font-size:0.72rem; font-weight:600; cursor:pointer; transition:all 0.2s; letter-spacing:0.02em;
 }
 .focus-fs-syllabus-btn:hover { border-color:rgba(255,255,255,0.2); color:rgba(255,255,255,0.55); }
-.focus-history-item {
+/* ── Break Banner ── */
+/* Legacy break banner — kept for backward compat but hidden */
+#focus-break-banner { display:none !important; }
+
+/* ── Full-screen break overlay ── */
+#focus-break-overlay {
+  display:none; position:fixed; inset:0; z-index:8600;
+  background:linear-gradient(160deg,#022c22 0%,#064e3b 50%,#065f46 100%);
+  flex-direction:column; align-items:center; justify-content:center; gap:0;
+  text-align:center;
+}
+#focus-break-overlay.visible { display:flex; }
+.break-ov-emoji { font-size:3rem; margin-bottom:14px; animation:break-float 3s ease-in-out infinite; }
+@keyframes break-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.break-ov-label {
+  font-family:'DM Mono',monospace; font-size:0.62rem; font-weight:700;
+  letter-spacing:0.22em; text-transform:uppercase;
+  color:rgba(52,211,153,0.6); margin-bottom:6px;
+}
+.break-ov-phase-name {
+  font-family:'Syne',sans-serif; font-size:1.15rem; font-weight:800;
+  color:#a7f3d0; letter-spacing:-0.02em; margin-bottom:16px;
+}
+.break-ov-timer {
+  font-family:'Syne',sans-serif; font-size:5rem; font-weight:800;
+  color:#34d399; letter-spacing:-0.04em; line-height:1;
+  text-shadow:0 0 40px rgba(52,211,153,0.4);
+  margin-bottom:14px;
+}
+.break-ov-msg {
+  font-size:0.8rem; color:rgba(167,243,208,0.55);
+  margin-bottom:6px;
+}
+.break-ov-next {
+  font-size:0.72rem; color:rgba(167,243,208,0.35);
+  margin-bottom:32px;
+}
+.break-ov-progress {
+  width:220px; height:4px; background:rgba(52,211,153,0.15);
+  border-radius:4px; overflow:hidden; margin-bottom:32px;
+}
+.break-ov-progress-bar {
+  height:100%; background:#34d399;
+  border-radius:4px; transition:width 0.25s linear;
+}
+.break-ov-skip {
+  padding:9px 26px; border-radius:10px;
+  border:1px solid rgba(52,211,153,0.35);
+  background:rgba(52,211,153,0.08);
+  color:#6ee7b7; font-family:'DM Sans',sans-serif;
+  font-size:0.82rem; font-weight:700; cursor:pointer;
+  transition:all 0.16s;
+}
+.break-ov-skip:hover { background:rgba(52,211,153,0.16); border-color:rgba(52,211,153,0.55); color:#a7f3d0; }
+
   padding:10px 12px; border-radius:9px; background:var(--surface-2); border:1px solid var(--border);
   display:flex; align-items:center; gap:10px; font-size:0.78rem;
 }
 .focus-history-time { font-family:'DM Mono',monospace; font-weight:700; color:var(--accent); min-width:60px; }
 .focus-history-goal { color:var(--text-2); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .focus-history-empty { font-size:0.76rem; color:var(--text-3); padding:8px 0; }
-.focus-history-tag { font-size:0.68rem; background:rgba(99,102,241,0.15); color:var(--accent); border-radius:5px; padding:1px 5px; flex-shrink:0; }
-.focus-history-date { font-size:0.65rem; color:var(--text-3); flex-shrink:0; }
-
-/* ── Daily Study Tracker ── */
-.focus-daily-tracker {
-  margin-top:18px; padding:14px 16px; border-radius:14px;
-  background:var(--surface-2); border:1px solid var(--border);
-}
-.focus-daily-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-.focus-daily-header-title {
-  font-family:'DM Mono',monospace; font-size:0.6rem; font-weight:700;
-  letter-spacing:0.14em; text-transform:uppercase; color:var(--text-3); flex:1;
-}
-.focus-daily-time-big {
-  font-family:'Syne',sans-serif; font-size:1.45rem; font-weight:800;
-  letter-spacing:-0.03em; color:var(--text);
-}
-.focus-daily-time-big.goal-reached { color:var(--green); }
-.focus-daily-goal-row {
-  display:flex; align-items:center; gap:7px; margin-top:9px; margin-bottom:9px;
-}
-.focus-daily-goal-label {
-  font-family:'DM Mono',monospace; font-size:0.62rem; font-weight:600;
-  color:var(--text-3); white-space:nowrap;
-}
-.focus-daily-goal-input {
-  width:62px; padding:5px 8px; border-radius:8px;
-  border:1px solid var(--border); background:rgba(255,255,255,0.04);
-  color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.82rem;
-  outline:none; transition:border-color 0.14s; text-align:center;
-}
-.focus-daily-goal-input:focus { border-color:rgba(99,102,241,0.45); background:rgba(99,102,241,0.05); }
-.focus-daily-goal-unit { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--text-3); }
-.focus-daily-progress-wrap { margin-bottom:4px; }
-.focus-daily-progress-bar {
-  height:7px; border-radius:100px; background:rgba(255,255,255,0.07); overflow:hidden; margin-bottom:5px;
-}
-.focus-daily-progress-fill {
-  height:100%; border-radius:100px;
-  background:linear-gradient(90deg,var(--accent),var(--accent-2));
-  transition:width 0.4s ease, background 0.3s;
-}
-.focus-daily-progress-text {
-  font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--text-3);
-}
-.focus-daily-celebration {
-  margin-top:7px; padding:7px 11px; border-radius:9px;
-  background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3);
-  font-size:0.75rem; font-weight:700; color:#34d399; display:none; text-align:center;
-}
-.focus-daily-celebration.show { display:block; }
-.focus-log-offline-btn {
-  width:100%; margin-top:10px; padding:8px 12px; border-radius:10px;
-  border:1px solid var(--border); background:transparent;
-  color:var(--text-3); font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600;
-  cursor:pointer; transition:all 0.15s; text-align:center;
-}
-.focus-log-offline-btn:hover { border-color:var(--border-2); color:var(--text-2); background:rgba(255,255,255,0.04); }
-
-/* ── Offline Modal extras ── */
-.offline-dur-row { display:flex; align-items:center; gap:8px; }
-.offline-dur-sep { color:var(--text-3); font-weight:700; font-size:0.9rem; }
-html.light .focus-daily-tracker { background:var(--surface-2); border-color:var(--border); }
-html.light .focus-daily-goal-input { background:rgba(90,65,40,0.04); border-color:var(--border); }
-html.light .focus-daily-goal-input:focus { border-color:rgba(80,70,228,0.4); background:rgba(80,70,228,0.04); }
-html.light .focus-log-offline-btn { border-color:var(--border); color:var(--text-3); }
-html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:var(--text-2); }
 
 /* ── Stopwatch mode: simplified UI ── */
 .stopwatch-mode .focus-subtab-row { display:none !important; }
 .stopwatch-mode .focus-right-card { display:none !important; }
-.stopwatch-mode #focus-grid { grid-template-columns:1fr !important; max-width:520px; margin:0 auto; }
+.stopwatch-mode .focus-grid { grid-template-columns:1fr !important; max-width:520px; margin:0 auto; }
 .stopwatch-mode #focus-pause-btn { display:none !important; }
 .stopwatch-mode #focus-reset-btn { display:none !important; }
 .stopwatch-mode #focus-duration-row { display:none !important; }
@@ -1890,7 +1888,114 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
 .focus-fs-mark-done-btn:hover { background:rgba(16,185,129,0.28); border-color:rgba(16,185,129,0.8); color:#fff; }
 .focus-fs-mark-done-btn.visible { display:block; }
 
-/* Locked-done indicator on calendar goals */
+/* ── Pomo Phase Builder Cards ── */
+.pomo-phase-card {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 13px 14px; transition: border-color 0.15s;
+}
+.pomo-phase-card:hover { border-color: var(--border-2); }
+.pomo-phase-card.phase-break { border-color: rgba(16,185,129,0.2); background: rgba(16,185,129,0.03); }
+.pomo-phase-header { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.pomo-phase-num {
+  width:22px; height:22px; border-radius:7px; flex-shrink:0;
+  background:rgba(99,102,241,0.14); border:1px solid rgba(99,102,241,0.25);
+  font-family:'DM Mono',monospace; font-size:0.6rem; font-weight:800; color:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+}
+.pomo-phase-card.phase-break .pomo-phase-num { background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.25); color:var(--green); }
+.pomo-phase-name-input {
+  flex:1; min-width:80px; background:transparent; border:none;
+  border-bottom:1px solid var(--border); color:var(--text);
+  font-size:0.84rem; font-weight:600; font-family:'DM Sans',sans-serif;
+  outline:none; padding:3px 4px; transition:border-color 0.15s;
+}
+.pomo-phase-name-input:focus { border-bottom-color:var(--accent); }
+.pomo-phase-dur-wrap { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.pomo-phase-dur-input {
+  width:44px; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+  border-radius:7px; color:var(--text); font-family:'DM Mono',monospace;
+  font-size:0.82rem; font-weight:700; text-align:center;
+  padding:4px 0; outline:none; transition:border-color 0.15s;
+}
+.pomo-phase-dur-input:focus { border-color:var(--accent); }
+.pomo-phase-type-toggle {
+  display:flex; gap:2px; padding:2px; flex-shrink:0;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:8px;
+}
+.pomo-phase-type-btn {
+  padding:4px 9px; border-radius:6px; border:none; background:transparent;
+  color:var(--text-3); font-size:0.72rem; font-weight:700; cursor:pointer;
+  font-family:'DM Sans',sans-serif; transition:all 0.13s;
+}
+.pomo-phase-type-btn.active-study { background:rgba(99,102,241,0.2); color:var(--accent); }
+.pomo-phase-type-btn.active-break { background:rgba(16,185,129,0.18); color:var(--green); }
+.pomo-phase-actions { display:flex; gap:2px; margin-left:auto; flex-shrink:0; }
+.pomo-phase-action-btn {
+  width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+  border-radius:7px; border:1px solid transparent; background:transparent;
+  color:var(--text-3); font-size:0.82rem; cursor:pointer; transition:all 0.13s;
+}
+.pomo-phase-action-btn:hover:not(:disabled) { background:rgba(255,255,255,0.07); border-color:var(--border); color:var(--text-2); }
+.pomo-phase-action-btn:disabled { opacity:0.22; cursor:not-allowed; }
+.pomo-phase-action-btn.btn-delete { color:rgba(239,68,68,0.65); }
+.pomo-phase-action-btn.btn-delete:hover { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#ef4444; }
+/* ── Pomo Phase Goal Picker ── */
+.pomo-goal-sep { margin-top:11px; padding-top:11px; border-top:1px solid rgba(255,255,255,0.05); }
+.pomo-goal-label {
+  font-size:0.6rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--text-3); display:block; margin-bottom:5px;
+}
+.pomo-goal-picker { position:relative; }
+.pomo-goal-trigger {
+  width:100%; padding:7px 32px 7px 10px; border-radius:9px;
+  border:1px solid var(--border); background:rgba(99,102,241,0.05);
+  color:var(--text); font-family:'DM Sans',sans-serif;
+  font-size:0.8rem; font-weight:500; cursor:pointer;
+  display:flex; align-items:center; gap:8px; position:relative;
+  transition:border-color 0.15s, box-shadow 0.15s; text-align:left;
+}
+.pomo-goal-trigger:hover { border-color:rgba(99,102,241,0.3); }
+.pomo-goal-trigger.open { border-color:var(--accent); box-shadow:0 0 0 2px rgba(99,102,241,0.12); }
+.pomo-goal-trigger.has-goal { border-color:rgba(99,102,241,0.28); background:rgba(99,102,241,0.08); }
+.pomo-goal-trigger-icon { font-size:0.85rem; flex-shrink:0; line-height:1; }
+.pomo-goal-trigger-text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pomo-goal-trigger-arrow { position:absolute; right:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:0.65rem; transition:transform 0.16s; pointer-events:none; }
+.pomo-goal-trigger.open .pomo-goal-trigger-arrow { transform:translateY(-50%) rotate(180deg); }
+.pomo-goal-dropdown {
+  display:none; position:absolute; top:calc(100% + 5px); left:0; right:0; min-width:220px;
+  background:var(--surface-1); border:1px solid var(--border-2); border-radius:12px;
+  z-index:400; overflow:hidden;
+  box-shadow:0 14px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.08);
+  animation:goalDropIn 0.13s ease;
+}
+.pomo-goal-dropdown.open { display:block; }
+.pomo-goal-list { max-height:190px; overflow-y:auto; padding:5px; }
+.pomo-goal-list::-webkit-scrollbar { width:3px; }
+.pomo-goal-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:3px; }
+.pomo-goal-none-item {
+  display:flex; align-items:center; gap:8px; padding:8px 9px;
+  border-radius:8px; cursor:pointer; color:var(--text-3); font-size:0.78rem; font-weight:500;
+  border-bottom:1px solid var(--border); margin-bottom:4px; transition:background 0.1s;
+}
+.pomo-goal-none-item:hover { background:rgba(255,255,255,0.04); color:var(--text-2); }
+.pomo-goal-item {
+  display:flex; align-items:center; gap:8px; padding:8px 9px;
+  border-radius:8px; cursor:pointer; transition:background 0.1s;
+  border:1px solid transparent; margin-bottom:2px;
+}
+.pomo-goal-item:last-child { margin-bottom:0; }
+.pomo-goal-item:hover { background:rgba(99,102,241,0.08); border-color:rgba(99,102,241,0.15); }
+.pomo-goal-item.selected { background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.28); }
+.pomo-goal-item-check {
+  width:16px; height:16px; border-radius:5px; flex-shrink:0;
+  border:1px solid var(--border-2); background:var(--surface-3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.58rem; color:transparent; transition:all 0.12s;
+}
+.pomo-goal-item.selected .pomo-goal-item-check { background:var(--accent); border-color:var(--accent); color:white; }
+.pomo-goal-item-text { flex:1; font-size:0.78rem; font-weight:500; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+
 .cal-goal-locked-icon {
   font-size:0.78rem; color:#fbbf24; margin-right:4px;
   cursor:help;
@@ -2195,11 +2300,10 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
       <div class="focus-mode-toggle">
         <button class="focus-mode-btn active" id="fmode-timer" onclick="focusSetMode('timer')">⏲️ Timer</button>
         <button class="focus-mode-btn" id="fmode-stopwatch" onclick="focusSetMode('stopwatch')">⏱️ Stopwatch</button>
-        <button class="focus-mode-btn" id="fmode-daily" onclick="focusSetMode('daily')">📊 Daily</button>
       </div>
     </div>
 
-    <div class="focus-grid" id="focus-grid">
+    <div class="focus-grid">
       <!-- Left: Timer / Display -->
       <div class="focus-card focus-display-card">
         <!-- Sub-tabs: Timer vs Pomodoro -->
@@ -2227,28 +2331,29 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
 
         <!-- Pomodoro tab: sequence picker (moved here from right card) -->
         <div id="focus-pomo-left" style="display:none;">
-          <div class="focus-pomo-grid">
-            <button class="focus-pomo-btn" id="pomo-0" onclick="focusPomoSelect(0)">
-              <div class="focus-pomo-name">Standard Double</div>
-              <div class="focus-pomo-steps">60m study → 5m break → 60m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-1" onclick="focusPomoSelect(1)">
-              <div class="focus-pomo-name">Long Haul</div>
-              <div class="focus-pomo-steps">90m study → 15m break → 60m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-2" onclick="focusPomoSelect(2)">
-              <div class="focus-pomo-name">Short Bursts</div>
-              <div class="focus-pomo-steps">30m study → 5m break → 30m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-3" onclick="focusPomoSelect(3)">
-              <div class="focus-pomo-name">Warm-up to Deep</div>
-              <div class="focus-pomo-steps">30m study → 25m break → 120m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-none" onclick="focusPomoSelect(-1)">
-              <div class="focus-pomo-name">No sequence</div>
-              <div class="focus-pomo-steps">Use the duration set above</div>
-            </button>
+          <div class="focus-pomo-grid" id="pomo-preset-grid">
+            <!-- dynamically rendered by _pomoRenderGrid() -->
           </div>
+
+          <!-- Custom Pomodoro Builder -->
+          <div id="pomo-custom-builder" style="display:none;margin-top:12px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span id="pomo-builder-title" style="font-family:'DM Mono',monospace;font-size:0.62rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);">New Custom Sequence</span>
+              <button onclick="focusPomoCloseBuilder()" style="margin-left:auto;background:none;border:none;color:var(--text-3);font-size:1rem;cursor:pointer;padding:0 4px;">✕</button>
+            </div>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:0.72rem;color:var(--text-3);display:block;margin-bottom:4px;">Sequence Name</label>
+              <input id="pomo-custom-name-input" type="text" placeholder="e.g. My Deep Work" maxlength="30"
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:0.82rem;font-family:inherit;outline:none;">
+            </div>
+            <div id="pomo-custom-phases" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+            <button onclick="focusPomoAddPhase()" style="width:100%;background:rgba(99,102,241,0.08);border:1px dashed rgba(99,102,241,0.35);border-radius:8px;padding:7px;color:var(--accent);font-size:0.8rem;font-weight:700;cursor:pointer;font-family:inherit;">+ Add Phase</button>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button onclick="focusPomoSaveCustom()" style="flex:1;background:var(--accent);color:white;border:none;border-radius:9px;padding:9px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">✓ Save & Use</button>
+              <button onclick="focusPomoCloseBuilder()" style="background:rgba(255,255,255,0.06);color:var(--text-3);border:none;border-radius:9px;padding:9px 14px;font-size:0.82rem;cursor:pointer;font-family:inherit;">Cancel</button>
+            </div>
+          </div>
+
           <div class="focus-pomo-phase" id="focus-pomo-phase-info">
             <div class="focus-pomo-phase-label">CURRENT PHASE</div>
             <div class="focus-pomo-phase-name" id="focus-pomo-phase-name">—</div>
@@ -2285,16 +2390,13 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
             <div class="focus-goal-dropdown-header">
               <span class="focus-goal-dropdown-week">📅 This Week's Goals</span>
               <span class="focus-goal-week-badge" id="focus-goal-week-badge">0 goals</span>
+              <button onclick="focusGoalPickerClose()" style="margin-left:auto;background:var(--accent);color:white;border:none;border-radius:6px;padding:3px 10px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:inherit;">Done</button>
             </div>
             <div class="focus-goal-list" id="focus-goal-list"></div>
           </div>
         </div>
 
-        <div class="focus-selected-goal" id="focus-selected-goal" style="display:none;">
-          <div class="focus-selected-label">SELECTED GOAL</div>
-          <div class="focus-selected-text" id="focus-selected-text"></div>
-          <div class="focus-selected-status" id="focus-selected-status"></div>
-        </div>
+        <div class="focus-selected-goal" id="focus-selected-goal" style="display:none;"></div>
 
         <label class="focus-lock-toggle">
           <input type="checkbox" id="focus-lock-mode" onchange="focusToggleLockMode(this.checked)">
@@ -2305,7 +2407,7 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
         </label>
 
         <button class="focus-btn focus-btn-success" id="focus-mark-done-btn" onclick="focusMarkGoalDone()" disabled>
-          ✓ Mark Selected Goal as Done
+          ✓ Mark Selected Goals as Done
         </button>
 
         <div class="focus-history" id="focus-history">
@@ -2313,62 +2415,7 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
           <div class="focus-history-list" id="focus-history-list"></div>
         </div>
       </div>
-
-    </div><!-- end focus-grid -->
-
-    <!-- ── Daily Progress Panel (shown when "Daily" mode is active) ── -->
-    <div id="focus-daily-panel" style="display:none;">
-      <div class="focus-daily-panel-inner">
-
-        <!-- Left: Big time + goal + progress -->
-        <div class="focus-card focus-daily-left-card">
-          <div class="cal-card-header" style="margin-bottom:20px;">
-            <span style="font-size:1.2rem;">&#x1F4CA;</span>
-            <span class="cal-section-title" style="margin-bottom:0;">Today's Progress</span>
-          </div>
-
-          <div style="text-align:center;padding:20px 0 18px;">
-            <div style="font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;">STUDIED TODAY</div>
-            <div class="focus-daily-time-big" id="focus-daily-time">0h 0m</div>
-          </div>
-
-          <div class="focus-daily-goal-row" style="margin-bottom:14px;justify-content:center;">
-            <span class="focus-daily-goal-label">Daily Goal:</span>
-            <input type="number" class="focus-daily-goal-input" id="focus-daily-goal-input"
-              min="0.5" max="24" step="0.5" placeholder="&#x2014;"
-              oninput="saveDailyGoal(this.value)" title="Set your daily study goal in hours">
-            <span class="focus-daily-goal-unit">hrs</span>
-          </div>
-
-          <div class="focus-daily-progress-wrap" id="focus-daily-progress-wrap" style="display:none;margin-bottom:14px;">
-            <div class="focus-daily-progress-bar" style="height:10px;">
-              <div class="focus-daily-progress-fill" id="focus-daily-progress-fill" style="width:0%"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-              <span class="focus-daily-progress-text" id="focus-daily-progress-text"></span>
-            </div>
-          </div>
-
-          <div class="focus-daily-celebration" id="focus-daily-celebration">&#x1F389; Daily goal reached! Great work!</div>
-
-          <button class="focus-log-offline-btn" onclick="openOfflineModal()" style="margin-top:16px;">&#x1F4DD; + Log Offline Time</button>
-        </div>
-
-        <!-- Right: Sessions list -->
-        <div class="focus-card focus-daily-right-card">
-          <div class="cal-card-header" style="margin-bottom:16px;">
-            <span style="font-size:1.1rem;">&#x1F4CB;</span>
-            <span class="cal-section-title" style="margin-bottom:0;">Sessions Today</span>
-          </div>
-          <div id="focus-today-sessions" class="focus-history-list"></div>
-
-          <div class="focus-section-label" style="margin-top:20px;">All Recent Sessions</div>
-          <div class="focus-history-list" id="focus-history-list-daily" style="margin-top:8px;"></div>
-        </div>
-
-      </div>
     </div>
-
   </div>
   </div><!-- end scroll wrapper -->
 </div>
@@ -6249,19 +6296,24 @@ function calMonthGoalDel(key, idx) {
 ══════════════════════════════════════════ */
 var focusState = {
   mode:           'timer',          // 'timer' | 'stopwatch'
-  durationMs:     25 * 60 * 1000,   // for timer mode
-  remainingMs:    25 * 60 * 1000,   // for timer mode
-  elapsedMs:      0,                // for stopwatch
+  durationMs:     25 * 60 * 1000,
+  remainingMs:    25 * 60 * 1000,
+  elapsedMs:      0,
   running:        false,
-  startTimestamp: 0,                // wall-clock time when current run segment began
+  startTimestamp: 0,
   intervalId:     null,
-  selectedKey:    null,             // weekKey of selected goal
-  selectedIdx:    null,             // index into data.goals
-  selectedText:   null,             // remembered text in case index shifts
+  selectedGoals:  [],               // array of {key, idx, text}
+  // legacy single-goal fields kept for compatibility
+  selectedKey:    null,
+  selectedIdx:    null,
+  selectedText:   null,
   lockMode:       false,
-  goalDoneInLock: false,            // user marked done while in lock-mode current run
-  history:        [],               // array of {time, text, mode, ts}
-  hiddenAt:       null              // wall-clock time when page was hidden (for 1-min grace)
+  goalDoneInLock: false,
+  history:        [],
+  hiddenAt:       null,
+  inOvertime:     false,
+  _beepedAtZero:  false,
+  isBreakPhase:   false
 };
 
 // Persist a few settings across reloads
@@ -6288,13 +6340,15 @@ function _focusPersist() {
 }
 
 function _focusFmtTime(ms) {
-  if (ms < 0) ms = 0;
-  const totalSec = Math.floor(ms / 1000);
+  const negative = ms < 0;
+  const absMs = negative ? -ms : ms;
+  const totalSec = Math.floor(absMs / 1000);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
   const pad = n => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+  const formatted = h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+  return negative ? `-${formatted}` : formatted;
 }
 
 function _focusUpdateDisplay() {
@@ -6329,42 +6383,24 @@ function _focusGetSelectedGoal() {
 }
 
 function focusSetMode(m) {
-  if (m !== 'daily' && focusState.running) {
+  if (focusState.running) {
     if (!confirm('A session is running. Switch mode and discard it?')) return;
     _focusStopInterval();
     focusState.running = false;
   }
-
-  // If switching to daily, just show the daily panel — don't reset session state
-  const isDaily = m === 'daily';
-  const grid        = document.getElementById('focus-grid');
-  const dailyPanel  = document.getElementById('focus-daily-panel');
-  if (grid)       grid.style.display       = isDaily ? 'none' : '';
-  if (dailyPanel) dailyPanel.style.display  = isDaily ? ''     : 'none';
-
-  // Update toggle buttons
+  focusState.mode = m;
+  focusState.remainingMs = focusState.durationMs;
+  focusState.elapsedMs = 0;
+  focusState.goalDoneInLock = false;
   document.getElementById('fmode-timer').classList.toggle('active', m === 'timer');
   document.getElementById('fmode-stopwatch').classList.toggle('active', m === 'stopwatch');
-  document.getElementById('fmode-daily').classList.toggle('active', m === 'daily');
-
-  if (!isDaily) {
-    focusState.mode = m;
-    focusState.remainingMs = focusState.durationMs;
-    focusState.elapsedMs = 0;
-    focusState.goalDoneInLock = false;
-    document.getElementById('focus-mode-label').textContent = m === 'timer' ? 'Pomodoro Timer' : 'Stopwatch';
-    document.getElementById('focus-duration-row').style.display = m === 'timer' ? '' : 'none';
-    const focusPage = document.getElementById('page-focus');
-    if (focusPage) focusPage.classList.toggle('stopwatch-mode', m === 'stopwatch');
-    _focusPersist();
-  }
-
-  if (isDaily) {
-    _focusRenderDailyTracker();
-    _focusRenderDailySessionList();
-  } else {
-    focusRender();
-  }
+  document.getElementById('focus-mode-label').textContent = m === 'timer' ? 'Pomodoro Timer' : 'Stopwatch';
+  document.getElementById('focus-duration-row').style.display = m === 'timer' ? '' : 'none';
+  // Stopwatch mode: simplified layout
+  const focusPage = document.getElementById('page-focus');
+  if (focusPage) focusPage.classList.toggle('stopwatch-mode', m === 'stopwatch');
+  _focusPersist();
+  focusRender();
 }
 
 function focusSetDuration(min) {
@@ -6381,6 +6417,8 @@ function focusSetDuration(min) {
 }
 
 function focusStart() {
+  // Request notification permission early (so it's ready for phase transitions)
+  try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch(e) {}
   // Clear "goal done in lock" flag when starting a fresh session
   if (focusState.mode === 'timer' && focusState.remainingMs <= 0) {
     focusState.remainingMs = focusState.durationMs;
@@ -6391,6 +6429,8 @@ function focusStart() {
   if (focusState.mode === 'timer' && focusState.remainingMs === focusState.durationMs) {
     focusState.goalDoneInLock = false;
   }
+  focusState._beepedAtZero = false;
+  focusState.inOvertime = false;
   focusState.running = true;
   focusState.startTimestamp = Date.now();
   _focusStartInterval();
@@ -6436,6 +6476,9 @@ function focusReset() {
   focusState.remainingMs = focusState.durationMs;
   focusState.elapsedMs = 0;
   focusState.goalDoneInLock = false;
+  focusState._beepedAtZero = false;
+  focusState.inOvertime = false;
+  focusState.isBreakPhase = false;
   _focusUpdateButtons();
   _focusUpdateDisplay();
 }
@@ -6447,8 +6490,8 @@ function _focusFinishSession(manualStop) {
     const segMs = Date.now() - focusState.startTimestamp;
     if (focusState.mode === 'timer') {
       focusState.remainingMs -= segMs;
+      totalElapsedMs = focusState.durationMs - focusState.remainingMs; // computed before clamp captures overtime
       if (focusState.remainingMs < 0) focusState.remainingMs = 0;
-      totalElapsedMs = focusState.durationMs - focusState.remainingMs;
     } else {
       focusState.elapsedMs += segMs;
       totalElapsedMs = focusState.elapsedMs;
@@ -6460,13 +6503,15 @@ function _focusFinishSession(manualStop) {
   }
   _focusStopInterval();
   focusState.running = false;
+  focusState.isBreakPhase = false;
+  _focusHideBreakBanner();
   if (focusState.lockMode || focusState.mode === 'stopwatch') { try { focusFsExit(); } catch(e) {} }
 
   // If lock mode + selected goal + goal was marked done during this session
   // → permanently lock the goal everywhere.
   if (focusState.lockMode && focusState.goalDoneInLock) {
     _focusLockGoalPermanent();
-  } else if (focusState.selectedKey && focusState.selectedText) {
+  } else if (focusState.selectedGoals.length > 0) {
     // Even outside lock mode: if the user marked goal done during the session,
     // ensure the goal is recorded as done (without permanent lock).
     const sel = _focusGetSelectedGoal();
@@ -6477,31 +6522,25 @@ function _focusFinishSession(manualStop) {
 
   // Add to history
   if (totalElapsedMs >= 5000) {
+    const goalText = focusState.selectedGoals.length === 0
+      ? '(no goal)'
+      : focusState.selectedGoals.map(sg => sg.text).join(', ');
     focusState.history.unshift({
       time: _focusFmtTime(totalElapsedMs),
-      text: focusState.selectedText || '(no goal)',
+      text: goalText,
       mode: focusState.mode,
       ts: Date.now()
     });
     if (focusState.history.length > 20) focusState.history.length = 20;
     _focusPersist();
-
-    // ── Log to daily study tracker ──
-    _slAddSession(_slTodayKey(), {
-      label:    focusState.selectedText || '(no goal)',
-      ms:       totalElapsedMs,
-      isManual: false,
-      ts:       Date.now(),
-      mode:     focusState.mode
-    });
-    _focusRenderDailyTracker();
-    _focusRenderDailySessionList();
   }
 
   // Reset display values for the next run
   focusState.remainingMs = focusState.durationMs;
   focusState.elapsedMs = 0;
   focusState.goalDoneInLock = false;
+  focusState._beepedAtZero = false;
+  focusState.inOvertime = false;
 
   _focusUpdateButtons();
   _focusUpdateDisplay();
@@ -6510,33 +6549,32 @@ function _focusFinishSession(manualStop) {
 }
 
 function _focusLockGoalPermanent() {
-  if (!focusState.selectedKey || !focusState.selectedText) return;
-  const data = calLoad(focusState.selectedKey);
-  if (!data.goals) return;
-  let mutated = false;
-  data.goals.forEach(g => {
-    if (g.text === focusState.selectedText) {
-      g.done = true;
-      g.lockedDone = true;
-      g.lockedAt = new Date().toISOString();
-      mutated = true;
-    }
+  if (focusState.selectedGoals.length === 0) return;
+  const byKey = {};
+  focusState.selectedGoals.forEach(sg => {
+    if (!byKey[sg.key]) byKey[sg.key] = [];
+    byKey[sg.key].push(sg);
   });
-  if (data.days) {
-    Object.values(data.days).forEach(dayData => {
-      (dayData.goals || []).forEach(g => {
-        if (g.text === focusState.selectedText) {
-          g.done = true;
-          g.lockedDone = true;
-          if (!g.doneDate) g.doneDate = new Date().toISOString().slice(0,10);
-          mutated = true;
-        }
+  let anyMutated = false;
+  Object.entries(byKey).forEach(([key, sgs]) => {
+    const data = calLoad(key);
+    if (!data.goals) return;
+    sgs.forEach(sg => {
+      data.goals.forEach(g => {
+        if (g.text === sg.text) { g.done = true; g.lockedDone = true; g.lockedAt = new Date().toISOString(); anyMutated = true; }
       });
+      if (data.days) {
+        Object.values(data.days).forEach(dayData => {
+          (dayData.goals || []).forEach(g => {
+            if (g.text === sg.text) { g.done = true; g.lockedDone = true; if (!g.doneDate) g.doneDate = localDateStr(new Date()); anyMutated = true; }
+          });
+        });
+      }
     });
-  }
-  if (mutated) {
-    calSave(focusState.selectedKey, data);
-    _calShowToast('🔒 Goal permanently locked as done.');
+    calSave(key, data);
+  });
+  if (anyMutated) {
+    _calShowToast('🔒 Goal(s) permanently locked as done.');
     if (typeof updateStreakBadge === 'function') updateStreakBadge();
   }
 }
@@ -6612,6 +6650,26 @@ function _focusStopInterval() {
 
     var awayMs = Date.now() - stamp;
 
+    // 1-minute grace-period reset only applies in lock mode (and not during break phases)
+    if (!focusState.lockMode || focusState.isBreakPhase) {
+      // Adjust time for the period we were away
+      if (focusState.mode === 'timer') {
+        focusState.remainingMs = Math.max(0, focusState.remainingMs - awayMs);
+        // If we were in a break phase and it expired while away → advance now
+        if (focusState.isBreakPhase && focusState.pomoIdx !== -1 && focusState.remainingMs <= 0 && !focusState._beepedAtZero) {
+          focusState._beepedAtZero = true;
+          focusState.startTimestamp = Date.now();
+          _focusAdvancePomoPhase();
+          return;
+        }
+      } else {
+        focusState.elapsedMs += awayMs;
+      }
+      focusState.startTimestamp = Date.now();
+      _focusUpdateDisplay();
+      return;
+    }
+
     if (awayMs >= GRACE_MS) {
       _focusStopInterval();
       focusState.running = false;
@@ -6654,9 +6712,18 @@ function _focusTick() {
     const liveRemaining = focusState.remainingMs - segMs;
     const el = document.getElementById('focus-time-display');
     if (el) {
-      el.textContent = _focusFmtTime(liveRemaining);
-      el.classList.toggle('warning', liveRemaining <= 60_000 && liveRemaining > 0);
+      el.textContent = _focusFmtTime(Math.max(0, liveRemaining));
+      el.classList.toggle('warning', liveRemaining <= 60_000 && liveRemaining > 0 && !focusState.isBreakPhase);
       el.classList.toggle('done', liveRemaining <= 0);
+    }
+    // Update break overlay timer + progress bar
+    if (focusState.isBreakPhase) {
+      const bt  = document.getElementById('break-ov-timer');
+      const bt2 = document.getElementById('focus-break-timer'); // legacy
+      const disp = _focusFmtTime(Math.max(0, liveRemaining));
+      if (bt)  bt.textContent  = disp;
+      if (bt2) bt2.textContent = disp;
+      _focusBreakUpdateBar(Math.max(0, liveRemaining), focusState.durationMs);
     }
     // Update fullscreen overlay timer
     const fsEl = document.getElementById('focus-fs-timer');
@@ -6664,30 +6731,26 @@ function _focusTick() {
       fsEl.textContent = _focusFmtTime(Math.max(0, liveRemaining));
     }
     if (liveRemaining <= 0) {
-      // Timer ran out
-      focusState.remainingMs = 0;
-      // Try to play a beep
-      try { _focusBeep(); } catch(e) {}
-      // If lock mode + goal not yet marked done, just hold at 00:00 and keep "running" state
-      if (focusState.lockMode && !focusState.goalDoneInLock && focusState.selectedKey) {
-        focusState.running = false;
-        _focusStopInterval();
-        _focusUpdateButtons();
-        _calShowToast('⏰ Time\'s up! Mark your goal as done to release lock mode.');
-        return;
+      if (!focusState._beepedAtZero) {
+        focusState._beepedAtZero = true;
+        // Auto-advance pomodoro sequence
+        if (focusState.pomoIdx !== -1) {
+          focusState.remainingMs = 0;
+          _focusAdvancePomoPhase();
+        } else {
+          // Non-pomo: regular overtime behaviour
+          focusState.inOvertime = true;
+          try { _focusBeep(); } catch(e) {}
+          _calShowToast('⏰ Time\'s up! Mark your goal as done or stop the session.');
+          _focusUpdateButtons();
+        }
       }
-      // Check if pomodoro sequence should advance
-      if (focusState.lockMode && focusState.pomoIdx >= 0) {
-        _focusAdvancePomoPhase();
-        return;
-      }
-      _focusFinishSession(false);
+      if (focusState.pomoIdx === -1) return; // stay in overtime for non-pomo
     }
   } else {
     const liveElapsed = focusState.elapsedMs + segMs;
     const el = document.getElementById('focus-time-display');
     if (el) el.textContent = _focusFmtTime(liveElapsed);
-    // Update fullscreen overlay for stopwatch
     const fsEl = document.getElementById('focus-fs-timer');
     if (fsEl && document.getElementById('focus-fs-overlay')?.classList.contains('visible')) {
       fsEl.textContent = _focusFmtTime(liveElapsed);
@@ -6709,6 +6772,80 @@ function _focusBeep() {
     o.start(); o.stop(ctx.currentTime + 0.6);
     setTimeout(() => ctx.close(), 800);
   } catch(e) {}
+}
+
+// Pleasant 3-tone chime for break-end / phase transitions
+function _focusChime(isBreakEnd) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = isBreakEnd
+      ? [523, 659, 784]   // C-E-G ascending → "study time!"
+      : [784, 659, 523];  // G-E-C descending → "relax now"
+    notes.forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      o.connect(g); g.connect(ctx.destination);
+      const t = ctx.currentTime + i * 0.18;
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      o.start(t); o.stop(t + 0.5);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch(e) {}
+}
+
+function _focusSendNotification(title, body) {
+  try {
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📚</text></svg>' });
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(p => {
+          if (p === 'granted') new Notification(title, { body });
+        });
+      }
+    }
+  } catch(e) {}
+}
+
+function _focusShowBreakBanner(breakLabel, nextLabel, totalMs) {
+  // Show full-screen break overlay
+  const ov       = document.getElementById('focus-break-overlay');
+  const nameEl   = document.getElementById('break-ov-phase-name');
+  const nextEl   = document.getElementById('break-ov-next');
+  const timerEl  = document.getElementById('break-ov-timer');
+  if (ov)     ov.classList.add('visible');
+  if (nameEl) nameEl.textContent = breakLabel || 'Break';
+  if (nextEl) nextEl.textContent = nextLabel ? 'Up next: ' + nextLabel : '';
+  if (timerEl) timerEl.textContent = _focusFmtTime(totalMs || 0);
+  _focusBreakUpdateBar(totalMs, totalMs);
+  // Legacy banner stays hidden
+  const banner = document.getElementById('focus-break-banner');
+  if (banner) banner.classList.remove('visible');
+}
+
+function _focusHideBreakBanner() {
+  const ov = document.getElementById('focus-break-overlay');
+  if (ov) ov.classList.remove('visible');
+  const banner = document.getElementById('focus-break-banner');
+  if (banner) banner.classList.remove('visible');
+}
+
+function _focusBreakUpdateBar(remainingMs, totalMs) {
+  const bar = document.getElementById('break-ov-bar');
+  if (!bar || !totalMs) return;
+  bar.style.width = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100)) + '%';
+}
+
+function focusBreakSkip() {
+  // Skip the rest of the break and go to next phase
+  if (!focusState.isBreakPhase) return;
+  focusState.remainingMs = 0;
+  focusState._beepedAtZero = false; // allow advance to fire
+  _focusAdvancePomoPhase();
 }
 
 function _focusUpdateButtons() {
@@ -6738,17 +6875,23 @@ function _focusUpdateButtons() {
   modeBtns.forEach(b => b.disabled = focusState.running);
   if (goalTrigger) goalTrigger.classList.toggle('disabled-trigger', focusState.running);
 
-  // Mark-done button enabled if a goal is selected, lock mode is on, and timer is running
-  const sel = _focusGetSelectedGoal();
-  const canMark = !!(sel && focusState.lockMode && focusState.running && !sel.goal.done);
+  // Mark-done button: enabled if any selected goal is not yet done, AND (lock mode OR in overtime) AND timer running
+  const anyUndone = focusState.selectedGoals.some(sg => {
+    const d = calLoad(sg.key);
+    const g = d.goals?.[sg.idx];
+    return g && !g.done;
+  });
+  const canMark = !!(focusState.selectedGoals.length > 0 && (focusState.lockMode || focusState.inOvertime) && focusState.running && anyUndone);
   markBtn.disabled = !canMark;
+
+  const sel = focusState.selectedGoals.length > 0 ? { goal: { done: !anyUndone } } : null;
 
   lockWarn.style.display = lockBlock ? '' : 'none';
 
   // Fullscreen overlay: stop button (always shown in fs), mark-done button (only in lock mode with goal)
   const fsFsMarkBtn = document.getElementById('focus-fs-mark-done-btn');
   const fsFsStopBtn = document.getElementById('focus-fs-stop-btn');
-  if (fsFsMarkBtn) fsFsMarkBtn.classList.toggle('visible', !!(focusState.lockMode && sel && focusState.running && !sel.goal.done));
+  if (fsFsMarkBtn) fsFsMarkBtn.classList.toggle('visible', !!((focusState.lockMode || focusState.inOvertime) && sel && focusState.running && !sel.goal.done));
   // Stop button in overlay: for stopwatch always; for timer only when not lockBlocked
   if (fsFsStopBtn) fsFsStopBtn.style.display = (isStopwatch || !lockBlock) ? '' : 'none';
 }
@@ -6816,6 +6959,334 @@ const POMO_SEQUENCES = [
   ]}
 ];
 
+// Custom pomodoro sequences (array, persisted in localStorage)
+let _customPomoSeqs = [];
+let _hiddenPresets  = [];          // indices of built-in presets the user deleted
+let _pomoEditingId  = null;        // id of the custom being edited (null = new)
+
+(function _loadPomoStorage() {
+  try {
+    const seqs = localStorage.getItem('pomo_custom_seqs');
+    if (seqs) _customPomoSeqs = JSON.parse(seqs);
+    // migrate old single-custom format
+    else {
+      const old = localStorage.getItem('pomo_custom_seq');
+      if (old) { const o = JSON.parse(old); o.id = 'c0'; _customPomoSeqs = [o]; _savePomoSeqs(); }
+    }
+  } catch(e) {}
+  try {
+    const hp = localStorage.getItem('pomo_hidden_presets');
+    if (hp) _hiddenPresets = JSON.parse(hp);
+  } catch(e) {}
+  _pomoRenderGrid();
+})();
+
+function _savePomoSeqs() {
+  try { localStorage.setItem('pomo_custom_seqs', JSON.stringify(_customPomoSeqs)); } catch(e) {}
+}
+function _saveHiddenPresets() {
+  try { localStorage.setItem('pomo_hidden_presets', JSON.stringify(_hiddenPresets)); } catch(e) {}
+}
+
+function _pomoGetSeq(idx) {
+  if (typeof idx === 'string' && idx.startsWith('c')) {
+    return _customPomoSeqs.find(s => s.id === idx) || null;
+  }
+  if (typeof idx === 'number' && idx >= 0) return POMO_SEQUENCES[idx];
+  return null;
+}
+
+function _pomoRenderGrid() {
+  const grid = document.getElementById('pomo-preset-grid');
+  if (!grid) return;
+  const selIdx = focusState.pomoIdx;
+  const isRunning = focusState.running;
+
+  let html = '';
+
+  // Built-in presets (deletable)
+  POMO_SEQUENCES.forEach((seq, i) => {
+    if (_hiddenPresets.includes(i)) return;
+    const isActive  = selIdx === i;
+    const isRun     = isRunning && isActive;
+    const steps     = seq.steps.map(s => s.mins + 'm ' + (s.isBreak ? 'break' : 'study')).join(' → ');
+    html += `<div class="focus-pomo-wrap">
+      <button class="focus-pomo-btn${isActive?' active':''}${isRun?' running':''}" onclick="focusPomoSelect(${i})">
+        <div class="focus-pomo-name">${escHtml(seq.name)}</div>
+        <div class="focus-pomo-steps">${escHtml(steps)}</div>
+      </button>
+      <button class="pomo-del-btn" title="Remove preset" onclick="focusPomoDeletePreset(${i})">✕</button>
+    </div>`;
+  });
+
+  // Custom sequences
+  _customPomoSeqs.forEach(seq => {
+    const isActive = selIdx === seq.id;
+    const isRun    = isRunning && isActive;
+    const steps    = seq.steps.map(s => s.mins + 'm ' + (s.isBreak ? 'break' : 'study')).join(' → ');
+    html += `<div class="focus-pomo-wrap">
+      <button class="focus-pomo-btn${isActive?' active':''}${isRun?' running':''}" onclick="focusPomoSelect('${seq.id}')">
+        <div class="focus-pomo-name">⭐ ${escHtml(seq.name)}</div>
+        <div class="focus-pomo-steps">${escHtml(steps)}</div>
+      </button>
+      <button class="pomo-del-btn" title="Delete custom" onclick="focusPomoDeleteCustom('${seq.id}')">✕</button>
+    </div>`;
+  });
+
+  // No sequence
+  const noneActive = selIdx === -1;
+  html += `<button class="focus-pomo-btn${noneActive?' active':''}" onclick="focusPomoSelect(-1)">
+    <div class="focus-pomo-name">No sequence</div>
+    <div class="focus-pomo-steps">Use the duration set above</div>
+  </button>`;
+
+  // New custom button
+  html += `<button class="focus-pomo-btn" onclick="focusPomoOpenBuilder(null)" style="border-style:dashed;color:var(--accent);border-color:rgba(99,102,241,0.4);">
+    <div class="focus-pomo-name">✏️ New Custom Timer</div>
+    <div class="focus-pomo-steps">Build your own sequence</div>
+  </button>`;
+
+  // Restore row (only when some presets are hidden)
+  if (_hiddenPresets.length > 0) {
+    html += `<div class="pomo-restore-row"><button class="pomo-restore-btn" onclick="focusPomoRestorePresets()">↺ Restore deleted presets</button></div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function focusPomoDeletePreset(i) {
+  if (!_hiddenPresets.includes(i)) { _hiddenPresets.push(i); _saveHiddenPresets(); }
+  if (focusState.pomoIdx === i) focusPomoSelect(-1);
+  _pomoRenderGrid();
+  _calShowToast('Preset removed. Use "Restore" to bring it back.');
+}
+
+function focusPomoRestorePresets() {
+  _hiddenPresets = []; _saveHiddenPresets();
+  _pomoRenderGrid();
+  _calShowToast('All presets restored.');
+}
+
+function focusPomoDeleteCustom(id) {
+  _customPomoSeqs = _customPomoSeqs.filter(s => s.id !== id);
+  _savePomoSeqs();
+  if (focusState.pomoIdx === id) focusPomoSelect(-1);
+  _pomoRenderGrid();
+  _calShowToast('Custom sequence deleted.');
+}
+
+// ── Builder state ──
+let _pomoBuilderPhases = [];
+
+function focusPomoOpenBuilder(editId) {
+  if (focusState.running) { _calShowToast('Stop the session first.'); return; }
+  _pomoEditingId = editId || null;
+  const titleEl = document.getElementById('pomo-builder-title');
+  if (_pomoEditingId) {
+    // Edit existing custom
+    const existing = _customPomoSeqs.find(s => s.id === _pomoEditingId);
+    if (existing) {
+      _pomoBuilderPhases = existing.steps.map(s => ({ ...s }));
+      document.getElementById('pomo-custom-name-input').value = existing.name || '';
+      if (titleEl) titleEl.textContent = 'Edit Custom Sequence';
+    }
+  } else {
+    // New custom
+    _pomoBuilderPhases = [
+      { label: 'Study', mins: 25, isBreak: false },
+      { label: 'Break', mins: 5,  isBreak: true  },
+      { label: 'Study', mins: 25, isBreak: false }
+    ];
+    document.getElementById('pomo-custom-name-input').value = '';
+    if (titleEl) titleEl.textContent = 'New Custom Sequence';
+  }
+  document.getElementById('pomo-custom-builder').style.display = '';
+  document.getElementById('pomo-preset-grid').style.display = 'none';
+  _pomoRenderBuilderPhases();
+}
+
+function focusPomoCloseBuilder() {
+  document.getElementById('pomo-custom-builder').style.display = 'none';
+  document.getElementById('pomo-preset-grid').style.display = '';
+}
+
+function focusPomoAddPhase() {
+  _pomoBuilderPhases.push({ label: 'Study', mins: 25, isBreak: false });
+  _pomoRenderBuilderPhases();
+}
+
+function _pomoRenderBuilderPhases() {
+  const container = document.getElementById('pomo-custom-phases');
+  if (!container) return;
+
+  const weekKey = calWeekKey(0);
+  const weekData = calLoad(weekKey);
+  const goals = weekData.goals || [];
+
+  container.innerHTML = _pomoBuilderPhases.map((p, i) => {
+    const isLast  = i === _pomoBuilderPhases.length - 1;
+    const isFirst = i === 0;
+    const typeClass = p.isBreak ? 'phase-break' : '';
+
+    // Build goal trigger label
+    let goalTriggerText = 'No goal linked';
+    let hasGoal = false;
+    if (p.goalKey) {
+      const [gKey, gIdx] = p.goalKey.split('|');
+      const gData = calLoad(gKey);
+      const g = gData.goals?.[parseInt(gIdx)];
+      if (g) { goalTriggerText = g.text.length > 42 ? g.text.slice(0,42)+'…' : g.text; hasGoal = true; }
+    }
+
+    // Build goal dropdown items
+    const goalItems = goals.length === 0
+      ? '<div style="padding:12px;text-align:center;font-size:0.74rem;color:var(--text-3)">No goals added this week</div>'
+      : goals.map((g, gi) => {
+          const val = weekKey + '|' + gi;
+          const sel = p.goalKey === val;
+          const label = g.text.length > 46 ? g.text.slice(0,46)+'…' : g.text;
+          return `<div class="pomo-goal-item${sel?' selected':''}" onclick="_pomoPhaseGoalSelect(${i},'${val}',event)">
+            <div class="pomo-goal-item-check">${sel?'✓':''}</div>
+            <span class="pomo-goal-item-text" title="${escHtml(g.text)}">${escHtml(label)}</span>
+          </div>`;
+        }).join('');
+
+    const goalRow = p.isBreak ? '' : `
+      <div class="pomo-goal-sep">
+        <span class="pomo-goal-label">🎯 Linked Week Goal</span>
+        <div class="pomo-goal-picker">
+          <button class="pomo-goal-trigger${hasGoal?' has-goal':''}" id="pomo-goal-trigger-${i}" onclick="_pomoPhaseGoalToggle(${i},event)" type="button">
+            <span class="pomo-goal-trigger-icon">${hasGoal?'✓':'◯'}</span>
+            <span class="pomo-goal-trigger-text" style="color:${hasGoal?'var(--text)':'var(--text-3)'}">${escHtml(goalTriggerText)}</span>
+            <span class="pomo-goal-trigger-arrow">▾</span>
+          </button>
+          <div class="pomo-goal-dropdown" id="pomo-goal-dd-${i}">
+            <div class="pomo-goal-list">
+              <div class="pomo-goal-none-item" onclick="_pomoPhaseGoalSelect(${i},'',event)">
+                <span style="font-size:0.8rem">✕</span> No goal linked
+              </div>
+              ${goalItems}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    return `<div class="pomo-phase-card ${typeClass}">
+      <div class="pomo-phase-header">
+        <div class="pomo-phase-num">${i+1}</div>
+        <input class="pomo-phase-name-input" type="text" value="${escHtml(p.label)}" maxlength="20" placeholder="Phase name"
+          oninput="_pomoBuilderPhases[${i}].label=this.value">
+        <div class="pomo-phase-dur-wrap">
+          <input class="pomo-phase-dur-input" type="number" value="${p.mins}" min="1" max="300"
+            oninput="_pomoBuilderPhases[${i}].mins=Math.max(1,parseInt(this.value)||1)">
+          <span style="font-size:0.68rem;color:var(--text-3);">m</span>
+        </div>
+        <div class="pomo-phase-type-toggle">
+          <button class="pomo-phase-type-btn${!p.isBreak?' active-study':''}" onclick="_pomoPhaseTypeChange(${i},'study')" type="button">📚</button>
+          <button class="pomo-phase-type-btn${p.isBreak?' active-break':''}" onclick="_pomoPhaseTypeChange(${i},'break')" type="button">☕</button>
+        </div>
+        <div class="pomo-phase-actions">
+          <button class="pomo-phase-action-btn" onclick="_pomoBuilderMoveUp(${i})" ${isFirst?'disabled':''} title="Move up" type="button">↑</button>
+          <button class="pomo-phase-action-btn" onclick="_pomoBuilderMoveDown(${i})" ${isLast?'disabled':''} title="Move down" type="button">↓</button>
+          <button class="pomo-phase-action-btn btn-delete" onclick="_pomoBuilderDeletePhase(${i})" title="Remove phase" type="button">✕</button>
+        </div>
+      </div>
+      ${goalRow}
+    </div>`;
+  }).join('');
+}
+
+function _pomoPhaseGoalToggle(i, event) {
+  event.stopPropagation();
+  const dropdown = document.getElementById('pomo-goal-dd-' + i);
+  const trigger  = document.getElementById('pomo-goal-trigger-' + i);
+  if (!dropdown || !trigger) return;
+  const isOpen = dropdown.classList.contains('open');
+  // Close all other open pomo goal dropdowns first
+  document.querySelectorAll('.pomo-goal-dropdown.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.pomo-goal-trigger.open').forEach(t => t.classList.remove('open'));
+  if (!isOpen) {
+    dropdown.classList.add('open');
+    trigger.classList.add('open');
+  }
+}
+
+function _pomoPhaseGoalSelect(i, val, event) {
+  event.stopPropagation();
+  _pomoBuilderPhases[i].goalKey = val;
+  document.querySelectorAll('.pomo-goal-dropdown.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.pomo-goal-trigger.open').forEach(t => t.classList.remove('open'));
+  _pomoRenderBuilderPhases();
+}
+
+// Collect ALL unique goals from every phase in a sequence and set them in selectedGoals
+function _focusSetPomoGoals(seq) {
+  if (!seq || !seq.steps) return;
+  const allGoals = [];
+  const seen = new Set();
+  seq.steps.forEach(step => {
+    if (!step.goalKey || seen.has(step.goalKey)) return;
+    seen.add(step.goalKey);
+    const [key, idxStr] = step.goalKey.split('|');
+    const idx = parseInt(idxStr, 10);
+    const data = calLoad(key);
+    if (data.goals?.[idx]) allGoals.push({ key, idx, text: data.goals[idx].text });
+  });
+  if (allGoals.length === 0) return;
+  focusState.selectedGoals = allGoals;
+  const first = allGoals[0];
+  focusState.selectedKey  = first.key;
+  focusState.selectedIdx  = first.idx;
+  focusState.selectedText = first.text;
+  _focusRenderSelectedGoalCard();
+  _focusRenderGoalDropdown();
+  _focusUpdateButtons();
+}
+
+function _pomoPhaseTypeChange(i, val) {
+  _pomoBuilderPhases[i].isBreak = val === 'break';
+  // Clear goal link if switching to break
+  if (_pomoBuilderPhases[i].isBreak) _pomoBuilderPhases[i].goalKey = '';
+  _pomoRenderBuilderPhases();
+}
+
+function _pomoBuilderMoveUp(i) {
+  if (i === 0) return;
+  [_pomoBuilderPhases[i-1], _pomoBuilderPhases[i]] = [_pomoBuilderPhases[i], _pomoBuilderPhases[i-1]];
+  _pomoRenderBuilderPhases();
+}
+function _pomoBuilderMoveDown(i) {
+  if (i >= _pomoBuilderPhases.length - 1) return;
+  [_pomoBuilderPhases[i], _pomoBuilderPhases[i+1]] = [_pomoBuilderPhases[i+1], _pomoBuilderPhases[i]];
+  _pomoRenderBuilderPhases();
+}
+function _pomoBuilderDeletePhase(i) {
+  _pomoBuilderPhases.splice(i, 1);
+  _pomoRenderBuilderPhases();
+}
+
+function focusPomoSaveCustom() {
+  if (_pomoBuilderPhases.length === 0) { _calShowToast('Add at least one phase.'); return; }
+  const name  = (document.getElementById('pomo-custom-name-input').value.trim()) || 'My Custom';
+  const steps = _pomoBuilderPhases.map(p => ({ ...p, mins: Math.max(1, parseInt(p.mins) || 1) }));
+  if (_pomoEditingId) {
+    // Update existing
+    const idx = _customPomoSeqs.findIndex(s => s.id === _pomoEditingId);
+    if (idx !== -1) _customPomoSeqs[idx] = { id: _pomoEditingId, name, steps };
+    _savePomoSeqs();
+    focusPomoCloseBuilder();
+    focusPomoSelect(_pomoEditingId);
+  } else {
+    // Create new with unique id
+    const id = 'c' + Date.now();
+    _customPomoSeqs.push({ id, name, steps });
+    _savePomoSeqs();
+    focusPomoCloseBuilder();
+    focusPomoSelect(id);
+  }
+  _calShowToast('✓ Sequence saved & selected!');
+}
+
 // -1 = no sequence, 0-3 = index into POMO_SEQUENCES
 // pomodoro phase index within the sequence
 if (focusState.pomoIdx === undefined) focusState.pomoIdx = -1;
@@ -6823,7 +7294,6 @@ if (!focusState.pomoPhase) focusState.pomoPhase = 0;
 if (!focusState.subTab) focusState.subTab = 'timer';
 
 function focusPomoSelect(idx) {
-  // Switch to pomo tab if not already
   if (focusState.subTab !== 'pomo') focusSubTab('pomo');
   if (focusState.running) {
     _calShowToast('Stop the session before changing the sequence.');
@@ -6831,18 +7301,14 @@ function focusPomoSelect(idx) {
   }
   focusState.pomoIdx = idx;
   focusState.pomoPhase = 0;
-  // Update button styles
-  document.querySelectorAll('.focus-pomo-btn').forEach((b, i) => {
-    b.classList.remove('active', 'running');
-  });
-  const btnId = idx === -1 ? 'pomo-none' : 'pomo-' + idx;
-  const btn = document.getElementById(btnId);
-  if (btn) btn.classList.add('active');
+  // Re-render grid to reflect new active state
+  _pomoRenderGrid();
   // Update timer duration to first phase
-  if (idx >= 0) {
-    const seq = POMO_SEQUENCES[idx];
-    const step = seq.steps[0];
-    focusSetDuration(step.mins);
+  const seq = _pomoGetSeq(idx);
+  if (seq && seq.steps.length > 0) {
+    focusSetDuration(seq.steps[0].mins);
+    // Auto-select ALL phase goals so they all appear in the linked week goal section
+    _focusSetPomoGoals(seq);
     _focusUpdatePomoPhaseInfo();
   } else {
     _focusHidePomoPhaseInfo();
@@ -6850,44 +7316,91 @@ function focusPomoSelect(idx) {
 }
 
 function _focusAdvancePomoPhase() {
-  if (focusState.pomoIdx < 0) return;
-  const seq = POMO_SEQUENCES[focusState.pomoIdx];
+  if (focusState.pomoIdx === -1) return;
+  const seq = _pomoGetSeq(focusState.pomoIdx);
+  if (!seq) return;
+
+  const prevStep = seq.steps[focusState.pomoPhase];
   focusState.pomoPhase++;
+
   if (focusState.pomoPhase >= seq.steps.length) {
-    // Sequence done - toast and reset
-    _calShowToast('\uD83C\uDF89 Pomodoro sequence complete! Great work.');
+    // Sequence complete
+    focusState.isBreakPhase = false;
+    _focusHideBreakBanner();
+    _calShowToast('🎉 Pomodoro sequence complete! Great work.');
+    _focusRenderGrid && _focusRenderGrid();
+    _pomoRenderGrid();
     focusState.pomoPhase = 0;
     focusState.pomoIdx = -1;
-    document.querySelectorAll('.focus-pomo-btn').forEach(b => b.classList.remove('active','running'));
-    const noneBtn = document.getElementById('pomo-none');
-    if (noneBtn) noneBtn.classList.add('active');
     _focusHidePomoPhaseInfo();
+    _focusChime(false);
+    _focusSendNotification('🎉 Session Complete!', 'You finished the full pomodoro sequence. Amazing work!');
     focusStop();
     return;
   }
+
   const step = seq.steps[focusState.pomoPhase];
-  // reset timer to new phase duration
+  const nextStep = seq.steps[focusState.pomoPhase + 1];
+
+  // Commit new phase timing
   focusState.remainingMs = step.mins * 60 * 1000;
   focusState.durationMs  = focusState.remainingMs;
-  focusState.running = true;
   focusState.startTimestamp = Date.now();
+  focusState._beepedAtZero = false;
+  focusState.inOvertime = false;
+  focusState.isBreakPhase = !!step.isBreak;
+
+  if (step.isBreak) {
+    // ── Entering break ──
+    // Exit lock overlay if showing
+    if (document.getElementById('focus-fs-overlay')?.classList.contains('visible')) {
+      focusFsExit();
+    }
+    const nextLabel = nextStep ? nextStep.label + ' (' + nextStep.mins + 'm)' : null;
+    _focusShowBreakBanner(step.label, nextLabel, step.mins * 60 * 1000);
+    _focusChime(false); // descending = relax
+    _focusSendNotification('☕ Break Time! ' + step.mins + ' min', (prevStep ? prevStep.label + ' complete. ' : '') + 'Relax — next phase starts automatically.');
+    _calShowToast('☕ Break: ' + step.mins + ' min — kick back!');
+    // Pre-request notification permission so break-end notification fires reliably
+    try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch(e) {}
+  } else {
+    // ── Entering study ──
+    _focusHideBreakBanner();
+    if (focusState.lockMode) {
+      focusFsEnter();
+    }
+    _focusChime(true); // ascending = focus up
+    _focusSendNotification('📚 Back to Study! ' + step.mins + ' min', step.label + ' — let\'s go!');
+    _calShowToast('📚 Study: ' + step.mins + ' min — ' + step.label);
+  }
+
+  // Restart interval if not already running
+  if (!focusState.running) focusState.running = true;
+  _focusStopInterval();
   _focusStartInterval();
   _focusUpdateButtons();
   _focusUpdateDisplay();
   _focusUpdatePomoPhaseInfo();
-  if (focusState.lockMode) { _focusFsUpdatePhase(); }
-  _calShowToast((step.isBreak ? '\u23F8\uFE0F Break: ' : '\uD83D\uDCDA Study: ') + step.mins + ' minutes');
+  if (!step.isBreak && focusState.lockMode) _focusFsUpdatePhase();
 }
 
 function _focusUpdatePomoPhaseInfo() {
-  if (focusState.pomoIdx < 0) { _focusHidePomoPhaseInfo(); return; }
-  const seq = POMO_SEQUENCES[focusState.pomoIdx];
+  if (focusState.pomoIdx === -1) { _focusHidePomoPhaseInfo(); return; }
+  const seq = _pomoGetSeq(focusState.pomoIdx);
+  if (!seq) { _focusHidePomoPhaseInfo(); return; }
   const step = seq.steps[focusState.pomoPhase];
   const el = document.getElementById('focus-pomo-phase-info');
   const nameEl = document.getElementById('focus-pomo-phase-name');
   if (el && nameEl) {
     el.classList.add('visible');
-    nameEl.textContent = (step.isBreak ? '\u23F8\uFE0F ' : '\uD83D\uDCDA ') + step.label + ' — ' + step.mins + 'm (Phase ' + (focusState.pomoPhase + 1) + '/' + seq.steps.length + ')';
+    let phaseText = (step.isBreak ? '\u23F8\uFE0F ' : '\uD83D\uDCDA ') + step.label + ' — ' + step.mins + 'm (Phase ' + (focusState.pomoPhase + 1) + '/' + seq.steps.length + ')';
+    if (step.goalKey && !step.isBreak) {
+      const [gKey, gIdx] = step.goalKey.split('|');
+      const gData = calLoad(gKey);
+      const g = gData.goals?.[parseInt(gIdx)];
+      if (g) phaseText += ' · 🎯 ' + (g.text.length > 30 ? g.text.slice(0,30) + '…' : g.text);
+    }
+    nameEl.textContent = phaseText;
   }
 }
 
@@ -6949,8 +7462,8 @@ function _focusFsUpdatePhase() {
   // Phase label
   if (focusState.mode === 'stopwatch') {
     if (phaseEl) phaseEl.textContent = '⏱️ STOPWATCH';
-  } else if (focusState.pomoIdx >= 0) {
-    const seq = POMO_SEQUENCES[focusState.pomoIdx];
+  } else if (focusState.pomoIdx !== -1 && _pomoGetSeq(focusState.pomoIdx)) {
+    const seq = _pomoGetSeq(focusState.pomoIdx);
     const step = seq.steps[focusState.pomoPhase];
     if (phaseEl) phaseEl.textContent = (step.isBreak ? '\u23F8\uFE0F BREAK' : '\uD83D\uDCDA STUDY') + ' — Phase ' + (focusState.pomoPhase + 1) + ' of ' + seq.steps.length;
   } else {
@@ -6973,48 +7486,89 @@ function _fsClearCountdown() {
 function focusSelectGoal(val) {
   if (focusState.running) return;
   if (!val) {
-    focusState.selectedKey = null;
-    focusState.selectedIdx = null;
-    focusState.selectedText = null;
+    focusState.selectedGoals = [];
+    // legacy compat
+    focusState.selectedKey = null; focusState.selectedIdx = null; focusState.selectedText = null;
   } else {
     const [key, idxStr] = val.split('|');
     const idx = parseInt(idxStr, 10);
     const data = calLoad(key);
-    if (data.goals?.[idx]) {
-      focusState.selectedKey  = key;
-      focusState.selectedIdx  = idx;
-      focusState.selectedText = data.goals[idx].text;
+    if (!data.goals?.[idx]) return;
+    const text = data.goals[idx].text;
+    // Toggle: if already selected, remove; else add
+    const existing = focusState.selectedGoals.findIndex(g => g.key === key && g.idx === idx);
+    if (existing >= 0) {
+      focusState.selectedGoals.splice(existing, 1);
+    } else {
+      focusState.selectedGoals.push({ key, idx, text });
     }
+    // Update legacy fields to first selected goal (for lock-mode compat)
+    const first = focusState.selectedGoals[0] || null;
+    focusState.selectedKey  = first ? first.key  : null;
+    focusState.selectedIdx  = first ? first.idx  : null;
+    focusState.selectedText = first ? first.text : null;
   }
   _focusRenderSelectedGoalCard();
   _focusUpdateButtons();
 }
 
+// Internal: force-set a single goal for a pomodoro phase, works even while running
+function _focusAutoSelectGoal(val) {
+  if (!val) return;
+  const [key, idxStr] = val.split('|');
+  const idx = parseInt(idxStr, 10);
+  const data = calLoad(key);
+  if (!data.goals?.[idx]) return;
+  const text = data.goals[idx].text;
+  focusState.selectedGoals = [{ key, idx, text }];
+  focusState.selectedKey  = key;
+  focusState.selectedIdx  = idx;
+  focusState.selectedText = text;
+  _focusRenderSelectedGoalCard();
+  _focusRenderGoalDropdown(); // refresh dropdown so checkmark shows
+  _focusUpdateButtons();
+}
+
 function focusMarkGoalDone() {
-  const sel = _focusGetSelectedGoal();
-  if (!sel) return;
-  if (sel.goal.done) return;
-  // Mark the goal done in week + day data
-  sel.goal.done = true;
-  if (focusState.lockMode) {
-    sel.goal.lockedDone = true;
-    sel.goal.lockedAt = new Date().toISOString();
-  }
-  if (sel.data.days) {
-    Object.values(sel.data.days).forEach(dayData => {
-      (dayData.goals || []).forEach(g => {
-        if (g.text === focusState.selectedText) {
-          g.done = true;
-          if (focusState.lockMode) g.lockedDone = true;
-          if (!g.doneDate) g.doneDate = new Date().toISOString().slice(0,10);
-        }
-      });
+  if (focusState.selectedGoals.length === 0) return;
+  let anyMarked = false;
+  // Group by key to avoid multiple loads of same week data
+  const byKey = {};
+  focusState.selectedGoals.forEach(sg => {
+    if (!byKey[sg.key]) byKey[sg.key] = [];
+    byKey[sg.key].push(sg);
+  });
+  Object.entries(byKey).forEach(([key, sgs]) => {
+    const data = calLoad(key);
+    if (!data.goals) return;
+    sgs.forEach(sg => {
+      const g = data.goals[sg.idx];
+      if (!g || g.done) return;
+      g.done = true;
+      if (focusState.lockMode) { g.lockedDone = true; g.lockedAt = new Date().toISOString(); }
+      if (data.days) {
+        Object.values(data.days).forEach(dayData => {
+          (dayData.goals || []).forEach(dg => {
+            if (dg.text === sg.text) {
+              dg.done = true;
+              if (focusState.lockMode) dg.lockedDone = true;
+              if (!dg.doneDate) dg.doneDate = localDateStr(new Date());
+            }
+          });
+        });
+      }
+      anyMarked = true;
     });
+    calSave(key, data);
+  });
+  if (anyMarked) {
+    focusState.goalDoneInLock = true;
+    if (typeof updateStreakBadge === 'function') updateStreakBadge();
+    const msg = focusState.selectedGoals.length > 1
+      ? `✓ ${focusState.selectedGoals.length} goals marked done${focusState.lockMode ? ' — lock released' : ''}.`
+      : `✓ Goal marked done${focusState.lockMode ? ' — lock released. You can stop now.' : ''}`;
+    _calShowToast(focusState.lockMode ? msg : msg);
   }
-  calSave(focusState.selectedKey, sel.data);
-  focusState.goalDoneInLock = true;
-  if (typeof updateStreakBadge === 'function') updateStreakBadge();
-  _calShowToast(focusState.lockMode ? '✓ Goal marked done — lock released. You can stop now.' : '✓ Goal marked done.');
   _focusUpdateButtons();
   _focusRenderSelectedGoalCard();
 }
@@ -7022,24 +7576,26 @@ function focusMarkGoalDone() {
 function _focusRenderSelectedGoalCard() {
   const card = document.getElementById('focus-selected-goal');
   if (!card) return;
-  const sel = _focusGetSelectedGoal();
-  if (!sel) {
+  if (focusState.selectedGoals.length === 0) {
     card.style.display = 'none';
     return;
   }
   card.style.display = '';
-  document.getElementById('focus-selected-text').textContent = sel.goal.text;
-  const status = document.getElementById('focus-selected-status');
-  status.classList.remove('done', 'locked');
-  if (sel.goal.lockedDone) {
-    status.classList.add('locked');
-    status.textContent = '🔒 Permanently locked as done';
-  } else if (sel.goal.done) {
-    status.classList.add('done');
-    status.textContent = '✓ Marked done';
-  } else {
-    status.textContent = 'Not done yet';
-  }
+  const key = calWeekKey(0);
+  const data = calLoad(key);
+  const items = focusState.selectedGoals.map((sg, si) => {
+    const g = data.goals?.[sg.idx];
+    const text = (g && g.text === sg.text) ? g.text : sg.text;
+    let statusCls = '', statusTxt = '';
+    if (g?.lockedDone)    { statusCls = 'locked'; statusTxt = '🔒 Permanently locked'; }
+    else if (g?.done)     { statusCls = 'done';   statusTxt = '✓ Done'; }
+    else                  { statusTxt = 'Pending'; }
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;${si>0?'border-top:1px solid rgba(255,255,255,0.06)':''}">
+      <span style="flex:1;font-size:0.88rem;font-weight:600;color:var(--text);line-height:1.35">${escHtml(text)}</span>
+      <span class="focus-selected-status ${statusCls}" style="margin:0;font-size:0.7rem;white-space:nowrap">${statusTxt}</span>
+    </div>`;
+  }).join('');
+  card.innerHTML = `<div class="focus-selected-label">SELECTED GOALS (${focusState.selectedGoals.length})</div>${items}`;
 }
 
 function _focusRenderGoalDropdown() {
@@ -7057,17 +7613,17 @@ function _focusRenderGoalDropdown() {
 
   // Update trigger label
   if (triggerText) {
-    if (focusState.selectedKey && focusState.selectedIdx !== null) {
-      const d2 = calLoad(focusState.selectedKey);
-      const g  = d2.goals?.[focusState.selectedIdx];
-      if (g) {
-        const lbl = g.text.length > 50 ? g.text.slice(0,50) + '\u2026' : g.text;
-        triggerText.textContent = lbl;
-      } else {
-        triggerText.textContent = '\u2014 No goal selected \u2014';
-      }
+    const n = focusState.selectedGoals.length;
+    if (n === 0) {
+      triggerText.textContent = '— No goal selected —';
+    } else if (n === 1) {
+      const g0 = focusState.selectedGoals[0];
+      const d2 = calLoad(g0.key);
+      const g  = d2.goals?.[g0.idx];
+      const lbl = (g ? g.text : g0.text);
+      triggerText.textContent = lbl.length > 50 ? lbl.slice(0,50) + '\u2026' : lbl;
     } else {
-      triggerText.textContent = '\u2014 No goal selected \u2014';
+      triggerText.textContent = n + ' goals selected';
     }
   }
 
@@ -7077,15 +7633,15 @@ function _focusRenderGoalDropdown() {
   }
 
   const rows = [];
-  // "None" option
-  const noneSelected = !focusState.selectedKey;
+  // "Clear all" option
+  const noneSelected = focusState.selectedGoals.length === 0;
   rows.push(`<div class="focus-goal-none-opt${noneSelected?' selected':''}" onclick="focusGoalPickerSelect('')">
-    <span style="font-size:1rem;opacity:0.6">\u2715</span> No goal selected
+    <span style="font-size:1rem;opacity:0.6">\u2715</span> Clear selection
   </div>`);
 
   goals.forEach((g, i) => {
     const val = `${key}|${i}`;
-    const isSel = focusState.selectedKey === key && focusState.selectedIdx === i;
+    const isSel = focusState.selectedGoals.some(sg => sg.key === key && sg.idx === i);
     const locked = !!g.lockedDone;
     let statusHtml = '';
     let statusClass = '';
@@ -7102,12 +7658,11 @@ function _focusRenderGoalDropdown() {
     rows.push(`<div class="focus-goal-opt${isSel?' selected':''}${locked?' locked-opt':''}"
       onclick="${locked ? '' : `focusGoalPickerSelect('${val}')`}"
       title="${escHtml(g.text)}">
-      <div class="focus-goal-opt-num">${i + 1}</div>
+      <div class="focus-goal-opt-num" style="${isSel?'background:rgba(99,102,241,0.25);border-color:var(--accent);color:var(--accent)':''}">${isSel?'\u2713':(i+1)}</div>
       <div class="focus-goal-opt-body">
         <div class="focus-goal-opt-text">${escHtml(g.text)}</div>
         <div class="focus-goal-opt-status ${statusClass}">${statusHtml}</div>
       </div>
-      ${isSel ? '<div class="focus-goal-opt-check" style="color:var(--accent)">\u2713</div>' : ''}
     </div>`);
   });
 
@@ -7139,13 +7694,17 @@ function focusGoalPickerClose() {
 
 function focusGoalPickerSelect(val) {
   focusSelectGoal(val);
-  _focusRenderGoalDropdown();
-  focusGoalPickerClose();
+  _focusRenderGoalDropdown(); // re-render to show updated checkmarks, but stay open
 }
 
 document.addEventListener('click', function(e) {
   const picker = document.getElementById('focus-goal-picker');
   if (picker && !picker.contains(e.target)) focusGoalPickerClose();
+  // Close any open pomo phase goal dropdowns
+  if (!e.target.closest('.pomo-goal-picker')) {
+    document.querySelectorAll('.pomo-goal-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.pomo-goal-trigger.open').forEach(t => t.classList.remove('open'));
+  }
 });
 
 function _focusRenderHistory() {
@@ -7159,243 +7718,18 @@ function _focusRenderHistory() {
     <div class="focus-history-item">
       <span class="focus-history-time">${h.time}</span>
       <span class="focus-history-goal">${escHtml(h.text)}</span>
-      ${h.isManual ? '<span class="focus-history-tag">&#x1F4DD; offline</span>' : ''}
-      ${h.dateKey && h.dateKey !== _slTodayKey() ? `<span class="focus-history-date">${h.dateKey}</span>` : ''}
     </div>`).join('');
 }
 
-// ══════════════════════════════════════════
-//   DAILY STUDY LOG
-// ══════════════════════════════════════════
-const _SL_KEY   = 'study_log';
-const _GOAL_KEY = 'daily_goal_minutes';
-
-function _slTodayKey() {
-  const d = new Date();
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
-}
-
-function _slLoad() {
-  try { return JSON.parse(localStorage.getItem(_SL_KEY) || '{}'); } catch(e) { return {}; }
-}
-function _slSave(log) {
-  try { localStorage.setItem(_SL_KEY, JSON.stringify(log)); } catch(e) {}
-}
-function _slGetDay(dateKey) {
-  const log = _slLoad();
-  return log[dateKey] || { totalMs: 0, sessions: [] };
-}
-function _slAddSession(dateKey, session) {
-  const log = _slLoad();
-  if (!log[dateKey]) log[dateKey] = { totalMs: 0, sessions: [] };
-  log[dateKey].sessions.push(session);
-  log[dateKey].totalMs = (log[dateKey].totalMs || 0) + session.ms;
-  _slSave(log);
-}
-
-function _slGetGoalMinutes() {
-  try { return parseFloat(localStorage.getItem(_GOAL_KEY) || '0') || 0; } catch(e) { return 0; }
-}
-
-function saveDailyGoal(val) {
-  const v = parseFloat(val);
-  try {
-    if (v > 0) localStorage.setItem(_GOAL_KEY, String(Math.round(v * 60)));
-    else localStorage.removeItem(_GOAL_KEY);
-  } catch(e) {}
-  _focusRenderDailyTracker();
-}
-
-function _focusRenderDailyTracker() {
-  const todayKey = _slTodayKey();
-  const dayData  = _slGetDay(todayKey);
-  const totalMs  = dayData.totalMs || 0;
-  const totalMin = Math.floor(totalMs / 60000);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-
-  const timeEl = document.getElementById('focus-daily-time');
-  if (timeEl) {
-    timeEl.textContent = h + 'h ' + m + 'm';
-  }
-
-  // Goal input — only pre-fill once (don't clobber while user types)
-  const goalMin = _slGetGoalMinutes();
-  const goalInput = document.getElementById('focus-daily-goal-input');
-  if (goalInput && document.activeElement !== goalInput) {
-    goalInput.value = goalMin > 0 ? (goalMin / 60).toString() : '';
-  }
-
-  const progressWrap = document.getElementById('focus-daily-progress-wrap');
-  const progressFill = document.getElementById('focus-daily-progress-fill');
-  const progressText = document.getElementById('focus-daily-progress-text');
-  const celebration  = document.getElementById('focus-daily-celebration');
-
-  if (goalMin > 0) {
-    if (progressWrap) progressWrap.style.display = '';
-    const pct     = Math.min(100, Math.round((totalMin / goalMin) * 100));
-    const reached = pct >= 100;
-    if (progressFill) {
-      progressFill.style.width = pct + '%';
-      progressFill.style.background = reached
-        ? 'var(--green)'
-        : 'linear-gradient(90deg, var(--accent), var(--accent-2))';
-    }
-    if (progressText) {
-      const gH = Math.floor(goalMin / 60);
-      const gM = goalMin % 60;
-      const goalStr = gH > 0 ? (gH + 'h ' + (gM ? gM + 'm' : '')) : gM + 'm';
-      progressText.textContent = (h > 0 ? h + 'h ' : '') + m + 'm / ' + goalStr.trim() + ' (' + pct + '%)';
-      progressText.style.color = reached ? 'var(--green)' : 'var(--text-3)';
-    }
-    if (timeEl) timeEl.classList.toggle('goal-reached', reached);
-    if (celebration) celebration.classList.toggle('show', reached);
-  } else {
-    if (progressWrap)  progressWrap.style.display = 'none';
-    if (celebration)   celebration.classList.remove('show');
-    if (timeEl)        timeEl.classList.remove('goal-reached');
-  }
-
-  // Populate today's session breakdown list
-  const todayList = document.getElementById('focus-today-sessions');
-  if (todayList) {
-    const sessions = (dayData.sessions || []).slice().reverse();
-    if (!sessions.length) {
-      todayList.innerHTML = '<div class="focus-history-empty">No sessions yet today.</div>';
-    } else {
-      todayList.innerHTML = sessions.map(s => {
-        const sm = Math.floor(s.ms / 60000);
-        const sh = Math.floor(sm / 60); const smm = sm % 60;
-        const dur = sh > 0 ? sh + 'h ' + smm + 'm' : smm + 'm';
-        return `<div class="focus-history-item">
-          <span class="focus-history-time">${dur}</span>
-          <span class="focus-history-goal">${escHtml(s.label)}</span>
-          ${s.isManual ? '<span class="focus-history-tag">&#x1F4DD;</span>' : ''}
-        </div>`;
-      }).join('');
-    }
-  }
-}
-
-// ── Offline Modal ──────────────────────
-function openOfflineModal() {
-  const today = _slTodayKey();
-  document.getElementById('offline-date').value    = today;
-  document.getElementById('offline-label').value   = '';
-  document.getElementById('offline-hours').value   = '0';
-  document.getElementById('offline-minutes').value = '30';
-  document.getElementById('offline-modal-backdrop').classList.add('open');
-  setTimeout(() => document.getElementById('offline-label').focus(), 60);
-}
-
-function closeOfflineModal(e) {
-  if (e && e.target !== document.getElementById('offline-modal-backdrop')) return;
-  document.getElementById('offline-modal-backdrop').classList.remove('open');
-}
-
-function saveOfflineEntry() {
-  const label = document.getElementById('offline-label').value.trim() || '(offline session)';
-  const hours = parseInt(document.getElementById('offline-hours').value, 10) || 0;
-  const mins  = parseInt(document.getElementById('offline-minutes').value, 10) || 0;
-  const date  = document.getElementById('offline-date').value || _slTodayKey();
-  const totalMs = (hours * 60 + mins) * 60 * 1000;
-
-  if (totalMs <= 0) {
-    const hEl = document.getElementById('offline-hours');
-    const mEl = document.getElementById('offline-minutes');
-    hEl.style.borderColor = '#ef4444';
-    mEl.style.borderColor = '#ef4444';
-    setTimeout(() => { hEl.style.borderColor = ''; mEl.style.borderColor = ''; }, 1400);
-    return;
-  }
-
-  // Add to persistent study log
-  _slAddSession(date, { label, ms: totalMs, isManual: true, ts: Date.now() });
-
-  // Mirror into focusState.history for display in "Recent Sessions"
-  focusState.history.unshift({
-    time:     _focusFmtTime(totalMs),
-    text:     label,
-    mode:     'manual',
-    ts:       Date.now(),
-    isManual: true,
-    dateKey:  date
-  });
-  if (focusState.history.length > 20) focusState.history.length = 20;
-  _focusPersist();
-
-  document.getElementById('offline-modal-backdrop').classList.remove('open');
-  _focusRenderHistory();
-  _focusRenderDailyTracker();
-  _focusRenderDailySessionList();
-  _calShowToast('&#x1F4DD; Offline session logged!');
-}
-
-function _focusRenderDailySessionList() {
-  const todayKey  = _slTodayKey();
-  const dayData   = _slGetDay(todayKey);
-  const sessions  = (dayData.sessions || []).slice().reverse(); // newest first
-
-  // Today's sessions (in daily panel)
-  const todayEl = document.getElementById('focus-today-sessions');
-  if (todayEl) {
-    if (!sessions.length) {
-      todayEl.innerHTML = '<div class="focus-history-empty">No sessions yet today.</div>';
-    } else {
-      todayEl.innerHTML = sessions.map(s => {
-        const ms  = s.ms || 0;
-        const h   = Math.floor(ms / 3600000);
-        const m   = Math.floor((ms % 3600000) / 60000);
-        const dur = (h > 0 ? h + 'h ' : '') + m + 'm';
-        const tag = s.isManual ? '<span class="focus-history-tag">&#x1F4DD; offline</span>' : '';
-        return `<div class="focus-history-item">
-          <span class="focus-history-time">${dur}</span>
-          <span class="focus-history-goal">${escHtml(s.label || '(session)')}</span>
-          ${tag}
-        </div>`;
-      }).join('');
-    }
-  }
-
-  // All recent sessions mirror (also in daily panel)
-  const allEl = document.getElementById('focus-history-list-daily');
-  if (allEl) {
-    if (!focusState.history.length) {
-      allEl.innerHTML = '<div class="focus-history-empty">No sessions recorded yet.</div>';
-    } else {
-      allEl.innerHTML = focusState.history.map(h => `
-        <div class="focus-history-item">
-          <span class="focus-history-time">${h.time}</span>
-          <span class="focus-history-goal">${escHtml(h.text)}</span>
-          ${h.isManual ? '<span class="focus-history-tag">&#x1F4DD; offline</span>' : ''}
-          ${h.dateKey && h.dateKey !== _slTodayKey() ? `<span class="focus-history-date">${h.dateKey}</span>` : ''}
-        </div>`).join('');
-    }
-  }
-}
-
 function focusRender() {
-  const m = focusState.mode;
-
-  // Show/hide grid vs daily panel
-  const grid       = document.getElementById('focus-grid');
-  const dailyPanel = document.getElementById('focus-daily-panel');
-  if (grid)       grid.style.display       = (m === 'daily') ? 'none' : '';
-  if (dailyPanel) dailyPanel.style.display  = (m === 'daily') ? ''     : 'none';
-
-  // Reflect mode buttons
-  document.getElementById('fmode-timer').classList.toggle('active', m === 'timer');
-  document.getElementById('fmode-stopwatch').classList.toggle('active', m === 'stopwatch');
-  document.getElementById('fmode-daily').classList.toggle('active', m === 'daily');
-
-  if (m === 'daily') {
-    _focusRenderDailyTracker();
-    _focusRenderDailySessionList();
-    return;
-  }
-
+  // Reflect persisted mode buttons
+  document.getElementById('fmode-timer').classList.toggle('active', focusState.mode === 'timer');
+  document.getElementById('fmode-stopwatch').classList.toggle('active', focusState.mode === 'stopwatch');
+  document.getElementById('focus-mode-label').textContent = focusState.mode === 'timer' ? 'Pomodoro Timer' : 'Stopwatch';
+  document.getElementById('focus-duration-row').style.display = focusState.mode === 'timer' ? '' : 'none';
+  // Stopwatch mode: simplified layout
+  const focusPage = document.getElementById('page-focus');
+  if (focusPage) focusPage.classList.toggle('stopwatch-mode', focusState.mode === 'stopwatch');
   // Reflect duration preset selection
   const minutes = Math.round(focusState.durationMs / 60000);
   document.querySelectorAll('#focus-duration-row .focus-preset-btn').forEach(b => {
@@ -7405,7 +7739,6 @@ function focusRender() {
   _focusRenderGoalDropdown();
   _focusRenderSelectedGoalCard();
   _focusRenderHistory();
-  _focusRenderDailyTracker();
   _focusUpdateButtons();
   _focusUpdateDisplay();
   // If a session is running, restart the interval (in case user navigated away)
@@ -7423,34 +7756,6 @@ function focusRender() {
   updateStreakBadge();
 })();
 </script>
-
-<!-- ── Offline Time Entry Modal ── -->
-<div class="modal-backdrop" id="offline-modal-backdrop" onclick="closeOfflineModal(event)">
-  <div class="modal">
-    <div class="modal-title">&#x1F4DD; Log Offline Study Time</div>
-    <div class="form-group">
-      <label class="form-label">Subject / Label</label>
-      <input class="form-input" id="offline-label" type="text" placeholder="e.g. Physics — Optics revision">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Duration</label>
-      <div class="offline-dur-row">
-        <input class="form-input" id="offline-hours" type="number" min="0" max="23" value="0" style="width:80px;text-align:center;">
-        <span class="offline-dur-sep">h</span>
-        <input class="form-input" id="offline-minutes" type="number" min="0" max="59" value="30" style="width:80px;text-align:center;">
-        <span class="offline-dur-sep">m</span>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Date</label>
-      <input class="form-input" id="offline-date" type="date">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" onclick="saveOfflineEntry()">&#x2713; Save</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('offline-modal-backdrop').classList.remove('open')">Cancel</button>
-    </div>
-  </div>
-</div>
 
 <!-- Firebase loaded via static module imports — works in all environments -->
 <script type="module">
@@ -7496,6 +7801,26 @@ try {
   console.warn('Firebase init failed:', e);
 }
 </script>
+<!-- ── Break Banner ── -->
+<div id="focus-break-banner">
+  <div class="break-banner-label">☕ Break Time</div>
+  <div class="break-banner-timer" id="focus-break-timer">05:00</div>
+  <div class="break-banner-msg">Relax — timer advances automatically</div>
+  <div class="break-banner-next" id="focus-break-next"></div>
+</div>
+
+<!-- ── Break Overlay ── -->
+<div id="focus-break-overlay">
+  <div class="break-ov-emoji">☕</div>
+  <div class="break-ov-label">Break Time</div>
+  <div class="break-ov-phase-name" id="break-ov-phase-name">Short Break</div>
+  <div class="break-ov-timer" id="break-ov-timer">05:00</div>
+  <div class="break-ov-progress"><div class="break-ov-progress-bar" id="break-ov-bar" style="width:100%"></div></div>
+  <div class="break-ov-msg">Relax — the next phase starts automatically 🎯</div>
+  <div class="break-ov-next" id="break-ov-next"></div>
+  <button class="break-ov-skip" onclick="focusBreakSkip()">Skip break →</button>
+</div>
+
 <!-- ── Fullscreen Lock Overlay ── -->
 <div id="focus-fs-overlay">
   <div class="focus-fs-phase" id="focus-fs-phase">STUDY SESSION</div>
