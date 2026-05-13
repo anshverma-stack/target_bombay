@@ -1864,6 +1864,175 @@ html.light .focus-daily-goal-input:focus { border-color:rgba(80,70,228,0.4); bac
 html.light .focus-log-offline-btn { border-color:var(--border); color:var(--text-3); }
 html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:var(--text-2); }
 
+/* ══════════════════════════════════════════
+   CUSTOM POMODORO BUILDER
+══════════════════════════════════════════ */
+/* Overtime / negative timer */
+.focus-time-display.overtime {
+  color: #ef4444 !important;
+  text-shadow: 0 0 28px rgba(239,68,68,0.55) !important;
+  animation: overtime-pulse 1.2s ease infinite;
+}
+@keyframes overtime-pulse { 0%,100%{opacity:1} 50%{opacity:0.72} }
+
+/* Phase-goal badge on the fullscreen overlay */
+#focus-fs-phase-goal {
+  margin-top:12px; padding:8px 18px; border-radius:10px;
+  background:rgba(99,102,241,0.14); border:1px solid rgba(99,102,241,0.35);
+  color:#a5b4fc; font-size:0.8rem; font-weight:600; display:none; text-align:center;
+}
+#focus-fs-phase-goal.visible { display:block; }
+
+/* Pomo card: action row overlay */
+.focus-pomo-btn { position:relative; cursor:pointer; }
+.focus-pomo-card-actions {
+  position:absolute; top:7px; right:7px;
+  display:flex; gap:4px; opacity:0; transition:opacity 0.15s;
+  pointer-events:none; z-index:10;
+}
+.focus-pomo-btn:hover .focus-pomo-card-actions { opacity:1; pointer-events:all; }
+.focus-pomo-card-act-btn {
+  width:26px; height:26px; border-radius:7px; border:none; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; font-size:0.72rem;
+  transition:all 0.14s; line-height:1; user-select:none;
+}
+.focus-pomo-card-act-btn.edit { background:rgba(99,102,241,0.18); color:#a5b4fc; }
+.focus-pomo-card-act-btn.edit:hover { background:rgba(99,102,241,0.38); color:white; }
+.focus-pomo-card-act-btn.del { background:rgba(239,68,68,0.14); color:#f87171; }
+.focus-pomo-card-act-btn.del:hover { background:rgba(239,68,68,0.32); color:white; }
+
+/* Build-custom button */
+.focus-pomo-btn.pomo-build-btn {
+  border-style:dashed; border-color:rgba(99,102,241,0.3);
+  background:rgba(99,102,241,0.04);
+}
+.focus-pomo-btn.pomo-build-btn:hover {
+  background:rgba(99,102,241,0.1); border-color:rgba(99,102,241,0.55);
+}
+
+/* Custom pomo modal */
+.cpm-backdrop {
+  display:none; position:fixed; inset:0; z-index:3500;
+  background:rgba(0,0,0,0.72); backdrop-filter:blur(10px);
+  align-items:flex-start; justify-content:center; padding:40px 16px;
+  overflow-y:auto;
+}
+.cpm-backdrop.open { display:flex; }
+.cpm-modal {
+  background:#0d1117; border:1px solid rgba(255,255,255,0.12);
+  border-radius:22px; padding:28px 28px 24px;
+  width:min(640px,96vw); box-shadow:0 28px 80px rgba(0,0,0,0.65);
+  flex-shrink:0;
+}
+.cpm-title {
+  font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800;
+  margin-bottom:20px; display:flex; align-items:center; gap:10px;
+}
+.cpm-field { margin-bottom:14px; }
+.cpm-label {
+  font-size:0.68rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:var(--text-3); display:block; margin-bottom:6px;
+}
+.cpm-input {
+  width:100%; padding:10px 14px; border-radius:11px;
+  border:1px solid var(--border); background:rgba(255,255,255,0.04);
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.87rem;
+  outline:none; transition:border-color 0.18s;
+}
+.cpm-input:focus { border-color:rgba(99,102,241,0.55); background:rgba(99,102,241,0.04); }
+.cpm-phases-label {
+  font-size:0.68rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:0.1em; color:var(--text-3); margin-bottom:8px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.cpm-phases-list { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+.cpm-phase-row {
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:13px; padding:12px 14px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.cpm-phase-num {
+  width:24px; height:24px; border-radius:50%; flex-shrink:0;
+  background:rgba(99,102,241,0.18); border:1px solid rgba(99,102,241,0.3);
+  color:#a5b4fc; font-size:0.72rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+}
+.cpm-phase-label-input {
+  flex:1; min-width:90px; padding:7px 11px; border-radius:9px;
+  border:1px solid var(--border); background:rgba(0,0,0,0.25);
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.82rem;
+  outline:none; transition:border-color 0.15s;
+}
+.cpm-phase-label-input:focus { border-color:rgba(99,102,241,0.45); }
+.cpm-phase-min-input {
+  width:68px; padding:7px 10px; border-radius:9px;
+  border:1px solid var(--border); background:rgba(0,0,0,0.25);
+  color:var(--text); font-family:'DM Mono',monospace; font-size:0.85rem;
+  font-weight:700; outline:none; text-align:center; transition:border-color 0.15s;
+}
+.cpm-phase-min-input:focus { border-color:rgba(99,102,241,0.45); }
+.cpm-phase-break-toggle {
+  display:flex; align-items:center; gap:5px;
+  font-size:0.73rem; font-weight:700; color:var(--text-3); cursor:pointer;
+  padding:5px 10px; border-radius:8px; border:1px solid var(--border);
+  background:transparent; transition:all 0.15s; flex-shrink:0;
+}
+.cpm-phase-break-toggle.is-break {
+  background:rgba(59,130,246,0.14); border-color:rgba(59,130,246,0.4); color:#60a5fa;
+}
+.cpm-phase-goal-select {
+  width:100%; margin-top:7px; padding:6px 11px; border-radius:9px;
+  border:1px solid var(--border); background:rgba(0,0,0,0.25);
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.78rem;
+  outline:none; transition:border-color 0.15s; appearance:none; cursor:pointer;
+}
+.cpm-phase-goal-select:focus { border-color:rgba(99,102,241,0.45); }
+.cpm-phase-goal-select option { background:#111827; }
+.cpm-phase-del-btn {
+  width:28px; height:28px; flex-shrink:0; border-radius:8px;
+  border:1px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.08);
+  color:#f87171; cursor:pointer; font-size:0.85rem; transition:all 0.15s;
+  display:flex; align-items:center; justify-content:center;
+}
+.cpm-phase-del-btn:hover { background:rgba(239,68,68,0.25); border-color:rgba(239,68,68,0.6); }
+.cpm-add-phase-btn {
+  width:100%; padding:9px; border-radius:10px;
+  border:1px dashed rgba(99,102,241,0.3); background:rgba(99,102,241,0.04);
+  color:var(--accent); font-family:'DM Sans',sans-serif; font-size:0.8rem;
+  font-weight:700; cursor:pointer; transition:all 0.15s; margin-bottom:18px;
+}
+.cpm-add-phase-btn:hover { background:rgba(99,102,241,0.12); border-color:rgba(99,102,241,0.55); }
+.cpm-lock-row {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 14px; border-radius:12px;
+  border:1px solid var(--border); background:rgba(255,255,255,0.03);
+  margin-bottom:16px; cursor:pointer;
+}
+.cpm-lock-row input[type=checkbox] { accent-color:var(--accent); width:16px; height:16px; cursor:pointer; }
+.cpm-lock-title { font-size:0.85rem; font-weight:700; }
+.cpm-lock-desc { font-size:0.72rem; color:var(--text-3); margin-top:2px; line-height:1.5; }
+.cpm-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:4px; }
+.cpm-btn {
+  padding:10px 22px; border-radius:11px; font-family:'DM Sans',sans-serif;
+  font-size:0.85rem; font-weight:800; cursor:pointer; transition:all 0.16s; border:none;
+}
+.cpm-btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:white; box-shadow:0 3px 12px var(--accent-glow); }
+.cpm-btn-primary:hover { transform:translateY(-1px); box-shadow:0 5px 18px var(--accent-glow); }
+.cpm-btn-cancel { background:rgba(255,255,255,0.07); color:var(--text-2); border:1px solid var(--border) !important; }
+.cpm-btn-cancel:hover { background:rgba(255,255,255,0.12); }
+
+/* Phase goal pending indicator on main display */
+.focus-phase-goal-info {
+  margin-top:10px; padding:8px 14px; border-radius:10px;
+  background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.28);
+  font-size:0.78rem; color:#a5b4fc; font-weight:600;
+  display:none; text-align:center; line-height:1.5;
+}
+.focus-phase-goal-info.visible { display:block; }
+.focus-phase-goal-info.overtime-info {
+  background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.4); color:#fca5a5;
+}
+
 /* ── Stopwatch mode: simplified UI ── */
 .stopwatch-mode .focus-subtab-row { display:none !important; }
 .stopwatch-mode .focus-right-card { display:none !important; }
@@ -2227,32 +2396,48 @@ html.light .focus-log-offline-btn:hover { border-color:var(--border-2); color:va
 
         <!-- Pomodoro tab: sequence picker (moved here from right card) -->
         <div id="focus-pomo-left" style="display:none;">
-          <div class="focus-pomo-grid">
-            <button class="focus-pomo-btn" id="pomo-0" onclick="focusPomoSelect(0)">
+          <div class="focus-pomo-grid" id="focus-pomo-grid">
+            <div class="focus-pomo-btn" id="pomo-0" onclick="focusPomoSelect(0)" role="button" tabindex="0">
+              <div class="focus-pomo-card-actions">
+                <span class="focus-pomo-card-act-btn del" onclick="event.stopPropagation();pomoDeleteBuiltin(0)" title="Delete" role="button" tabindex="0">🗑️</span>
+              </div>
               <div class="focus-pomo-name">Standard Double</div>
               <div class="focus-pomo-steps">60m study → 5m break → 60m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-1" onclick="focusPomoSelect(1)">
+            </div>
+            <div class="focus-pomo-btn" id="pomo-1" onclick="focusPomoSelect(1)" role="button" tabindex="0">
+              <div class="focus-pomo-card-actions">
+                <span class="focus-pomo-card-act-btn del" onclick="event.stopPropagation();pomoDeleteBuiltin(1)" title="Delete" role="button" tabindex="0">🗑️</span>
+              </div>
               <div class="focus-pomo-name">Long Haul</div>
               <div class="focus-pomo-steps">90m study → 15m break → 60m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-2" onclick="focusPomoSelect(2)">
+            </div>
+            <div class="focus-pomo-btn" id="pomo-2" onclick="focusPomoSelect(2)" role="button" tabindex="0">
+              <div class="focus-pomo-card-actions">
+                <span class="focus-pomo-card-act-btn del" onclick="event.stopPropagation();pomoDeleteBuiltin(2)" title="Delete" role="button" tabindex="0">🗑️</span>
+              </div>
               <div class="focus-pomo-name">Short Bursts</div>
               <div class="focus-pomo-steps">30m study → 5m break → 30m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-3" onclick="focusPomoSelect(3)">
+            </div>
+            <div class="focus-pomo-btn" id="pomo-3" onclick="focusPomoSelect(3)" role="button" tabindex="0">
+              <div class="focus-pomo-card-actions">
+                <span class="focus-pomo-card-act-btn del" onclick="event.stopPropagation();pomoDeleteBuiltin(3)" title="Delete" role="button" tabindex="0">🗑️</span>
+              </div>
               <div class="focus-pomo-name">Warm-up to Deep</div>
               <div class="focus-pomo-steps">30m study → 25m break → 120m study</div>
-            </button>
-            <button class="focus-pomo-btn" id="pomo-none" onclick="focusPomoSelect(-1)">
-              <div class="focus-pomo-name">No sequence</div>
-              <div class="focus-pomo-steps">Use the duration set above</div>
+            </div>
+            <!-- Custom timers rendered here by JS -->
+            <div id="custom-pomo-btns"></div>
+            <!-- Build custom button -->
+            <button class="focus-pomo-btn pomo-build-btn" id="pomo-build-custom" onclick="cpmOpen(null)">
+              <div class="focus-pomo-name">➕ Build Custom</div>
+              <div class="focus-pomo-steps">Create your own phases with goals</div>
             </button>
           </div>
           <div class="focus-pomo-phase" id="focus-pomo-phase-info">
             <div class="focus-pomo-phase-label">CURRENT PHASE</div>
             <div class="focus-pomo-phase-name" id="focus-pomo-phase-name">—</div>
           </div>
+          <div class="focus-phase-goal-info" id="focus-phase-goal-info"></div>
         </div>
 
         <div class="focus-controls">
@@ -3651,7 +3836,7 @@ async function loadFromCloud(user) {
         store = p.sylStore;
       } catch(e) {}
     }
-    // Load focus study log & daily goal
+    // Load focus study log, daily goal & focus state
     if (p.studyLog && typeof p.studyLog === 'object') {
       try { localStorage.setItem('study_log', JSON.stringify(p.studyLog)); } catch(e) {}
     }
@@ -3687,7 +3872,7 @@ async function saveToCloud() {
     let sylStore = null;
     try { sylStore = JSON.parse(localStorage.getItem('jee_command_v10')); } catch(e2) {}
 
-    // Collect focus history (study_log + daily goal)
+    // Collect focus history (study_log + daily goal + focus state)
     let studyLog = null, dailyGoalMin = null, focusStateSaved = null;
     try { studyLog = JSON.parse(localStorage.getItem('study_log') || 'null'); } catch(e2) {}
     try { dailyGoalMin = localStorage.getItem('daily_goal_minutes'); } catch(e2) {}
@@ -3698,10 +3883,10 @@ async function saveToCloud() {
       calEvents,
       weekData: { weekKey: getWeekKey(), entries: weekData },
       calJournal,
-      ...(sylStore          !== null ? { sylStore }         : {}),
-      ...(studyLog          !== null ? { studyLog }         : {}),
-      ...(dailyGoalMin             ? { dailyGoalMin }      : {}),
-      ...(focusStateSaved   !== null ? { focusStateSaved }  : {}),
+      ...(sylStore        !== null ? { sylStore }        : {}),
+      ...(studyLog        !== null ? { studyLog }        : {}),
+      ...(dailyGoalMin           ? { dailyGoalMin }     : {}),
+      ...(focusStateSaved !== null ? { focusStateSaved } : {}),
     });
     setSyncDot('synced');
   } catch(e) { console.warn('Cloud save error:', e); setSyncDot('error'); }
@@ -6867,7 +7052,7 @@ function focusPomoSelect(idx) {
   document.querySelectorAll('.focus-pomo-btn').forEach((b, i) => {
     b.classList.remove('active', 'running');
   });
-  const btnId = idx === -1 ? 'pomo-none' : 'pomo-' + idx;
+  const btnId = idx >= 0 ? 'pomo-' + idx : null;
   const btn = document.getElementById(btnId);
   if (btn) btn.classList.add('active');
   // Update timer duration to first phase
@@ -6891,8 +7076,8 @@ function _focusAdvancePomoPhase() {
     focusState.pomoPhase = 0;
     focusState.pomoIdx = -1;
     document.querySelectorAll('.focus-pomo-btn').forEach(b => b.classList.remove('active','running'));
-    const noneBtn = document.getElementById('pomo-none');
-    if (noneBtn) noneBtn.classList.add('active');
+    
+    
     _focusHidePomoPhaseInfo();
     focusStop();
     return;
@@ -7446,6 +7631,551 @@ function focusRender() {
   if (focusState.running && !focusState.intervalId) _focusStartInterval();
 }
 
+/* ════════════════════════════════════════════════════════════════
+   CUSTOM POMODORO SYSTEM
+   ─ localStorage key: 'customPomoTimers'  →  array of timer objects
+   ─ Each timer: { id, name, lockMode, steps[] }
+   ─ Each step:  { label, mins, isBreak, goalText? }
+   ─ Active custom timer is selected via focusState.pomoIdx === 'c:ID'
+════════════════════════════════════════════════════════════════ */
+
+const CPM_LS_KEY = 'customPomoTimers';
+var _cpmEditId   = null;   // null = new, else id of timer being edited
+var _cpmPhases   = [];     // working copy of phases while modal is open
+
+// ── Persistence ──────────────────────────────────────────────
+function cpmLoadAll() {
+  try { return JSON.parse(localStorage.getItem(CPM_LS_KEY)) || []; } catch(e) { return []; }
+}
+function cpmSaveAll(arr) {
+  try { localStorage.setItem(CPM_LS_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+
+// ── Render custom timer buttons in the pomo grid ─────────────
+function cpmRenderGrid() {
+  const container = document.getElementById('custom-pomo-btns');
+  if (!container) return;
+  const timers = cpmLoadAll();
+  if (!timers.length) { container.innerHTML = ''; return; }
+  container.innerHTML = timers.map(t => {
+    const stepsDesc = t.steps.map(s => s.mins + 'm ' + (s.isBreak ? '☕' : '📚')).join(' → ');
+    const lockIcon  = t.lockMode ? ' 🔒' : '';
+    const isActive  = focusState.pomoIdx === 'c:' + t.id;
+    return `<div class="focus-pomo-btn${isActive ? ' active' : ''}" id="pomo-c-${t.id}" onclick="focusPomoSelectCustom('${t.id}')" role="button" tabindex="0">
+      <div class="focus-pomo-card-actions">
+        <span class="focus-pomo-card-act-btn edit" onclick="event.stopPropagation();cpmOpen('${t.id}')" title="Edit" role="button" tabindex="0">✏️</span>
+        <span class="focus-pomo-card-act-btn del"  onclick="event.stopPropagation();cpmDelete('${t.id}')" title="Delete" role="button" tabindex="0">🗑️</span>
+      </div>
+      <div class="focus-pomo-name">${escHtml(t.name)}${lockIcon}</div>
+      <div class="focus-pomo-steps">${escHtml(stepsDesc)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Select a custom timer ────────────────────────────────────
+function focusPomoSelectCustom(id) {
+  if (focusState.subTab !== 'pomo') focusSubTab('pomo');
+  if (focusState.running) { _calShowToast('Stop the session before changing the sequence.'); return; }
+  const timers = cpmLoadAll();
+  const t = timers.find(x => x.id === id);
+  if (!t) return;
+  focusState.pomoIdx    = 'c:' + id;
+  focusState.pomoPhase  = 0;
+  // Apply this timer's lock mode preference (can still be overridden manually)
+  if (t.lockMode !== undefined) {
+    focusState.lockMode = !!t.lockMode;
+    const chk = document.getElementById('focus-lock-mode');
+    if (chk) chk.checked = focusState.lockMode;
+  }
+  // Set duration to first phase
+  focusSetDuration(t.steps[0].mins);
+  // Update UI
+  document.querySelectorAll('.focus-pomo-btn').forEach(b => b.classList.remove('active','running'));
+  const btn = document.getElementById('pomo-c-' + id);
+  if (btn) btn.classList.add('active');
+  _focusUpdatePomoPhaseInfo();
+  _cpmUpdatePhaseGoalInfo();
+  _focusPersist();
+}
+
+// ── Get the active custom timer object (or null) ─────────────
+function _cpmGetActive() {
+  if (typeof focusState.pomoIdx !== 'string' || !focusState.pomoIdx.startsWith('c:')) return null;
+  const id = focusState.pomoIdx.slice(2);
+  return cpmLoadAll().find(t => t.id === id) || null;
+}
+
+// ── Advance phase for custom timers (called from _focusAdvancePomoPhase) ─
+function _cpmAdvancePhase() {
+  const t = _cpmGetActive();
+  if (!t) return;
+  focusState.pomoPhase++;
+  if (focusState.pomoPhase >= t.steps.length) {
+    _calShowToast('🎉 Custom Pomodoro complete! Great work.');
+    focusState.pomoPhase  = 0;
+    focusState.pomoIdx    = -1;
+    focusState.goalDoneInLock = false;
+    document.querySelectorAll('.focus-pomo-btn').forEach(b => b.classList.remove('active','running'));
+    
+    
+    _focusHidePomoPhaseInfo();
+    _cpmHidePhaseGoalInfo();
+    focusStop();
+    return;
+  }
+  const step = t.steps[focusState.pomoPhase];
+  focusState.remainingMs = step.mins * 60 * 1000;
+  focusState.durationMs  = focusState.remainingMs;
+  focusState.overdueMs   = 0;
+  focusState.running     = true;
+  focusState.startTimestamp = Date.now();
+  focusState.goalDoneInLock = false;   // reset per-phase
+  _focusStartInterval();
+  _focusUpdateButtons();
+  _focusUpdateDisplay();
+  _focusUpdatePomoPhaseInfo();
+  _cpmUpdatePhaseGoalInfo();
+  if (focusState.lockMode) _focusFsUpdatePhase();
+  _calShowToast((step.isBreak ? '☕ Break: ' : '📚 Study: ') + step.mins + 'm — ' + step.label);
+}
+
+// ── Phase goal info banner ────────────────────────────────────
+function _cpmUpdatePhaseGoalInfo() {
+  const el    = document.getElementById('focus-phase-goal-info');
+  const fsEl  = document.getElementById('focus-fs-phase-goal');
+  const t     = _cpmGetActive();
+  if (!t) { _cpmHidePhaseGoalInfo(); return; }
+  const step = t.steps[focusState.pomoPhase];
+  if (!step || !step.goalText) { _cpmHidePhaseGoalInfo(); return; }
+
+  const isDone = _cpmIsPhaseGoalDone(step.goalText);
+  const txt = isDone
+    ? `✅ Goal done: <em>${escHtml(step.goalText)}</em>`
+    : `🎯 Phase goal: <em>${escHtml(step.goalText)}</em> — mark done to advance`;
+  if (el) {
+    el.innerHTML = txt;
+    el.classList.add('visible');
+    el.classList.toggle('overtime-info', !isDone && focusState.overdueMs > 0);
+  }
+  if (fsEl) {
+    fsEl.innerHTML = isDone
+      ? `✅ ${escHtml(step.goalText)}`
+      : `🎯 ${escHtml(step.goalText)}`;
+    fsEl.classList.add('visible');
+  }
+}
+
+function _cpmHidePhaseGoalInfo() {
+  const el   = document.getElementById('focus-phase-goal-info');
+  const fsEl = document.getElementById('focus-fs-phase-goal');
+  if (el)   { el.classList.remove('visible'); el.innerHTML = ''; }
+  if (fsEl) { fsEl.classList.remove('visible'); fsEl.innerHTML = ''; }
+}
+
+// ── Check if a phase's linked goal is done in the calendar ───
+function _cpmIsPhaseGoalDone(goalText) {
+  if (!goalText) return true;
+  // Search all week-level goals in calData for a match that's done
+  const allData = Object.keys(localStorage)
+    .filter(k => k.startsWith('calData_'))
+    .map(k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } })
+    .filter(Boolean);
+  for (const d of allData) {
+    if (d.goals) {
+      const g = d.goals.find(g => g.text === goalText);
+      if (g && g.done) return true;
+    }
+    // Also check day-level goals
+    if (d.days) {
+      for (const ds of Object.values(d.days)) {
+        if (ds.goals) {
+          const g = ds.goals.find(g => g.text === goalText);
+          if (g && g.done) return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/* ── Patch _focusTick to support overtime & custom-timer goal-lock ─ */
+// We override the behaviour after the timer hits zero:
+// If a custom phase has a goalText and it's NOT done → keep running in negative
+// The display shows a negative time. When user marks goal done → advance.
+(function _patchFocusTick() {
+  const _orig = window._focusTick ? _focusTick : null;
+  // We inject our logic via a flag on focusState
+  // The real override is done inline in the patched tick below.
+})();
+
+// Store original tick — we'll call it but extend it
+var _origFocusTick = _focusTick;
+
+// Overtime tracking
+if (focusState.overdueMs === undefined) focusState.overdueMs = 0;
+
+_focusTick = function() {
+  if (!focusState.running) return;
+  const segMs = Date.now() - focusState.startTimestamp;
+
+  if (focusState.mode !== 'timer') {
+    _origFocusTick();
+    return;
+  }
+
+  const liveRemaining = focusState.remainingMs - segMs;
+  const el   = document.getElementById('focus-time-display');
+  const fsEl = document.getElementById('focus-fs-timer');
+
+  // Check if we're in overtime (time hit 0 but goal not done)
+  const inOvertime = liveRemaining <= 0 && focusState.inOvertime;
+
+  if (inOvertime) {
+    const overMs = -liveRemaining; // positive elapsed past zero
+    if (el) {
+      el.textContent = '−' + _focusFmtTime(overMs);
+      el.classList.add('overtime');
+      el.classList.remove('warning', 'done');
+    }
+    if (fsEl && document.getElementById('focus-fs-overlay')?.classList.contains('visible')) {
+      fsEl.textContent = '−' + _focusFmtTime(overMs);
+    }
+    focusState.overdueMs = overMs;
+    _cpmUpdatePhaseGoalInfo();
+    return; // keep running until goal marked done
+  }
+
+  // Normal timer behaviour up to zero
+  if (el) {
+    el.textContent = _focusFmtTime(Math.max(0, liveRemaining));
+    el.classList.toggle('warning', liveRemaining <= 60000 && liveRemaining > 0);
+    el.classList.toggle('done',    liveRemaining <= 0);
+    el.classList.remove('overtime');
+  }
+  if (fsEl && document.getElementById('focus-fs-overlay')?.classList.contains('visible')) {
+    fsEl.textContent = _focusFmtTime(Math.max(0, liveRemaining));
+  }
+
+  if (liveRemaining <= 0) {
+    focusState.remainingMs = 0;
+    try { _focusBeep(); } catch(e) {}
+
+    // Determine if the current phase has an unfinished goal (custom pomo only)
+    const t    = _cpmGetActive();
+    const step = t ? t.steps[focusState.pomoPhase] : null;
+    const hasGoal   = !!(step && step.goalText);
+    const goalDone  = hasGoal && _cpmIsPhaseGoalDone(step.goalText);
+
+    if (hasGoal && !goalDone) {
+      // Enter overtime mode — timer goes negative until goal is marked done
+      focusState.inOvertime     = true;
+      focusState.startTimestamp = Date.now();
+      focusState.remainingMs    = 0; // freeze so segMs measures overtime
+      _cpmUpdatePhaseGoalInfo();
+      _calShowToast('⏰ Time\'s up! Mark the phase goal done to advance.');
+      return;
+    }
+
+    // Standard lock-mode block (non-custom or no phase goal)
+    if (focusState.lockMode && !focusState.goalDoneInLock && focusState.selectedKey && !t) {
+      focusState.running = false;
+      _focusStopInterval();
+      _focusUpdateButtons();
+      _calShowToast('⏰ Time\'s up! Mark your goal as done to release lock mode.');
+      return;
+    }
+
+    // Advance custom pomo phase
+    if (t) { _cpmAdvancePhase(); return; }
+
+    // Advance built-in pomo phase
+    if (focusState.pomoIdx >= 0) { _focusAdvancePomoPhase(); return; }
+
+    _focusFinishSession(false);
+  }
+};
+
+// Ensure overdueMs & inOvertime reset on stop/start
+var _origFocusStop = focusStop;
+focusStop = function() {
+  focusState.overdueMs  = 0;
+  focusState.inOvertime = false;
+  const el = document.getElementById('focus-time-display');
+  if (el) el.classList.remove('overtime');
+  _cpmHidePhaseGoalInfo();
+  _origFocusStop.apply(this, arguments);
+};
+
+var _origFocusStart = focusStart;
+focusStart = function() {
+  focusState.overdueMs  = 0;
+  focusState.inOvertime = false;
+  const el = document.getElementById('focus-time-display');
+  if (el) el.classList.remove('overtime');
+  _cpmUpdatePhaseGoalInfo();
+  _origFocusStart.apply(this, arguments);
+};
+
+// Override _focusUpdatePomoPhaseInfo to handle custom timers
+var _origUpdatePomoPhaseInfo = _focusUpdatePomoPhaseInfo;
+_focusUpdatePomoPhaseInfo = function() {
+  const t = _cpmGetActive();
+  if (!t) { _origUpdatePomoPhaseInfo(); return; }
+  const step  = t.steps[focusState.pomoPhase];
+  const el    = document.getElementById('focus-pomo-phase-info');
+  const nameEl= document.getElementById('focus-pomo-phase-name');
+  if (el && nameEl) {
+    el.classList.add('visible');
+    nameEl.textContent = (step.isBreak ? '☕ ' : '📚 ') + step.label + ' — ' + step.mins + 'm (Phase ' + (focusState.pomoPhase + 1) + '/' + t.steps.length + ')';
+  }
+};
+
+// Override _focusFsUpdatePhase to handle custom timers
+var _origFsFsUpdatePhase = _focusFsUpdatePhase;
+_focusFsUpdatePhase = function() {
+  const t = _cpmGetActive();
+  if (!t) { _origFsFsUpdatePhase(); return; }
+  const phaseEl = document.getElementById('focus-fs-phase');
+  const step    = t.steps[focusState.pomoPhase];
+  if (phaseEl) phaseEl.textContent = (step.isBreak ? '☕ BREAK' : '📚 STUDY') + ' — ' + escHtml(step.label) + ' (' + (focusState.pomoPhase + 1) + '/' + t.steps.length + ')';
+  const el  = document.getElementById('focus-fs-timer');
+  const ms  = focusState.inOvertime
+    ? -(Date.now() - focusState.startTimestamp)
+    : focusState.remainingMs;
+  if (el) el.textContent = (focusState.inOvertime ? '−' : '') + _focusFmtTime(Math.abs(ms));
+};
+
+// Override focusMarkGoalDone to also handle phase-goal done in overtime
+var _origFocusMarkGoalDone = focusMarkGoalDone;
+focusMarkGoalDone = function() {
+  // If we're in overtime for a custom phase goal — mark it done and advance
+  const t = _cpmGetActive();
+  if (t && focusState.inOvertime) {
+    const step = t.steps[focusState.pomoPhase];
+    if (step && step.goalText) {
+      // Mark the goal done in the calendar data (first match found)
+      _cpmMarkGoalDoneInCalendar(step.goalText);
+      focusState.inOvertime = false;
+      focusState.overdueMs  = 0;
+      const el = document.getElementById('focus-time-display');
+      if (el) el.classList.remove('overtime');
+      _calShowToast('✅ Goal marked done — advancing to next phase!');
+      _cpmAdvancePhase();
+      return;
+    }
+  }
+  _origFocusMarkGoalDone.apply(this, arguments);
+};
+
+function _cpmMarkGoalDoneInCalendar(goalText) {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('calData_'));
+  for (const k of keys) {
+    let d; try { d = JSON.parse(localStorage.getItem(k)); } catch(e) { continue; }
+    let changed = false;
+    if (d.goals) {
+      d.goals.forEach(g => { if (g.text === goalText && !g.done) { g.done = true; g.doneDate = new Date().toISOString().slice(0,10); changed = true; } });
+    }
+    if (d.days) {
+      Object.values(d.days).forEach(ds => {
+        (ds.goals || []).forEach(g => { if (g.text === goalText && !g.done) { g.done = true; g.doneDate = new Date().toISOString().slice(0,10); changed = true; } });
+      });
+    }
+    if (changed) try { localStorage.setItem(k, JSON.stringify(d)); } catch(e) {}
+  }
+}
+
+/* ─── Override _focusHidePomoPhaseInfo to also clear custom ─── */
+var _origHidePomoPhaseInfo = _focusHidePomoPhaseInfo;
+_focusHidePomoPhaseInfo = function() {
+  _origHidePomoPhaseInfo();
+  _cpmHidePhaseGoalInfo();
+};
+
+/* ═══════════════════════════════════════
+   CPM MODAL  –  Open / Close / Populate
+═══════════════════════════════════════ */
+function cpmOpen(editId) {
+  _cpmEditId = editId;
+  const timers  = cpmLoadAll();
+  const editing = editId ? timers.find(t => t.id === editId) : null;
+
+  document.getElementById('cpm-modal-title').textContent = editing ? 'Edit Custom Timer' : 'Build Custom Pomodoro Timer';
+  document.getElementById('cpm-name-input').value = editing ? editing.name : '';
+  document.getElementById('cpm-lock-chk').checked  = editing ? !!editing.lockMode : false;
+
+  // Build working phases
+  _cpmPhases = editing
+    ? editing.steps.map(s => ({ ...s }))
+    : [
+        { label: 'Study',       mins: 25, isBreak: false, goalText: '' },
+        { label: 'Short Break', mins: 5,  isBreak: true,  goalText: '' }
+      ];
+
+  _cpmRenderPhases();
+  document.getElementById('cpm-backdrop').classList.add('open');
+}
+
+function cpmClose() {
+  document.getElementById('cpm-backdrop').classList.remove('open');
+  _cpmEditId = null;
+  _cpmPhases = [];
+}
+
+function cpmBackdropClick(e) {
+  if (e.target === document.getElementById('cpm-backdrop')) cpmClose();
+}
+
+function cpmAddPhase() {
+  _cpmPhases.push({ label: 'Phase ' + (_cpmPhases.length + 1), mins: 25, isBreak: false, goalText: '' });
+  _cpmRenderPhases();
+}
+
+function cpmRemovePhase(idx) {
+  if (_cpmPhases.length <= 1) { _calShowToast('A timer must have at least one phase.'); return; }
+  _cpmPhases.splice(idx, 1);
+  _cpmRenderPhases();
+}
+
+function cpmToggleBreak(idx) {
+  _cpmPhases[idx].isBreak = !_cpmPhases[idx].isBreak;
+  _cpmRenderPhases();
+}
+
+function _cpmCollectPhaseInputs() {
+  // Flush current input values into _cpmPhases before re-rendering
+  document.querySelectorAll('.cpm-phase-row').forEach((row, i) => {
+    if (!_cpmPhases[i]) return;
+    const labelIn = row.querySelector('.cpm-phase-label-input');
+    const minIn   = row.querySelector('.cpm-phase-min-input');
+    const goalSel = row.querySelector('.cpm-phase-goal-select');
+    if (labelIn) _cpmPhases[i].label    = labelIn.value.trim() || 'Phase ' + (i + 1);
+    if (minIn)   _cpmPhases[i].mins     = Math.max(1, parseInt(minIn.value, 10) || 1);
+    if (goalSel) _cpmPhases[i].goalText = goalSel.value;
+  });
+}
+
+function _cpmRenderPhases() {
+  const list = document.getElementById('cpm-phases-list');
+  if (!list) return;
+
+  // Collect all week goals for the goal picker
+  const weekGoals = _cpmGetAllWeekGoals();
+
+  list.innerHTML = _cpmPhases.map((p, i) => {
+    const breakClass = p.isBreak ? ' is-break' : '';
+    const breakLabel = p.isBreak ? '☕ Break' : '📚 Study';
+    const goalOptions = weekGoals.length
+      ? ['<option value="">— No linked goal —</option>',
+         ...weekGoals.map(g => `<option value="${escHtml(g)}"${g === p.goalText ? ' selected' : ''}>${escHtml(g)}</option>`)
+        ].join('')
+      : '<option value="">— No goals in calendar yet —</option>';
+
+    return `<div class="cpm-phase-row" data-idx="${i}">
+      <div class="cpm-phase-num">${i + 1}</div>
+      <input class="cpm-phase-label-input" type="text" value="${escHtml(p.label)}" placeholder="Phase name" maxlength="30">
+      <input class="cpm-phase-min-input" type="number" min="1" max="600" value="${p.mins}" title="Duration (minutes)">
+      <button class="cpm-phase-break-toggle${breakClass}" onclick="_cpmCollectPhaseInputs();cpmToggleBreak(${i})">${breakLabel}</button>
+      <button class="cpm-phase-del-btn" onclick="_cpmCollectPhaseInputs();cpmRemovePhase(${i})" title="Remove phase">✕</button>
+      <select class="cpm-phase-goal-select" title="Link a goal — must be done before next phase">
+        ${goalOptions}
+      </select>
+    </div>`;
+  }).join('');
+}
+
+function _cpmGetAllWeekGoals() {
+  const goals = new Set();
+  Object.keys(localStorage).filter(k => k.startsWith('calData_')).forEach(k => {
+    try {
+      const d = JSON.parse(localStorage.getItem(k));
+      (d.goals || []).forEach(g => { if (g.text) goals.add(g.text); });
+      Object.values(d.days || {}).forEach(ds => {
+        (ds.goals || []).forEach(g => { if (g.text) goals.add(g.text); });
+      });
+    } catch(e) {}
+  });
+  return [...goals].sort();
+}
+
+function cpmSave() {
+  _cpmCollectPhaseInputs();
+
+  const name = document.getElementById('cpm-name-input').value.trim();
+  if (!name) { document.getElementById('cpm-name-input').focus(); _calShowToast('Please give the timer a name.'); return; }
+  if (!_cpmPhases.length) { _calShowToast('Add at least one phase.'); return; }
+  if (_cpmPhases.some(p => p.mins < 1)) { _calShowToast('All phases must be at least 1 minute.'); return; }
+
+  const lockMode = document.getElementById('cpm-lock-chk').checked;
+  const timers   = cpmLoadAll();
+
+  if (_cpmEditId) {
+    const idx = timers.findIndex(t => t.id === _cpmEditId);
+    if (idx >= 0) {
+      timers[idx] = { ...timers[idx], name, lockMode, steps: _cpmPhases.map(p => ({ ...p })) };
+    }
+  } else {
+    timers.push({ id: Date.now().toString(36), name, lockMode, steps: _cpmPhases.map(p => ({ ...p })) });
+  }
+
+  cpmSaveAll(timers);
+  cpmRenderGrid();
+  cpmClose();
+  focusSubTab('pomo'); // ensure pomo tab is visible so user sees their new timer
+  _calShowToast('✅ Timer "' + name + '" saved!');
+}
+
+function cpmDelete(id) {
+  const timers = cpmLoadAll();
+  const t = timers.find(x => x.id === id);
+  if (!t) return;
+  if (!confirm('Delete "' + t.name + '"? This cannot be undone.')) return;
+  cpmSaveAll(timers.filter(x => x.id !== id));
+  // Deselect if it was active
+  if (focusState.pomoIdx === 'c:' + id) {
+    focusState.pomoIdx   = -1;
+    focusState.pomoPhase = 0;
+    
+    _focusHidePomoPhaseInfo();
+  }
+  cpmRenderGrid();
+  _calShowToast('🗑️ Timer deleted.');
+}
+
+// ── Built-in preset hiding ────────────────────────────────────
+const POMO_HIDDEN_LS = 'pomoHiddenBuiltins';
+
+function _pomoGetHidden() {
+  try { return JSON.parse(localStorage.getItem(POMO_HIDDEN_LS)) || []; } catch(e) { return []; }
+}
+
+function _pomoApplyHiddenBuiltins() {
+  const hidden = _pomoGetHidden();
+  for (let i = 0; i < POMO_SEQUENCES.length; i++) {
+    const el = document.getElementById('pomo-' + i);
+    if (el) el.style.display = hidden.includes(i) ? 'none' : '';
+  }
+}
+
+function pomoDeleteBuiltin(idx) {
+  const hidden = _pomoGetHidden();
+  if (!hidden.includes(idx)) hidden.push(idx);
+  try { localStorage.setItem(POMO_HIDDEN_LS, JSON.stringify(hidden)); } catch(e) {}
+  // Deselect if it was active
+  if (focusState.pomoIdx === idx) {
+    focusState.pomoIdx  = -1;
+    focusState.pomoPhase = 0;
+    _focusHidePomoPhaseInfo();
+  }
+  _pomoApplyHiddenBuiltins();
+  _calShowToast('🗑️ Preset removed.');
+}
+
+// Run on load
+_pomoApplyHiddenBuiltins();
+
+// ── Custom pomodoro system init ───────────────────────────────
+cpmRenderGrid();
+
 // ── Hash-based routing: boot to the right page ──
 // Runs AFTER all functions are defined so calRender / sylRender / etc. exist.
 (function initRouting() {
@@ -7533,6 +8263,7 @@ try {
 <!-- ── Fullscreen Lock Overlay ── -->
 <div id="focus-fs-overlay">
   <div class="focus-fs-phase" id="focus-fs-phase">STUDY SESSION</div>
+  <div id="focus-fs-phase-goal"></div>
   <div class="focus-fs-timer" id="focus-fs-timer">00:00</div>
   <div class="focus-fs-warn" id="focus-fs-warn">
     <div>You tried to leave! Timer resets in</div>
@@ -7543,6 +8274,44 @@ try {
     <button class="focus-fs-stop-btn" id="focus-fs-stop-btn" onclick="focusFsStop()">&#x25A0; Stop</button>
   </div>
   <button class="focus-fs-syllabus-btn" onclick="focusFsOpenSyllabus()">&#x1F4DA; Open Syllabus Tracker</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     CUSTOM POMODORO BUILDER MODAL
+════════════════════════════════════════ -->
+<div class="cpm-backdrop" id="cpm-backdrop" onclick="cpmBackdropClick(event)">
+  <div class="cpm-modal" onclick="event.stopPropagation()">
+    <div class="cpm-title">
+      <span>🍅</span>
+      <span id="cpm-modal-title">Build Custom Pomodoro Timer</span>
+      <button onclick="cpmClose()" style="margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:0.9rem;flex-shrink:0;">✕</button>
+    </div>
+
+    <div class="cpm-field">
+      <label class="cpm-label">Timer Name</label>
+      <input class="cpm-input" id="cpm-name-input" type="text" placeholder="e.g. Deep Work Cycle" maxlength="40">
+    </div>
+
+    <div class="cpm-phases-label">
+      <span>Phases</span>
+      <span style="font-size:0.67rem;color:var(--text-3);font-weight:500;text-transform:none;letter-spacing:0;">Each phase runs in order. Link a goal to require completion before advancing.</span>
+    </div>
+    <div class="cpm-phases-list" id="cpm-phases-list"></div>
+    <button class="cpm-add-phase-btn" onclick="cpmAddPhase()">＋ Add Phase</button>
+
+    <label class="cpm-lock-row" id="cpm-lock-row">
+      <input type="checkbox" id="cpm-lock-chk">
+      <div>
+        <div class="cpm-lock-title">🔒 Enable Lock Mode by default</div>
+        <div class="cpm-lock-desc">Fullscreen overlay. Exiting for 60+ seconds resets the timer. Goal-linked phases must be marked done before advancing.</div>
+      </div>
+    </label>
+
+    <div class="cpm-actions">
+      <button class="cpm-btn cpm-btn-cancel" onclick="cpmClose()">Cancel</button>
+      <button class="cpm-btn cpm-btn-primary" onclick="cpmSave()">✓ Save Timer</button>
+    </div>
+  </div>
 </div>
 
 </body>
